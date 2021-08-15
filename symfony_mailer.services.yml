@@ -1,0 +1,8 @@
+services:
+  symfony_mailer:
+    class: Drupal\symfony_mailer\Mailer
+    arguments: ['@event_dispatcher', '@renderer', '@module_handler', '@token', '@asset.resolver', '@asset.css.collection_renderer', '@config.factory']
+  twig.extension.css_inliner:
+    class: Twig\Extra\CssInliner\CssInlinerExtension
+    tags:
+      - { name: twig.extension }

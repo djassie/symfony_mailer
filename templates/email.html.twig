@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Default theme implementation for Symfony Email.
+ *
+ * Variables:
+ * - content: Email body content.
+ * - css: CSS to inline.
+ *
+ * @see template_preprocess_email()
+ *
+ * @ingroup themeable
+ */
+#}
+
+{% apply inline_css %}
+  {% if css %}
+    <style>{{ css }}</style>
+  {% endif %}
+  {{ content }}
+  {{ footer }}
+{% endapply %}
