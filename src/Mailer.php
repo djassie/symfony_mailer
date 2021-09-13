@@ -158,7 +158,7 @@ class Mailer implements MailerInterface {
     // Send.
     $mailer = new SymfonyMailer($message->getTransport(), NULL, $this->dispatcher);
     try {
-      ksm($message);
+      //ksm($message, $message->getHeaders());
       $mailer->send($message);
     }
     catch (RuntimeException $e) {
