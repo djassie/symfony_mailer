@@ -1,15 +1,15 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc\Annotation;
+namespace Drupal\symfony_mailer\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
 
 /**
- * Defines a MailBC item annotation object.
+ * Defines a MailBuilder item annotation object.
  *
  * @Annotation
  */
-class MailBc extends Plugin {
+class MailBuilder extends Plugin {
 
   /**
    * The plugin ID.

@@ -1,14 +1,14 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc;
+namespace Drupal\symfony_mailer;
 
-interface MailBcInterface {
+interface MailBuilderInterface {
 
   /**
    * Builds an email message.
    *
-   * @param \Drupal\symfony_mailer\Email $message
-   *   The message to build.
+   * @param \Drupal\symfony_mailer\Email $email
+   *   The email to build.
    * @param string $key
    *   A key to identify the email sent. The final message ID for email altering
    *   will be {$module}_{$key}.

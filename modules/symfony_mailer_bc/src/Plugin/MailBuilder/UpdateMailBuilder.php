@@ -1,20 +1,20 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc\Plugin\symfony_mailer_bc;
+namespace Drupal\symfony_mailer_bc\Plugin\MailBuilder;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\symfony_mailer_bc\MailBcInterface;
+use Drupal\symfony_mailer\MailBuilderInterface;
 
 /**
- * Defines the mail back-compatibility plug-in for update module.
+ * Defines the Mail Builder plug-in for update module.
  *
- * @MailBc(
+ * @MailBuilder(
  *   id = "update",
- *   label = @Translation("Mail BC for update module"),
+ *   label = @Translation("Mail Builder for update module"),
  * )
  */
-class UpdateMailBc implements MailBcInterface {
+class UpdateMailBuilder implements MailBuilderInterface {
 
   use StringTranslationTrait;
 

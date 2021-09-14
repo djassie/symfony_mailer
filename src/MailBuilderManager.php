@@ -1,18 +1,16 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc;
+namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Mail\MailManagerInterface;
-use Drupal\symfony_mailer\Email;
-use Drupal\symfony_mailer\MailerInterface;
 
 /**
- * Provides a back-compatibility shim for MailManager.
+ * Provides a Symfony Mailer replacement for MailManager.
  */
-class MailManagerBc extends DefaultPluginManager implements MailManagerInterface {
+class MailBuilderManager extends DefaultPluginManager implements MailManagerInterface {
 
   /**
    * The mailer.
@@ -35,8 +33,8 @@ class MailManagerBc extends DefaultPluginManager implements MailManagerInterface
    *   The renderer.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, MailerInterface $mailer) {
-    parent::__construct('Plugin/symfony_mailer_bc', $namespaces, $module_handler, 'Drupal\symfony_mailer_bc\MailBcInterface', 'Drupal\symfony_mailer_bc\Annotation\MailBc');
-    $this->setCacheBackend($cache_backend, 'symfony_mailer_bc_plugins');
+    parent::__construct('Plugin/MailBuilder', $namespaces, $module_handler, 'Drupal\symfony_mailer\MailBuilderInterface', 'Drupal\symfony_mailer\Annotation\MailBuilder');
+    $this->setCacheBackend($cache_backend, 'symfony_mailer_builder_plugins');
     $this->mailer = $mailer;
   }
 
