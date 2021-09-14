@@ -8,6 +8,7 @@ use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
@@ -19,6 +20,7 @@ use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 /**
  * Provides a Mailer service based on Symfony Mailer.
@@ -67,6 +69,13 @@ class Mailer implements MailerInterface {
    */
   protected $configFactory;
 
+  /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
   protected $defaultTransport;
 
   /**
@@ -86,14 +95,17 @@ class Mailer implements MailerInterface {
    *   The CSS asset collection renderer.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    */
-  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, Token $token, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory) {
+  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, Token $token, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager) {
     $this->dispatcher = $dispatcher;
     $this->renderer = $renderer;
     $this->moduleHandler = $module_handler;
     $this->token = $token;
     $this->assetResolver = $asset_resolver;
     $this->configFactory = $config_factory;
+    $this->languageManager = $language_manager;
     // @todo Maybe should override the options to pass -bs.
     // @see https://swiftmailer.symfony.com/docs/sending.html
     $this->defaultTransport = Transport::fromDsn('native://default');
@@ -102,117 +114,122 @@ class Mailer implements MailerInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(Email $message) {
+  public function newEmail($key) {
+    $site_config = $this->configFactory->get('system.site');
+    $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
+    $from = new Address($site_mail, $site_config->get('name'));
+    return new Email($this, $key, $from);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function send(Email $email) {
     // Mailing can invoke rendering (e.g., generating URLs, replacing tokens),
     // but e-mails are not HTTP responses: they're not cached, they don't have
     // attachments. Therefore we perform mailing inside its own render context,
     // to ensure it doesn't leak into the render context for the HTTP response
     // to the current request.
-    return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($message) {
-      return $this->doSend($message);
+    return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($email) {
+      return $this->doSend($email);
     });
   }
 
   /**
+   * Sends an email.
+   *
+   * @param \Drupal\symfony_mailer\Email $email
+   *   The email to send.
+   *
+   * @throws TransportExceptionInterface
    * @internal
    */
-  public function doSend(Email $message) {
-    // Set defaults.
-    $site_config = $this->configFactory->get('system.site');
-    $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
-    $from = new Address($site_mail, $site_config->get('name'));
+  public function doSend(Email $email) {
+    if ($langcode = $email->getLangcode()) {
+      // @todo This only switches language for config. We also want to switch
+      // all translations, tokens, url, etc.
+      // @see https://drupal.stackexchange.com/questions/156094/switch-a-language-programatically
+      $original_language = $this->languageManager->getConfigOverrideLanguage();
+      $this->languageManager->setConfigOverrideLanguage($this->languageManager->getLanguage($langcode));
+    }
 
-    if (empty($message->getFrom())) {
-      $message->from($from);
-    }
-    if (empty($message->getSender())) {
-      $message->sender($from);
-    }
-    if (empty($message->getReturnPath())) {
-      $message->returnPath($from);
-    }
-    $message->getHeaders()->addTextHeader('X-Mailer', 'Drupal');
-
-    if (!$message->getLibraries()) {
+    if (!$email->getLibraries()) {
       // @todo Configure mail theme.
       $mail_theme = \Drupal::theme()->getActiveTheme()->getName();
-      $message->addLibrary("$mail_theme/email");
+      $email->addLibrary("$mail_theme/email");
     }
-    if (!$message->getTransport()) {
-      $message->setTransport($this->defaultTransport);
+    if (!$email->getTransport()) {
+      $email->transport($this->defaultTransport);
     }
 
     // Call hooks
-    // @todo Also hook_email_KEY_alter().
-    $this->moduleHandler->alter('email', $message);
+    $this->moduleHandler->alter($email->getKeySuggestions('email', '_'), $email);
 
     // Set body.
-    $is_html = $message->isHtml();
-    $this->setBody($message, $is_html);
-    // @todo Allow caller to supply a custom plain text alternative.
-    if ($is_html) {
-      // Set plain text alternative.
-      $this->setBody($message, FALSE);
-    }
+    $this->setBody($email, $email->isHtml());
 
     // Send.
-    $mailer = new SymfonyMailer($message->getTransport(), NULL, $this->dispatcher);
+    $mailer = new SymfonyMailer($email->getTransport(), NULL, $this->dispatcher);
     try {
-      //ksm($message, $message->getHeaders());
-      $mailer->send($message);
+      //ksm($email, $email->getHeaders());
+      $mailer->send($email);
     }
     catch (RuntimeException $e) {
+      // @todo Log exception, print user-focused message.
       \Drupal::messenger()->addWarning($e->getMessage());
+    }
+
+    if (isset($original_language)) {
+      $this->languageManager->setConfigOverrideLanguage($original_language);
     }
   }
 
   /**
    * Sets the message body.
    *
-   * @param \Drupal\symfony_mailer\Email $message
-   *   The message to send.
+   * @param \Drupal\symfony_mailer\Email $email
+   *   The email to send.
    * @param boolean $is_html
    *   True if generating HTML output, false for plain text.
    *
    * @internal
    */
-  protected function setBody(Email $message, $is_html) {
+  protected function setBody(Email $email, $is_html) {
     $render = [
       '#theme' => 'email',
-      '#message' => $message,
+      '#email' => $email,
       '#is_html' => $is_html,
     ];
 
-    if ($is_html) {
-      $assets = (new AttachedAssets())->setLibraries($message->getLibraries());
-      // Request optimization so that the CssOptimizer performs essential
-      // processing such as @include.
-      $css_files = $this->assetResolver->getCssAssets($assets, TRUE);
-      $css = '';
-      foreach ($css_files as $file) {
-        $css .= file_get_contents($file['data']);
-      }
-      $render['#css'] = $css;
-    }
-
     $output = (string) $this->renderer->renderPlain($render);
-    $message->sending();
+    $email->sending();
 
     // Replace tokens.
-    if ($message->requiresTokenReplace()) {
-      $message->subject($this->token->replace(Html::escape($message->getSubject()), $message->getData(), $message->getTokenOptions()));
-      $output = $this->token->replace($output, $message->getData(), $message->getTokenOptions());
+    if ($email->requiresTokenReplace()) {
+      $email->subject($this->token->replace(Html::escape($email->getSubject()), $email->getParams(), $email->getTokenOptions()));
+      $output = $this->token->replace($output, $email->getParams(), $email->getTokenOptions());
     }
 
     // Convert relative URLs to absolute.
     $output = Html::transformRootRelativeUrlsToAbsolute($output, \Drupal::request()->getSchemeAndHttpHost());
 
     if ($is_html) {
-      $message->html($output);
+      // Inline CSS. Request optimization so that the CssOptimizer performs
+      // essential processing such as @include.
+      $assets = (new AttachedAssets())->setLibraries($email->getLibraries());
+      $css = '';
+      foreach ($this->assetResolver->getCssAssets($assets, TRUE) as $file) {
+        $css .= file_get_contents($file['data']);
+      }
+
+      $html_output = $css ? (new CssToInlineStyles())->convert($output, $css) : $output;
+      $email->html($html_output);
     }
-    else {
-      // @todo Or maybe use league/html-to-markdown?
-      $message->text((new Html2Text($output))->getText());
+
+    // Text body or plain-text alternative.
+    if (!$is_html || !$email->getTextBody()) {
+      // @todo Or maybe use league/html-to-markdown as symfony mailer does?
+      $email->text((new Html2Text($output))->getText());
     }
   }
 

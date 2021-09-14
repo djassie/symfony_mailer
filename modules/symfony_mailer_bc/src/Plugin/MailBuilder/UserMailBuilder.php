@@ -25,12 +25,12 @@ class UserMailBuilder implements MailBuilderInterface {
       '#text' => $mail_config->get("$key.body"),
       '#format' => $mail_config->get('text_format'),
     ];
-    $data = ['user' => $params['account']];
+    $params = ['user' => $params['account']];
     $token_options = ['langcode' => $langcode, 'callback' => 'user_mail_tokens', 'clear' => TRUE];
 
     $email->subject($subject)
       ->content($content)
-      ->data($data)
+      ->params($params)
       ->enableTokenReplace($token_options);
   }
 

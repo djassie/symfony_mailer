@@ -5,8 +5,8 @@
  *
  * Variables:
  * - content: Email body content.
- * - css: CSS to inline.
- * - data: Array of data that can be used to replace values in template text.
+ * - params: Array of parameters that can be used to replace values in template
+ *   text.
  *
  * @see template_preprocess_email()
  *
@@ -14,9 +14,4 @@
  */
 #}
 
-{% apply inline_css %}
-  {% if css %}
-    <style>{{ css }}</style>
-  {% endif %}
-  {{ content }}
-{% endapply %}
+{{ content }}

@@ -10,8 +10,7 @@ interface MailBuilderInterface {
    * @param \Drupal\symfony_mailer\Email $email
    *   The email to build.
    * @param string $key
-   *   A key to identify the email sent. The final message ID for email altering
-   *   will be {$module}_{$key}.
+   *   The second entry in the email key, which identifies the TYPE.
    * @param string $to
    *   The email address or addresses where the message will be sent to. The
    *   formatting of this string will be validated with the

@@ -51,14 +51,17 @@ class MailBuilderManager extends DefaultPluginManager implements MailManagerInte
    * {@inheritdoc}
    */
   public function mail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
-    $email = (new Email("$module.$key"))->addTo($to);
+    $email = $this->mailer->newEmail([$module, $key])
+      ->addTo($to)
+      ->langcode($langcode)
+      ->params($params);
     if ($reply) {
       $email->addReplyTo($reply);
     }
 
     // Retrieve the responsible implementation for this message.
     $this->getInstance(['module' => $module])->mail($email, $key, $to, $langcode, $params);
-    $this->mailer->send($email);
+    $email->send();
   }
 
 }
