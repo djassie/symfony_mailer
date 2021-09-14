@@ -15,7 +15,7 @@ interface MailerInterface
    * @param array $key
    *   Message key array, in the form [MODULE, TYPE, INSTANCE].
    *
-   * @return
+   * @return Drupal\symfony_mailer\Email
    *   New email.
    */
   public function newEmail(array $key);
@@ -26,7 +26,8 @@ interface MailerInterface
    * @param \Drupal\symfony_mailer\Email $email
    *   The email to send.
    *
-   * @throws TransportExceptionInterface
+   * @return bool
+   *   Whether successful.
    */
   public function send(Email $email);
 

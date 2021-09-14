@@ -141,7 +141,9 @@ class Mailer implements MailerInterface {
    * @param \Drupal\symfony_mailer\Email $email
    *   The email to send.
    *
-   * @throws TransportExceptionInterface
+   * @return bool
+   *   Whether successful.
+   *
    * @internal
    */
   public function doSend(Email $email) {
@@ -173,15 +175,19 @@ class Mailer implements MailerInterface {
     try {
       //ksm($email, $email->getHeaders());
       $mailer->send($email);
+      $result = TRUE;
     }
     catch (RuntimeException $e) {
       // @todo Log exception, print user-focused message.
       \Drupal::messenger()->addWarning($e->getMessage());
+      $result = FALSE;
     }
 
     if (isset($original_language)) {
       $this->languageManager->setConfigOverrideLanguage($original_language);
     }
+
+    return $result;
   }
 
   /**

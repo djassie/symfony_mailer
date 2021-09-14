@@ -2,6 +2,7 @@
 
 namespace Drupal\symfony_mailer;
 
+use Drupal\Component\Plugin\FallbackPluginManagerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -10,7 +11,7 @@ use Drupal\Core\Mail\MailManagerInterface;
 /**
  * Provides a Symfony Mailer replacement for MailManager.
  */
-class MailBuilderManager extends DefaultPluginManager implements MailManagerInterface {
+class MailBuilderManager extends DefaultPluginManager implements MailManagerInterface, FallbackPluginManagerInterface {
 
   /**
    * The mailer.
@@ -50,6 +51,13 @@ class MailBuilderManager extends DefaultPluginManager implements MailManagerInte
   /**
    * {@inheritdoc}
    */
+  public function getFallbackPluginId($plugin_id, array $configuration = []) {
+    return '__legacy';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function mail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
     $email = $this->mailer->newEmail([$module, $key])
       ->addTo($to)
@@ -61,7 +69,8 @@ class MailBuilderManager extends DefaultPluginManager implements MailManagerInte
 
     // Retrieve the responsible implementation for this message.
     $this->getInstance(['module' => $module])->mail($email, $key, $to, $langcode, $params);
-    $email->send();
+    $result = $email->send();
+    return ['result' => $result];
   }
 
 }
