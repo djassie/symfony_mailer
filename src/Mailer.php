@@ -2,25 +2,13 @@
 
 namespace Drupal\symfony_mailer;
 
-use Drupal\Component\Render\MarkupInterface;
-use Drupal\Component\Utility\Html;
-use Drupal\Core\Asset\AssetResolverInterface;
-use Drupal\Core\Asset\AttachedAssets;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
-use Drupal\Core\Utility\Token;
-use Html2Text\Html2Text;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
-use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 /**
  * Provides a Mailer service based on Symfony Mailer.
@@ -42,32 +30,11 @@ class Mailer implements MailerInterface {
   protected $renderer;
 
   /**
-   * The module handler to invoke the alter hook.
+   * The language default.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var \Drupal\Core\Language\LanguageDefault
    */
-  protected $moduleHandler;
-
-  /**
-   * The token service.
-   *
-   * @var \Drupal\Core\Utility\Token
-   */
-  protected $token;
-
-  /**
-   * The asset resolver.
-   *
-   * @var \Drupal\Core\Asset\AssetResolverInterface
-   */
-  protected $assetResolver;
-
-  /**
-   * The configuration factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
+  protected $languageDefault;
 
   /**
    * The language manager.
@@ -76,8 +43,6 @@ class Mailer implements MailerInterface {
    */
   protected $languageManager;
 
-  protected $defaultTransport;
-
   /**
    * Constructs the Mailer object.
    *
@@ -85,40 +50,16 @@ class Mailer implements MailerInterface {
    *   The event dispatcher.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\Utility\Token $token
-   *   The token service.
-   * @param \Drupal\Core\Asset\AssetResolverInterface $asset_resolver
-   *   The asset resolver.
-   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $css_collection_renderer
-   *   The CSS asset collection renderer.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
+   * @param \Drupal\Core\Language\LanguageDefault $default_language
+   *   The default language.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, Token $token, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager) {
+  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, LanguageDefault $language_default, LanguageManagerInterface $language_manager) {
     $this->dispatcher = $dispatcher;
     $this->renderer = $renderer;
-    $this->moduleHandler = $module_handler;
-    $this->token = $token;
-    $this->assetResolver = $asset_resolver;
-    $this->configFactory = $config_factory;
+    $this->languageDefault = $language_default;
     $this->languageManager = $language_manager;
-    // @todo Maybe should override the options to pass -bs.
-    // @see https://swiftmailer.symfony.com/docs/sending.html
-    $this->defaultTransport = Transport::fromDsn('native://default');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function newEmail($key) {
-    $site_config = $this->configFactory->get('system.site');
-    $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
-    $from = new Address($site_mail, $site_config->get('name'));
-    return new Email($this, $key, $from);
   }
 
   /**
@@ -147,33 +88,33 @@ class Mailer implements MailerInterface {
    * @internal
    */
   public function doSend(Email $email) {
-    if ($langcode = $email->getLangcode()) {
-      // @todo This only switches language for config. We also want to switch
-      // all translations, tokens, url, etc.
-      // @see https://drupal.stackexchange.com/questions/156094/switch-a-language-programatically
-      $original_language = $this->languageManager->getConfigOverrideLanguage();
-      $this->languageManager->setConfigOverrideLanguage($this->languageManager->getLanguage($langcode));
+    $langcode = $email->getLangcode();
+    $currentLangcode = $this->languageManager->getCurrentLanguage()->getId();
+    $mustSwitch = isset($langcode) && $langcode !== $currentLangcode;
+
+    if ($mustSwitch) {
+      $this->changeActiveLanguage($langcode);
     }
 
-    if (!$email->getLibraries()) {
-      // @todo Configure mail theme.
-      $mail_theme = \Drupal::theme()->getActiveTheme()->getName();
-      $email->addLibrary("$mail_theme/email");
-    }
-    if (!$email->getTransport()) {
-      $email->transport($this->defaultTransport);
-    }
+    // Call pre-render hooks
+    $this->alter('pre', $email);
 
-    // Call hooks
-    $this->moduleHandler->alter($email->getKeySuggestions('email', '_'), $email);
+    $render = [
+      '#theme' => 'email',
+      '#email' => $email,
+    ];
 
-    // Set body.
-    $this->setBody($email, $email->isHtml());
+    $output = (string) $this->renderer->renderPlain($render);
+    $email->sending();
+    $email->html($output);
+
+    // Call post-render hooks
+    $this->alter('post', $email);
 
     // Send.
     $mailer = new SymfonyMailer($email->getTransport(), NULL, $this->dispatcher);
     try {
-      //ksm($email, $email->getHeaders());
+      ksm($email, $email->getHeaders());
       $mailer->send($email);
       $result = TRUE;
     }
@@ -183,59 +124,61 @@ class Mailer implements MailerInterface {
       $result = FALSE;
     }
 
-    if (isset($original_language)) {
-      $this->languageManager->setConfigOverrideLanguage($original_language);
+    if ($mustSwitch) {
+      $this->changeActiveLanguage($currentLangcode);
     }
 
     return $result;
   }
 
   /**
-   * Sets the message body.
+   * Changes the active language for translations.
    *
-   * @param \Drupal\symfony_mailer\Email $email
-   *   The email to send.
-   * @param boolean $is_html
-   *   True if generating HTML output, false for plain text.
-   *
-   * @internal
+   * @param string $langcode
+   *   The langcode.
    */
-  protected function setBody(Email $email, $is_html) {
-    $render = [
-      '#theme' => 'email',
-      '#email' => $email,
-      '#is_html' => $is_html,
-    ];
-
-    $output = (string) $this->renderer->renderPlain($render);
-    $email->sending();
-
-    // Replace tokens.
-    if ($email->requiresTokenReplace()) {
-      $email->subject($this->token->replace(Html::escape($email->getSubject()), $email->getParams(), $email->getTokenOptions()));
-      $output = $this->token->replace($output, $email->getParams(), $email->getTokenOptions());
+  protected function changeActiveLanguage($langcode) {
+    // Language switching adapted from commerce module.
+    // @see \Drupal\commerce\MailHandler::sendMail
+    if (!$this->languageManager->isMultilingual()) {
+      return;
     }
 
-    // Convert relative URLs to absolute.
-    $output = Html::transformRootRelativeUrlsToAbsolute($output, \Drupal::request()->getSchemeAndHttpHost());
-
-    if ($is_html) {
-      // Inline CSS. Request optimization so that the CssOptimizer performs
-      // essential processing such as @include.
-      $assets = (new AttachedAssets())->setLibraries($email->getLibraries());
-      $css = '';
-      foreach ($this->assetResolver->getCssAssets($assets, TRUE) as $file) {
-        $css .= file_get_contents($file['data']);
-      }
-
-      $html_output = $css ? (new CssToInlineStyles())->convert($output, $css) : $output;
-      $email->html($html_output);
+    $language = $this->languageManager->getLanguage($langcode);
+    if (!$language) {
+      return;
     }
+    // The language manager has no method for overriding the default
+    // language, like it does for config overrides. We have to change the
+    // default language service's current language.
+    // @see https://www.drupal.org/project/drupal/issues/3029010
+    $this->languageDefault->set($language);
+    $this->languageManager->setConfigOverrideLanguage($language);
+    $this->languageManager->reset();
 
-    // Text body or plain-text alternative.
-    if (!$is_html || !$email->getTextBody()) {
-      // @todo Or maybe use league/html-to-markdown as symfony mailer does?
-      $email->text((new Html2Text($output))->getText());
+    // The default string_translation service, TranslationManager, has a
+    // setDefaultLangcode method. However, this method is not present on
+    // either of its interfaces. Therefore we check for the concrete class
+    // here so that any swapped service does not break the application.
+    // @see https://www.drupal.org/project/drupal/issues/3029003
+    $string_translation = $this->getStringTranslation();
+    if ($string_translation instanceof TranslationManager) {
+      $string_translation->setDefaultLangcode($language->getId());
+      $string_translation->reset();
+    }
+  }
+
+  /**
+   * Calls the alter functions.
+   *
+   * @param string $type
+   *   The callback type: pre or post.
+   * @param \Drupal\symfony_mailer\Email $email
+   *   The email to alter.
+   */
+  protected function alter($type, $email) {
+    foreach ($email->getAlter($type) as $callback) {
+      $callback($email);
     }
   }
 

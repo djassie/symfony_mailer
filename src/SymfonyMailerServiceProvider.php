@@ -18,7 +18,7 @@ class SymfonyMailerServiceProvider extends ServiceProviderBase {
     $definition = $container->getDefinition('plugin.manager.mail');
     $definition->setClass('Drupal\symfony_mailer\MailBuilderManager')
       ->setArguments(array_slice($definition->getArguments(), 0, 3))
-      ->addArgument(new Reference('symfony_mailer'));
+      ->addArgument(new Reference('email_factory'));
   }
 
 }

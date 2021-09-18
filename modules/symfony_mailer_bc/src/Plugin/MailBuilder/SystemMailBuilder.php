@@ -26,7 +26,7 @@ class SystemMailBuilder implements MailBuilderInterface {
 
     $email->subject($context['subject'])
       ->content($content)
-      ->enableTokenReplace($params['context']);
+      ->addParam('token_options', $params['context']);
   }
 
 }

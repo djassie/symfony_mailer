@@ -14,11 +14,11 @@ use Drupal\Core\Mail\MailManagerInterface;
 class MailBuilderManager extends DefaultPluginManager implements MailManagerInterface, FallbackPluginManagerInterface {
 
   /**
-   * The mailer.
+   * The email factory.
    *
-   * @var Drupal\symfony_mailer\MailerInterface
+   * @var Drupal\symfony_mailer\EmailFactory
    */
-  protected $mailer;
+  protected $emailFactory;
 
   /**
    * Constructs the MailManager object.
@@ -30,13 +30,11 @@ class MailBuilderManager extends DefaultPluginManager implements MailManagerInte
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, MailerInterface $mailer) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EmailFactory $email_factory) {
     parent::__construct('Plugin/MailBuilder', $namespaces, $module_handler, 'Drupal\symfony_mailer\MailBuilderInterface', 'Drupal\symfony_mailer\Annotation\MailBuilder');
     $this->setCacheBackend($cache_backend, 'symfony_mailer_builder_plugins');
-    $this->mailer = $mailer;
+    $this->emailFactory = $email_factory;
   }
 
   /**
@@ -59,7 +57,7 @@ class MailBuilderManager extends DefaultPluginManager implements MailManagerInte
    * {@inheritdoc}
    */
   public function mail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
-    $email = $this->mailer->newEmail([$module, $key])
+    $email = $this->emailFactory->newEmail([$module, $key])
       ->addTo($to)
       ->langcode($langcode)
       ->params($params);

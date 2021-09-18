@@ -17,9 +17,10 @@ class Email extends SymfonyEmail {
    */
   protected $mailer;
 
+  protected $alter = ['pre' => [], 'post' => []];
+
   protected array $key;
   protected array $content = [];
-  protected bool $isHtml = TRUE;
   protected $libraries = [];
 
   /**
@@ -31,9 +32,6 @@ class Email extends SymfonyEmail {
 
   protected $langcode;
   protected $params = [];
-  protected $tokenReplace = FALSE;
-  protected $tokenData;
-  protected $tokenOptions;
   protected $sending = FALSE;
 
   /**
@@ -48,14 +46,10 @@ class Email extends SymfonyEmail {
    * @param Symfony\Component\Mime\Address $from
    *   Default to use for from, sender and return path headers.
    */
-  public function __construct(MailerInterface $mailer, array $key, Address $from) {
+  public function __construct(MailerInterface $mailer, array $key) {
     parent::__construct();
     $this->mailer = $mailer;
     $this->key = $key;
-    $this->from($from);
-    $this->sender($from);
-    $this->returnPath($from);
-    $this->getHeaders()->addTextHeader('X-Mailer', 'Drupal');
   }
 
   /**
@@ -63,6 +57,28 @@ class Email extends SymfonyEmail {
    */
   public function send() {
     $this->mailer->send($this);
+  }
+
+  /**
+   * Gets alter callbacks.
+   *
+   * @param string $type
+   *   The callback type: pre or post.
+   */
+  public function getAlter(string $type) {
+    return $this->alter[$type];
+  }
+
+  /**
+   * Add an alter callback.
+   *
+   * @param string $type
+   *   The callback type: pre or post.
+   * @param callable $callable
+   *   The function to call.
+   */
+  public function addAlter(string $type, callable $callable) {
+    $this->alter[$type][] = $callable;
   }
 
   /**
@@ -157,29 +173,6 @@ class Email extends SymfonyEmail {
   }
 
   /**
-   * Sets whether to send the email as HTML.
-   *
-   * @param bool $is_html
-   *   TRUE to send as HTML content type, FALSE to send as plain text.
-   *
-   * @return $this
-   */
-  public function enableHtml(bool $is_html) {
-    $this->isHtml = $is_html;
-    return $this;
-  }
-
-  /**
-   * Queries whether to send the email as HTML.
-   *
-   * @return bool
-   *   TRUE to send as HTML content type, FALSE to send as plain text.
-   */
-  public function isHtml() {
-    return $this->isHtml;
-  }
-
-  /**
    * Adds an asset library to use as mail CSS.
    *
    * @param string $library
@@ -249,7 +242,7 @@ class Email extends SymfonyEmail {
   }
 
   /**
-   * Sets parameters to pass to the email template and for token replacement.
+   * Sets parameters for hooks and to pass to the email template.
    *
    * @param array $params
    *   (optional) An array of keyed objects.
@@ -262,6 +255,21 @@ class Email extends SymfonyEmail {
   }
 
   /**
+   * Adds a parameter for hooks and to pass to the email template.
+   *
+   * @param string $key
+   *   Parameter key to set.
+   * @param $value
+   *   Parameter value to set.
+   *
+   * @return $this
+   */
+  public function addParam(string $key, $value) {
+    $this->params[$key] = $value;
+    return $this;
+  }
+
+  /**
    * Gets parameters to pass to the email template and for token replacement.
    *
    * @return array
@@ -269,29 +277,6 @@ class Email extends SymfonyEmail {
    */
   public function getParams() {
     return $this->params;
-  }
-
-  /**
-   * Enables tokens replacement in the message subject and body.
-   *
-   * @param array $options
-   *   (optional) A keyed array of settings and flags to control the token
-   *   replacement process.
-   *
-   * @return $this
-   */
-  public function enableTokenReplace(array $options = []) {
-    $this->tokenReplace = TRUE;
-    $this->tokenOptions = $options;
-    return $this;
-  }
-
-  public function requiresTokenReplace() {
-    return $this->tokenReplace;
-  }
-
-  public function getTokenOptions() {
-    return $this->tokenOptions;
   }
 
   /**
