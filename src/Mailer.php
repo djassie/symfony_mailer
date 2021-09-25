@@ -2,6 +2,7 @@
 
 namespace Drupal\symfony_mailer;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\RenderContext;
@@ -30,6 +31,13 @@ class Mailer implements MailerInterface {
   protected $renderer;
 
   /**
+   * The module handler to invoke the alter hook.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * The language default.
    *
    * @var \Drupal\Core\Language\LanguageDefault
@@ -50,14 +58,17 @@ class Mailer implements MailerInterface {
    *   The event dispatcher.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler to invoke the alter hook with.
    * @param \Drupal\Core\Language\LanguageDefault $default_language
    *   The default language.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, LanguageDefault $language_default, LanguageManagerInterface $language_manager) {
+  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, LanguageDefault $language_default, LanguageManagerInterface $language_manager) {
     $this->dispatcher = $dispatcher;
     $this->renderer = $renderer;
+    $this->moduleHandler = $module_handler;
     $this->languageDefault = $language_default;
     $this->languageManager = $language_manager;
   }
@@ -88,6 +99,10 @@ class Mailer implements MailerInterface {
    * @internal
    */
   public function doSend(Email $email) {
+    if ($email->getHtmlBody()) {
+      throw new \exception('Use the content() method to set the message body.');
+    }
+
     $langcode = $email->getLangcode();
     $currentLangcode = $this->languageManager->getCurrentLanguage()->getId();
     $mustSwitch = isset($langcode) && $langcode !== $currentLangcode;
@@ -96,19 +111,20 @@ class Mailer implements MailerInterface {
       $this->changeActiveLanguage($langcode);
     }
 
-    // Call pre-render hooks
+    // Call alter hooks.
+    $this->moduleHandler->alter($email->getKeySuggestions('email', '_'), $email);
+    return $email;
+
+    // Call pre-render hooks.
     $this->alter('pre', $email);
 
     $render = [
       '#theme' => 'email',
       '#email' => $email,
     ];
+    $email->html($this->renderer->renderPlain($render));
 
-    $output = (string) $this->renderer->renderPlain($render);
-    $email->sending();
-    $email->html($output);
-
-    // Call post-render hooks
+    // Call post-render hooks.
     $this->alter('post', $email);
 
     // Send.
@@ -116,7 +132,7 @@ class Mailer implements MailerInterface {
     $mailer = new SymfonyMailer($dsn, NULL, $this->dispatcher);
 
     try {
-      ksm($email, $email->getHeaders());
+      //ksm($email, $email->getHeaders());
       $mailer->send($email);
       $result = TRUE;
     }
@@ -150,18 +166,18 @@ class Mailer implements MailerInterface {
     if (!$language) {
       return;
     }
-    // The language manager has no method for overriding the default
-    // language, like it does for config overrides. We have to change the
-    // default language service's current language.
+    // The language manager has no method for overriding the default language,
+    // like it does for config overrides. We have to change the default
+    // language service's current language.
     // @see https://www.drupal.org/project/drupal/issues/3029010
     $this->languageDefault->set($language);
     $this->languageManager->setConfigOverrideLanguage($language);
     $this->languageManager->reset();
 
     // The default string_translation service, TranslationManager, has a
-    // setDefaultLangcode method. However, this method is not present on
-    // either of its interfaces. Therefore we check for the concrete class
-    // here so that any swapped service does not break the application.
+    // setDefaultLangcode method. However, this method is not present on either
+    // of its interfaces. Therefore we check for the concrete class here so
+    // that any swapped service does not break the application.
     // @see https://www.drupal.org/project/drupal/issues/3029003
     $string_translation = $this->getStringTranslation();
     if ($string_translation instanceof TranslationManager) {

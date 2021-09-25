@@ -6,7 +6,6 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Utility\Token;
 use Html2Text\Html2Text;
@@ -17,7 +16,7 @@ use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 /**
  * Provides a Mailer service based on Symfony Mailer.
  */
-class EMailFactory {
+class EmailFactory {
 
   /**
    * The mailer service.
@@ -25,13 +24,6 @@ class EMailFactory {
    * @var \Drupal\symfony_mailer\MailerInterface
    */
   protected $mailer;
-
-  /**
-   * The module handler to invoke the alter hook.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
 
   /**
    * The token service.
@@ -66,8 +58,6 @@ class EMailFactory {
    *
    * @param Drupal\symfony_mailer\MailerInterface $mailer
    *   Mailer service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to invoke the alter hook with.
    * @param \Drupal\Core\Utility\Token $token
    *   The token service.
    * @param \Drupal\Core\Asset\AssetResolverInterface $asset_resolver
@@ -75,9 +65,8 @@ class EMailFactory {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
    */
-  public function __construct(MailerInterface $mailer, ModuleHandlerInterface $module_handler, Token $token, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory) {
+  public function __construct(MailerInterface $mailer, Token $token, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory) {
     $this->mailer = $mailer;
-    $this->moduleHandler = $module_handler;
     $this->token = $token;
     $this->assetResolver = $asset_resolver;
     $this->configFactory = $config_factory;
@@ -104,12 +93,8 @@ class EMailFactory {
 
     $email->addAlter('post', [$this, 'tokenReplace']);
     $email->addAlter('post', [$this, 'urlToAbsolute']);
-    $email->addAlter('post', [$this, 'inlineCss']);
     $email->addAlter('post', [$this, 'htmlToText']);
-
-    // Call hooks
-    $this->moduleHandler->alter($email->getKeySuggestions('email', '_'), $email);
-    return $email;
+    $email->addAlter('post', [$this, 'inlineCss']);
   }
 
   /**

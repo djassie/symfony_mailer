@@ -4,7 +4,6 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\PlainTextOutput;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
 class Email extends SymfonyEmail {
@@ -36,14 +35,12 @@ class Email extends SymfonyEmail {
   /**
    * Constructs the Email object.
    *
-   * Use MailerInterface::newEmail() instead of calling this directly.
+   * Use MailerFactory::newEmail() instead of calling this directly.
    *
    * @param Drupal\symfony_mailer\MailerInterface $mailer
    *   Mailer service.
    * @param array $key
    *   Message key array, in the form [MODULE, TYPE, INSTANCE].
-   * @param Symfony\Component\Mime\Address $from
-   *   Default to use for from, sender and return path headers.
    */
   public function __construct(MailerInterface $mailer, array $key) {
     parent::__construct();
@@ -288,25 +285,6 @@ class Email extends SymfonyEmail {
       $subject = PlainTextOutput::renderFromHtml($subject);
     }
     return parent::subject($subject);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function html($body, string $charset = 'utf-8') {
-    if (!$this->sending) {
-      throw new \exception('Use the content() method to set the message body.');
-    }
-    return parent::html($body, $charset);
-  }
-
-  /**
-   * Marks that the email is sending.
-   *
-   * @internal
-   */
-  public function sending() {
-    $this->sending = TRUE;
   }
 
 }
