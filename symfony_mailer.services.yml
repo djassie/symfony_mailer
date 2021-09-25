@@ -5,6 +5,9 @@ services:
   email_factory:
     class: Drupal\symfony_mailer\EmailFactory
     arguments: ['@symfony_mailer', '@module_handler', '@token', '@asset.resolver', '@config.factory']
+  plugin.manager.mailer_transport:
+    class: Drupal\symfony_mailer\TransportManager
+    parent: default_plugin_manager
   twig.extension.css_inliner:
     class: Twig\Extra\CssInliner\CssInlinerExtension
     tags:

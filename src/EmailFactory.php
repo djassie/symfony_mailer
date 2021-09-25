@@ -10,7 +10,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Utility\Token;
 use Html2Text\Html2Text;
-use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
@@ -83,9 +82,6 @@ class EMailFactory {
     $this->assetResolver = $asset_resolver;
     $this->configFactory = $config_factory;
     $this->cssInliner = new CssToInlineStyles();
-    // @todo Maybe should override the options to pass -bs.
-    // @see https://swiftmailer.symfony.com/docs/sending.html
-    $this->defaultTransport = Transport::fromDsn('native://default');
   }
 
   /**
@@ -105,7 +101,6 @@ class EMailFactory {
     // @todo Configure mail theme.
     $mail_theme = \Drupal::theme()->getActiveTheme()->getName();
     $email->addLibrary("$mail_theme/email");
-    $email->transport($this->defaultTransport);
 
     $email->addAlter('post', [$this, 'tokenReplace']);
     $email->addAlter('post', [$this, 'urlToAbsolute']);

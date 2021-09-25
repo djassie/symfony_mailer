@@ -4,7 +4,6 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\PlainTextOutput;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
@@ -196,23 +195,23 @@ class Email extends SymfonyEmail {
   }
 
   /**
-   * Sets the mail transport to use.
+   * Sets the mail transport ID to use.
    *
-   * @param Symfony\Component\Mailer\Transport\TransportInterface $transport
-   *   Transport interface.
+   * @param string $transport
+   *   Transport ID.
    *
    * @return $this
    */
-  public function transport(TransportInterface $transport) {
+  public function transport(string $transport) {
     $this->transport = $transport;
     return $this;
   }
 
   /**
-   * Gets the mail transport to use.
+   * Gets the mail transport ID to use.
    *
-   * @return Symfony\Component\Mailer\Transport\TransportInterface
-   *   Transport interface.
+   * @return string
+   *   Transport ID.
    */
   public function getTransport() {
     return $this->transport;

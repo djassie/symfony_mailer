@@ -1,0 +1,25 @@
+# Schema for the configuration files of the Symfony Mailer module.
+
+symfony_mailer.mailer_transport.*:
+  type: config_entity
+  label: 'Transport'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    plugin:
+      type: string
+      label: 'Plugin'
+    configuration:
+      type: symfony_mailer.mailer_transport.[%parent.plugin]
+
+symfony_mailer.mailer_transport.dsn:
+  type: mapping
+  label: 'DSN transport'
+  mapping:
+    dsn:
+      type: string
+      label: 'DSN'

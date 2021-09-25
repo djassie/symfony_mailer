@@ -112,7 +112,9 @@ class Mailer implements MailerInterface {
     $this->alter('post', $email);
 
     // Send.
-    $mailer = new SymfonyMailer($email->getTransport(), NULL, $this->dispatcher);
+    $dsn = MailerTransport::loadDsn($email->getTransport());
+    $mailer = new SymfonyMailer($dsn, NULL, $this->dispatcher);
+
     try {
       ksm($email, $email->getHeaders());
       $mailer->send($email);
