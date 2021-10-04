@@ -4,6 +4,7 @@ namespace Drupal\symfony_mailer_bc\Plugin\MailBuilder;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\symfony_mailer\MailBuilderInterface;
+use Drupal\symfony_mailer\Email;
 
 /**
  * Defines the Legacy Mail Builder plug-in that calls hook_mail().
@@ -18,7 +19,7 @@ class LegacyMailBuilder implements MailBuilderInterface {
   /**
    * {@inheritdoc}
    */
-  public function mail($email, $key, $to, $langcode, $params) {
+  public function build(Email $email) {
     $message = $this->getMessage($email);
     $email->subject($message['subject']);
 

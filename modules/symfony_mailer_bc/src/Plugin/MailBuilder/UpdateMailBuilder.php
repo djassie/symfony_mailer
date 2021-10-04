@@ -5,6 +5,7 @@ namespace Drupal\symfony_mailer_bc\Plugin\MailBuilder;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\MailBuilderInterface;
+use Drupal\symfony_mailer\Email;
 
 /**
  * Defines the Mail Builder plug-in for update module.
@@ -21,9 +22,9 @@ class UpdateMailBuilder implements MailBuilderInterface {
   /**
    * {@inheritdoc}
    */
-  public function mail($email, $key, $to, $langcode, $params) {
+  public function build(Email $email) {
     $email->subject($this->t('New release(s) available for @site_name', ['@site_name' => \Drupal::config('system.site')->get('name')]));
-    foreach ($params as $msg_type => $msg_reason) {
+    foreach ($email->getParams() as $msg_type => $msg_reason) {
       $email->appendParagraph(_update_message_text($msg_type, $msg_reason, $langcode));
     }
     $email->appendParagraph($this->t('See the available updates page for more information:') . "\n" . Url::fromRoute('update.status')->toString());

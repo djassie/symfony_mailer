@@ -26,6 +26,13 @@ class EmailFactory {
   protected $mailer;
 
   /**
+   * The mail builder manager.
+   *
+   * @var \Drupal\symfony_mailer\MailBuilderManager
+   */
+  protected $mailBuilderManager;
+
+  /**
    * The token service.
    *
    * @var \Drupal\Core\Utility\Token
@@ -57,7 +64,9 @@ class EmailFactory {
    * Constructs the Mailer object.
    *
    * @param Drupal\symfony_mailer\MailerInterface $mailer
-   *   Mailer service.
+   *   The mailer service.
+   * @param Drupal\symfony_mailer\MailBuilderManager
+   *   The mail builder manager.
    * @param \Drupal\Core\Utility\Token $token
    *   The token service.
    * @param \Drupal\Core\Asset\AssetResolverInterface $asset_resolver
@@ -65,8 +74,9 @@ class EmailFactory {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
    */
-  public function __construct(MailerInterface $mailer, Token $token, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory) {
+  public function __construct(MailerInterface $mailer, MailBuilderManager $mail_builder_manager, Token $token, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory) {
     $this->mailer = $mailer;
+    $this->mailBuilderManager = $mail_builder_manager;
     $this->token = $token;
     $this->assetResolver = $asset_resolver;
     $this->configFactory = $config_factory;
@@ -91,10 +101,24 @@ class EmailFactory {
     $mail_theme = \Drupal::theme()->getActiveTheme()->getName();
     $email->addLibrary("$mail_theme/email");
 
+    foreach ($email->getKeySuggestions('', '.') as $id) {
+      $this->addBuilder($email, $id);
+    }
+
     $email->addAlter('post', [$this, 'tokenReplace']);
     $email->addAlter('post', [$this, 'urlToAbsolute']);
     $email->addAlter('post', [$this, 'htmlToText']);
     $email->addAlter('post', [$this, 'inlineCss']);
+    return $email;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addBuilder(Email $email, string $id) {
+    if ($this->mailBuilderManager->hasDefinition($id)) {
+      $email->addAlter('pre', [$this->mailBuilderManager->createInstance($id), 'build']);
+    }
   }
 
   /**

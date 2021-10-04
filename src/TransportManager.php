@@ -7,7 +7,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
- * Provides a mailer transport plugin manager.
+ * Provides the mailer transport plugin manager.
  */
 class TransportManager extends DefaultPluginManager {
 

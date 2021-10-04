@@ -2,26 +2,18 @@
 
 namespace Drupal\symfony_mailer;
 
-use Drupal\Component\Plugin\FallbackPluginManagerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Mail\MailManagerInterface;
 
 /**
- * Provides a Symfony Mailer replacement for MailManager.
+ * Provides the mail builder plugin manager.
  */
-class MailBuilderManager extends DefaultPluginManager implements MailManagerInterface, FallbackPluginManagerInterface {
+class MailBuilderManager extends DefaultPluginManager {
 
   /**
-   * The email factory.
-   *
-   * @var Drupal\symfony_mailer\EmailFactory
-   */
-  protected $emailFactory;
-
-  /**
-   * Constructs the MailManager object.
+   * Constructs the MailBuilderManager object.
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
@@ -31,44 +23,9 @@ class MailBuilderManager extends DefaultPluginManager implements MailManagerInte
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EmailFactory $email_factory) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/MailBuilder', $namespaces, $module_handler, 'Drupal\symfony_mailer\MailBuilderInterface', 'Drupal\symfony_mailer\Annotation\MailBuilder');
     $this->setCacheBackend($cache_backend, 'symfony_mailer_builder_plugins');
-    $this->emailFactory = $email_factory;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getInstance(array $options) {
-    if (isset($options['module'])) {
-      return $this->createInstance($options['module']);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFallbackPluginId($plugin_id, array $configuration = []) {
-    return '__legacy';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function mail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
-    $email = $this->emailFactory->newEmail([$module, $key])
-      ->addTo($to)
-      ->langcode($langcode)
-      ->params($params);
-    if ($reply) {
-      $email->addReplyTo($reply);
-    }
-
-    // Retrieve the responsible implementation for this message.
-    $this->getInstance(['module' => $module])->mail($email, $key, $to, $langcode, $params);
-    $result = $email->send();
-    return ['result' => $result];
   }
 
 }

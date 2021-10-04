@@ -60,6 +60,9 @@ class Email extends SymfonyEmail {
    *
    * @param string $type
    *   The callback type: pre or post.
+   *
+   * @return array
+   *   Array of callbacks.
    */
   public function getAlter(string $type) {
     return $this->alter[$type];
@@ -100,15 +103,16 @@ class Email extends SymfonyEmail {
    *   each part of the key.
    */
   public function getKeySuggestions(string $initial, string $join) {
-  $key_array = $this->key;
-  $key = $initial;
-  $suggestions[] = $key;
-  while ($key_array) {
-    $key .= $join . array_shift($key_array);
+    $key_array = $this->key;
+    $key = $initial ?: array_shift($key_array);
     $suggestions[] = $key;
-  }
 
-  return $suggestions;
+    while ($key_array) {
+      $key .= $join . array_shift($key_array);
+      $suggestions[] = $key;
+    }
+
+    return $suggestions;
   }
 
   /**
@@ -273,6 +277,19 @@ class Email extends SymfonyEmail {
    */
   public function getParams() {
     return $this->params;
+  }
+
+  /**
+   * Gets a parameter to pass to the email template and for token replacement.
+   *
+   * @param string $key
+   *   Parameter key to get.
+   *
+   * @return mixed
+   *   Parameter value.
+   */
+  public function getParam(string $key) {
+    return $this->params[$key];
   }
 
   /**

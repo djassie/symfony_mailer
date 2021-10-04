@@ -7,6 +7,7 @@ use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\symfony_mailer\Entity\MailerTransport;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -113,7 +114,6 @@ class Mailer implements MailerInterface {
 
     // Call alter hooks.
     $this->moduleHandler->alter($email->getKeySuggestions('email', '_'), $email);
-    return $email;
 
     // Call pre-render hooks.
     $this->alter('pre', $email);

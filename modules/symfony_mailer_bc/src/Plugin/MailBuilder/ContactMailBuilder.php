@@ -5,6 +5,7 @@ namespace Drupal\symfony_mailer_bc\Plugin\MailBuilder;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\MailBuilderInterface;
+use Drupal\symfony_mailer\Email;
 
 /**
  * Defines the Mail Builder plug-in for contact module.
@@ -21,7 +22,8 @@ class ContactMailBuilder implements MailBuilderInterface {
   /**
    * {@inheritdoc}
    */
-  public function mail($email, $key, $to, $langcode, $params) {
+  public function build(Email $email) {
+    $params = $email->getParams();
     $contact_message = $params['contact_message'];
     /** @var \Drupal\user\UserInterface $sender */
     $sender = $params['sender'];
@@ -42,7 +44,7 @@ class ContactMailBuilder implements MailBuilderInterface {
 
     $email->params($variables);
 
-    switch ($key) {
+    switch ($email->getKey()[1]) {
       case 'page_mail':
       case 'page_copy':
         $email->subject($this->t('[@form] @subject', $variables));
