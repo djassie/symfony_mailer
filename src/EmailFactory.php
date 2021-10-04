@@ -94,7 +94,6 @@ class EmailFactory {
     $from = new Address($site_mail, $site_config->get('name'));
     $email->from($from);
     $email->sender($from);
-    $email->returnPath($from);
     $email->getHeaders()->addTextHeader('X-Mailer', 'Drupal');
 
     // @todo Configure mail theme.
