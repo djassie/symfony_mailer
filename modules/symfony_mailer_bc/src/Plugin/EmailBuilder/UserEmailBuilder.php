@@ -1,19 +1,19 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc\Plugin\MailBuilder;
+namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\MailBuilderInterface;
+use Drupal\symfony_mailer\EmailBuilderInterface;
 use Drupal\symfony_mailer\Email;
 
 /**
- * Defines the Mail Builder plug-in for user module.
+ * Defines the Email Builder plug-in for user module.
  *
- * @MailBuilder(
+ * @EmailBuilder(
  *   id = "user",
- *   label = @Translation("Mail Builder for user module"),
+ *   label = @Translation("Email Builder for user module"),
  * )
  */
-class UserMailBuilder implements MailBuilderInterface {
+class UserEmailBuilder implements EmailBuilderInterface {
 
   /**
    * {@inheritdoc}

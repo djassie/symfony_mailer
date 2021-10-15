@@ -26,11 +26,11 @@ class EmailFactory {
   protected $mailer;
 
   /**
-   * The mail builder manager.
+   * The email builder manager.
    *
-   * @var \Drupal\symfony_mailer\MailBuilderManager
+   * @var \Drupal\symfony_mailer\EmailBuilderManager
    */
-  protected $mailBuilderManager;
+  protected $emailBuilderManager;
 
   /**
    * The token service.
@@ -65,8 +65,8 @@ class EmailFactory {
    *
    * @param Drupal\symfony_mailer\MailerInterface $mailer
    *   The mailer service.
-   * @param Drupal\symfony_mailer\MailBuilderManager
-   *   The mail builder manager.
+   * @param Drupal\symfony_mailer\EmailBuilderManager
+   *   The email builder manager.
    * @param \Drupal\Core\Utility\Token $token
    *   The token service.
    * @param \Drupal\Core\Asset\AssetResolverInterface $asset_resolver
@@ -74,9 +74,9 @@ class EmailFactory {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
    */
-  public function __construct(MailerInterface $mailer, MailBuilderManager $mail_builder_manager, Token $token, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory) {
+  public function __construct(MailerInterface $mailer, EmailBuilderManager $email_builder_manager, Token $token, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory) {
     $this->mailer = $mailer;
-    $this->mailBuilderManager = $mail_builder_manager;
+    $this->emailBuilderManager = $email_builder_manager;
     $this->token = $token;
     $this->assetResolver = $asset_resolver;
     $this->configFactory = $config_factory;
@@ -115,8 +115,8 @@ class EmailFactory {
    * {@inheritdoc}
    */
   public function addBuilder(Email $email, string $id) {
-    if ($this->mailBuilderManager->hasDefinition($id)) {
-      $email->addAlter('pre', [$this->mailBuilderManager->createInstance($id), 'build']);
+    if ($this->emailBuilderManager->hasDefinition($id)) {
+      $email->addAlter('pre', [$this->emailBuilderManager->createInstance($id), 'build']);
     }
   }
 

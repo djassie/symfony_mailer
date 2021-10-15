@@ -4,7 +4,7 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\symfony_mailer\Email;
 
-interface MailBuilderInterface {
+interface EmailBuilderInterface {
 
   /**
    * Builds an email message.

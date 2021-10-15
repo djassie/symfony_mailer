@@ -1,20 +1,20 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc\Plugin\MailBuilder;
+namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Component\Render\MarkupInterface;
-use Drupal\symfony_mailer\MailBuilderInterface;
+use Drupal\symfony_mailer\EmailBuilderInterface;
 use Drupal\symfony_mailer\Email;
 
 /**
- * Defines the Legacy Mail Builder plug-in that calls hook_mail().
+ * Defines the Legacy Email Builder plug-in that calls hook_mail().
  *
- * @MailBuilder(
+ * @EmailBuilder(
  *   id = "__legacy",
- *   label = @Translation("Legacy Mail Builder"),
+ *   label = @Translation("Legacy Email Builder"),
  * )
  */
-class LegacyMailBuilder implements MailBuilderInterface {
+class LegacyEmailBuilder implements EmailBuilderInterface {
 
   /**
    * {@inheritdoc}

@@ -1,21 +1,21 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc\Plugin\MailBuilder;
+namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\symfony_mailer\MailBuilderInterface;
+use Drupal\symfony_mailer\EmailBuilderInterface;
 use Drupal\symfony_mailer\Email;
 
 /**
- * Defines the Mail Builder plug-in for update module.
+ * Defines the Email Builder plug-in for update module.
  *
- * @MailBuilder(
+ * @EmailBuilder(
  *   id = "update",
- *   label = @Translation("Mail Builder for update module"),
+ *   label = @Translation("Email Builder for update module"),
  * )
  */
-class UpdateMailBuilder implements MailBuilderInterface {
+class UpdateEmailBuilder implements EmailBuilderInterface {
 
   use StringTranslationTrait;
 

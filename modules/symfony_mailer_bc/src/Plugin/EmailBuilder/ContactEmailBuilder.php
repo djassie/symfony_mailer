@@ -1,21 +1,21 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc\Plugin\MailBuilder;
+namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\symfony_mailer\MailBuilderInterface;
+use Drupal\symfony_mailer\EmailBuilderInterface;
 use Drupal\symfony_mailer\Email;
 
 /**
- * Defines the Mail Builder plug-in for contact module.
+ * Defines the Email Builder plug-in for contact module.
  *
- * @MailBuilder(
+ * @EmailBuilder(
  *   id = "contact",
- *   label = @Translation("Mail Builder for contact module"),
+ *   label = @Translation("Email Builder for contact module"),
  * )
  */
-class ContactMailBuilder implements MailBuilderInterface {
+class ContactEmailBuilder implements EmailBuilderInterface {
 
   use StringTranslationTrait;
 

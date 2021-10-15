@@ -8,12 +8,12 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Mail\MailManagerInterface;
 
 /**
- * Provides the mail builder plugin manager.
+ * Provides the email builder plugin manager.
  */
-class MailBuilderManager extends DefaultPluginManager {
+class EmailBuilderManager extends DefaultPluginManager {
 
   /**
-   * Constructs the MailBuilderManager object.
+   * Constructs the EmailBuilderManager object.
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
@@ -24,7 +24,7 @@ class MailBuilderManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/MailBuilder', $namespaces, $module_handler, 'Drupal\symfony_mailer\MailBuilderInterface', 'Drupal\symfony_mailer\Annotation\MailBuilder');
+    parent::__construct('Plugin/EmailBuilder', $namespaces, $module_handler, 'Drupal\symfony_mailer\EmailBuilderInterface', 'Drupal\symfony_mailer\Annotation\EmailBuilder');
     $this->setCacheBackend($cache_backend, 'symfony_mailer_builder_plugins');
   }
 

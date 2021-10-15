@@ -5,11 +5,11 @@ namespace Drupal\symfony_mailer\Annotation;
 use Drupal\Component\Annotation\Plugin;
 
 /**
- * Defines a MailBuilder item annotation object.
+ * Defines an EmailBuilder item annotation object.
  *
  * @Annotation
  */
-class MailBuilder extends Plugin {
+class EmailBuilder extends Plugin {
 
   /**
    * The plugin ID.
