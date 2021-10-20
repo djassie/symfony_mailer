@@ -33,6 +33,6 @@ function symfony_mailer_theme_suggestions_email(array $variables) {
  *   - is_html: True if generating HTML output, false for plain text.
  */
 function template_preprocess_email(&$variables) {
-  $variables['content'] = $variables['email']->getContent();
+  $variables['content'] = $variables['email']->getBody();
   $variables['params'] = $variables['email']->getParams();
 }

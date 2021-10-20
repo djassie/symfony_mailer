@@ -77,7 +77,7 @@ class Mailer implements MailerInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(Email $email) {
+  public function send(UnrenderedEmailInterface $email) {
     // Mailing can invoke rendering (e.g., generating URLs, replacing tokens),
     // but e-mails are not HTTP responses: they're not cached, they don't have
     // attachments. Therefore we perform mailing inside its own render context,
@@ -91,7 +91,7 @@ class Mailer implements MailerInterface {
   /**
    * Sends an email.
    *
-   * @param \Drupal\symfony_mailer\Email $email
+   * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
    *   The email to send.
    *
    * @return bool
@@ -99,11 +99,7 @@ class Mailer implements MailerInterface {
    *
    * @internal
    */
-  public function doSend(Email $email) {
-    if ($email->getHtmlBody()) {
-      throw new \exception('Use the content() method to set the message body.');
-    }
-
+  public function doSend(UnrenderedEmailInterface $email) {
     $langcode = $email->getLangcode();
     $currentLangcode = $this->languageManager->getCurrentLanguage()->getId();
     $mustSwitch = isset($langcode) && $langcode !== $currentLangcode;
@@ -118,22 +114,20 @@ class Mailer implements MailerInterface {
     // Call pre-render hooks.
     $this->alter('pre', $email);
 
-    $render = [
-      '#theme' => 'email',
-      '#email' => $email,
-    ];
-    $email->html($this->renderer->renderPlain($render));
+    // Render.
+    /** @var \Drupal\symfony_mailer\RenderedEmailInterface $rendered_email */
+    $rendered_email = $email->render($this->renderer);
 
     // Call post-render hooks.
-    $this->alter('post', $email);
+    $this->alter('post', $rendered_email);
 
     // Send.
-    $dsn = MailerTransport::loadDsn($email->getTransport());
+    $dsn = MailerTransport::loadDsn($rendered_email->getTransport());
     $mailer = new SymfonyMailer($dsn, NULL, $this->dispatcher);
 
     try {
-      //ksm($email, $email->getHeaders());
-      $mailer->send($email);
+      //ksm($rendered_email, $rendered_email->getInner()->getHeaders());
+      $mailer->send($rendered_email->getInner());
       $result = TRUE;
     }
     catch (RuntimeException $e) {
@@ -191,7 +185,7 @@ class Mailer implements MailerInterface {
    *
    * @param string $type
    *   The callback type: pre or post.
-   * @param \Drupal\symfony_mailer\Email $email
+   * @param \Drupal\symfony_mailer\BaseEmailInterface $email
    *   The email to alter.
    */
   protected function alter($type, $email) {

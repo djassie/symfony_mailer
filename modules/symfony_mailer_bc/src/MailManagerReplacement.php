@@ -54,11 +54,11 @@ class MailManagerReplacement extends MailManager {
    */
   public function mail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
     $email = $this->emailFactory->newEmail([$module, $key])
-      ->addTo($to)
-      ->langcode($langcode)
-      ->params($params);
+      ->setTo($to)
+      ->setLangcode($langcode)
+      ->setParams($params);
     if ($reply) {
-      $email->addReplyTo($reply);
+      $email->setReplyTo($reply);
     }
 
     if (!$email->getAlter('pre')) {

@@ -4,8 +4,8 @@ namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\symfony_mailer\EmailBuilderInterface;
-use Drupal\symfony_mailer\Email;
+use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
  * Defines the Email Builder plug-in for contact module.
@@ -15,14 +15,14 @@ use Drupal\symfony_mailer\Email;
  *   label = @Translation("Email Builder for contact module"),
  * )
  */
-class ContactEmailBuilder implements EmailBuilderInterface {
+class ContactEmailBuilder extends EmailBuilderBase {
 
   use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function build(Email $email) {
+  public function build(UnrenderedEmailInterface $email) {
     $params = $email->getParams();
     $contact_message = $params['contact_message'];
     /** @var \Drupal\user\UserInterface $sender */
@@ -42,22 +42,22 @@ class ContactEmailBuilder implements EmailBuilderInterface {
       $variables['@sender-url'] = $params['sender']->getEmail();
     }
 
-    $email->params($variables);
+    $email->setParams($variables);
 
     switch ($email->getKey()[1]) {
       case 'page_mail':
       case 'page_copy':
-        $email->subject($this->t('[@form] @subject', $variables));
-        $email->appendParagraph($this->t("@sender-name (@sender-url) sent a message using the contact form at @form-url.", $variables));
+        $email->setSubject($this->t('[@form] @subject', $variables));
+        $email->appendBodyParagraph($this->t("@sender-name (@sender-url) sent a message using the contact form at @form-url.", $variables));
         $build = \Drupal::entityTypeManager()
           ->getViewBuilder('contact_message')
           ->view($contact_message, 'mail');
-        $email->appendContent($build);
+        $email->appendBody($build);
         break;
 
       case 'page_autoreply':
-        $email->subject($this->t('[@form] @subject', $variables));
-        $email->content($params['contact_form']->getReply());
+        $email->setSubject($this->t('[@form] @subject', $variables));
+        $email->setBody($params['contact_form']->getReply());
         break;
 
       case 'user_mail':
@@ -66,14 +66,14 @@ class ContactEmailBuilder implements EmailBuilderInterface {
           '@recipient-name' => $params['recipient']->getDisplayName(),
           '@recipient-edit-url' => $params['recipient']->toUrl('edit-form')->toString(),
         ];
-        $email->subject($this->t('[@site-name] @subject', $variables));
-        $email->appendParagraph($this->t('Hello @recipient-name,', $variables));
-        $email->appendParagraph($this->t("@sender-name (@sender-url) has sent you a message via your contact form at @site-name.", $variables));
-        $email->appendParagraph($this->t("If you don't want to receive such emails, you can change your settings at @recipient-edit-url.", $variables));
+        $email->setSubject($this->t('[@site-name] @subject', $variables));
+        $email->appendBodyParagraph($this->t('Hello @recipient-name,', $variables));
+        $email->appendBodyParagraph($this->t("@sender-name (@sender-url) has sent you a message via your contact form at @site-name.", $variables));
+        $email->appendBodyParagraph($this->t("If you don't want to receive such emails, you can change your settings at @recipient-edit-url.", $variables));
         $build = \Drupal::entityTypeManager()
           ->getViewBuilder('contact_message')
           ->view($contact_message, 'mail');
-        $email->appendContent($build);
+        $email->appendBody($build);
         break;
     }
   }

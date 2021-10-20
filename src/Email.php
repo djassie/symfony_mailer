@@ -4,9 +4,10 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
-class Email extends SymfonyEmail {
+class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
 
   /**
    * The mailer.
@@ -15,22 +16,25 @@ class Email extends SymfonyEmail {
    */
   protected $mailer;
 
-  protected $alter = ['pre' => [], 'post' => []];
-
   protected array $key;
-  protected array $content = [];
+  protected $subject;
+  protected array $body = [];
+  protected array $to = [];
+  protected array $replyTo = [];
+  protected $alter = ['pre' => [], 'post' => []];
+  protected $langcode;
+  protected $params = [];
+
+  protected SymfonyEmail $inner;
+
   protected $libraries = [];
 
   /**
-   * The mail transport.
+   * The mail transport ID.
    *
-   * @var Symfony\Component\Mailer\Transport\TransportInterface
+   * @var string
    */
-  protected $transport;
-
-  protected $langcode;
-  protected $params = [];
-  protected $sending = FALSE;
+  protected string $transport = '';
 
   /**
    * Constructs the Email object.
@@ -43,64 +47,114 @@ class Email extends SymfonyEmail {
    *   Message key array, in the form [MODULE, TYPE, INSTANCE].
    */
   public function __construct(MailerInterface $mailer, array $key) {
-    parent::__construct();
     $this->mailer = $mailer;
     $this->key = $key;
   }
 
   /**
-   * Sends the email.
+   * {@inheritdoc}
    */
-  public function send() {
-    $this->mailer->send($this);
+  public function setSubject($subject) {
+    $this->subject = $subject;
+    return $this;
   }
 
   /**
-   * Gets alter callbacks.
-   *
-   * @param string $type
-   *   The callback type: pre or post.
-   *
-   * @return array
-   *   Array of callbacks.
+   * {@inheritdoc}
+   */
+  public function getSubject() {
+    return $this->subject;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setBody(array $body) {
+    $this->body = $body;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function appendBody(array $body) {
+    $name = 'n' . count($this->body);
+    $this->body[$name] = $body;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function appendBodyParagraph(string $text) {
+    $element = [
+      '#markup' => $text,
+      '#prefix' => '<p>',
+      '#suffix' => '</p>',
+    ];
+    return $this->appendBody($element);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBody() {
+    return $this->body;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTo(...$addresses) {
+    $this->to = $addresses;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTo() {
+    return $this->to;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setReplyTo(...$addresses) {
+    $this->replyTo = $addresses;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getReplyTo() {
+    return $this->replyTo;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function getAlter(string $type) {
     return $this->alter[$type];
   }
 
   /**
-   * Add an alter callback.
-   *
-   * @param string $type
-   *   The callback type: pre or post.
-   * @param callable $callable
-   *   The function to call.
+   * {@inheritdoc}
    */
   public function addAlter(string $type, callable $callable) {
     $this->alter[$type][] = $callable;
   }
 
   /**
-   * Gets the message key.
-   *
-   * @return array
-   *   Message key array, in the form [MODULE, TYPE, INSTANCE].
+   * {@inheritdoc}
    */
   public function getKey() {
     return $this->key;
   }
 
   /**
-   * Gets an array of 'suggestions' for the message key.
-   *
-   * @param string $initial
-   *   The initial suggestion.
-   * @param string $join
-   *   The 'glue' to join each part of the key array with.
-   *
-   * @return array
-   *   Suggestions, formed by taking the initial part and incrementally adding
-   *   each part of the key.
+   * {@inheritdoc}
    */
   public function getKeySuggestions(string $initial, string $join) {
     $key_array = $this->key;
@@ -116,153 +170,30 @@ class Email extends SymfonyEmail {
   }
 
   /**
-   * Sets the content to use for creating the HTML/plain email body.
-   *
-   * Use this function instead of calling text() or html() directly.
-   *
-   * @param array $content
-   *   Render array for the email body content. This will be rendered using a
-   *   template that can add header or footer markup.
-   *
-   * @return $this
+   * {@inheritdoc}
    */
-  public function content(array $content) {
-    $this->content = $content;
-    return $this;
-  }
-
-  /**
-   * Appends content to use for creating the HTML/plain email body.
-   *
-   * @param array $content
-   *   Array to append to the content render array.
-   *
-   * @return $this
-   */
-  public function appendContent(array $content) {
-    $name = 'n' . count($this->content);
-    $this->content[$name] = $content;
-    return $this;
-  }
-
-  /**
-   * Appends string content to use for creating the HTML/plain email body.
-   *
-   * @param string $text
-   *   String to append to the content render array in a paragraph tag.
-   *
-   * @return $this
-   */
-  public function appendParagraph(string $text) {
-    $element = [
-      '#markup' => $text,
-      '#prefix' => '<p>',
-      '#suffix' => '</p>',
-    ];
-    return $this->appendContent($element);
-  }
-
-  /**
-   * Gets content to use for creating the HTML/plain email body.
-   *
-   * @return array
-   *   Content render array.
-   */
-  public function getContent() {
-    return $this->content;
-  }
-
-  /**
-   * Adds an asset library to use as mail CSS.
-   *
-   * @param string $library
-   *   Library name, in the form "THEME/LIBRARY".
-   *
-   * @return $this
-   */
-  public function addLibrary(string $library) {
-    $this->libraries[] = $library;
-    return $this;
-  }
-
-  /**
-   * Gets the libraries to use as mail CSS.
-   *
-   * @return array
-   *   Array of library names, in the form "THEME/LIBRARY".
-   */
-  public function getLibraries() {
-    return $this->libraries;
-  }
-
-  /**
-   * Sets the mail transport ID to use.
-   *
-   * @param string $transport
-   *   Transport ID.
-   *
-   * @return $this
-   */
-  public function transport(string $transport) {
-    $this->transport = $transport;
-    return $this;
-  }
-
-  /**
-   * Gets the mail transport ID to use.
-   *
-   * @return string
-   *   Transport ID.
-   */
-  public function getTransport() {
-    return $this->transport;
-  }
-
-  /**
-   * Sets the langcode.
-   *
-   * @param string $langcode
-   *   Language code to use to compose the email.
-   *
-   * @return $this
-   */
-  public function langcode(string $langcode) {
+  public function setLangcode(string $langcode) {
     $this->langcode = $langcode;
     return $this;
   }
 
   /**
-   * Gets the langcode.
-   *
-   * @return string
-   *   Language code to use to compose the email.
+   * {@inheritdoc}
    */
   public function getLangcode() {
     return $this->langcode;
   }
 
   /**
-   * Sets parameters for hooks and to pass to the email template.
-   *
-   * @param array $params
-   *   (optional) An array of keyed objects.
-   *
-   * @return $this
+   * {@inheritdoc}
    */
-  public function params(array $params = []) {
+  public function setParams(array $params = []) {
     $this->params = $params;
     return $this;
   }
 
   /**
-   * Adds a parameter for hooks and to pass to the email template.
-   *
-   * @param string $key
-   *   Parameter key to set.
-   * @param $value
-   *   Parameter value to set.
-   *
-   * @return $this
+   * {@inheritdoc}
    */
   public function addParam(string $key, $value) {
     $this->params[$key] = $value;
@@ -270,23 +201,14 @@ class Email extends SymfonyEmail {
   }
 
   /**
-   * Gets parameters to pass to the email template and for token replacement.
-   *
-   * @return array
-   *   An array of keyed objects.
+   * {@inheritdoc}
    */
   public function getParams() {
     return $this->params;
   }
 
   /**
-   * Gets a parameter to pass to the email template and for token replacement.
-   *
-   * @param string $key
-   *   Parameter key to get.
-   *
-   * @return mixed
-   *   Parameter value.
+   * {@inheritdoc}
    */
   public function getParam(string $key) {
     return $this->params[$key];
@@ -295,13 +217,86 @@ class Email extends SymfonyEmail {
   /**
    * {@inheritdoc}
    */
-  public function subject($subject) {
-    // @todo Is this safe in the global render context? Could instead save the
-    // unaltered subject and render it in sending().
-    if ($subject instanceof MarkupInterface) {
-      $subject = PlainTextOutput::renderFromHtml($subject);
-    }
-    return parent::subject($subject);
+  public function send() {
+    $this->mailer->send($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function render(RendererInterface $renderer) {
+    // Render subject.
+    $subject = ($this->subject instanceof MarkupInterface) ? PlainTextOutput::renderFromHtml($this->subject) : $this->subject;
+
+    // Render body.
+    $body = [
+      '#theme' => 'email',
+      '#email' => $this,
+    ];
+
+    $this->inner = (new SymfonyEmail())
+      ->subject($subject)
+      ->html((string) $renderer->renderPlain($body))
+      ->to(...$this->to)
+      ->replyTo(...$this->replyTo);
+    $this->subject = NULL;
+    $this->body = [];
+    $this->to = [];
+    $this->replyTo = [];
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getInner() {
+    return $this->inner;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setHtmlBody($body) {
+    $this->inner->html($body);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getHtmlBody() {
+    return $this->inner->getHtmlBody();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addLibrary(string $library) {
+    $this->libraries[] = $library;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLibraries() {
+    return $this->libraries;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTransport(string $transport) {
+    $this->transport = $transport;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTransport() {
+    return $this->transport;
   }
 
 }

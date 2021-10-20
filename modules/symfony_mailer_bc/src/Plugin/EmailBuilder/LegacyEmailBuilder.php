@@ -3,8 +3,8 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Component\Render\MarkupInterface;
-use Drupal\symfony_mailer\EmailBuilderInterface;
-use Drupal\symfony_mailer\Email;
+use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
  * Defines the Legacy Email Builder plug-in that calls hook_mail().
@@ -14,14 +14,14 @@ use Drupal\symfony_mailer\Email;
  *   label = @Translation("Legacy Email Builder"),
  * )
  */
-class LegacyEmailBuilder implements EmailBuilderInterface {
+class LegacyEmailBuilder extends EmailBuilderBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(Email $email) {
+  public function build(UnrenderedEmailInterface $email) {
     $message = $this->getMessage($email);
-    $email->subject($message['subject']);
+    $email->setSubject($message['subject']);
 
     foreach ($message['body'] as $part) {
       if ($part instanceof MarkupInterface) {
@@ -34,27 +34,26 @@ class LegacyEmailBuilder implements EmailBuilderInterface {
         ];
       }
 
-      $email->appendContent($content);
+      $email->appendBody($content);
     }
   }
 
   /**
    * Gets a message array by calling hook_mail().
    *
-   * @param \Drupal\symfony_mailer\Email $email
+   * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
    *   The email to build.
    *
    * @return array
    *   Message array.
    */
-  protected function getMessage($email) {
+  protected function getMessage(UnrenderedEmailInterface $email) {
     list($module, $key) = $email->getKey();
     $message = [
       'id' => $module . '_' . $key,
       'module' => $module,
       'key' => $key,
       'to' => $email->getTo()[0],
-      'from' => $email->getFrom()[0],
       'reply-to' => $email->getReplyTo()[0],
       'langcode' => $email->getLangcode(),
       'params' => $email->getParams(),

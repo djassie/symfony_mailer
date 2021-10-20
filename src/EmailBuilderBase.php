@@ -2,7 +2,7 @@
 
 namespace Drupal\symfony_mailer;
 
-interface EmailBuilderInterface {
+class EmailBuilderBase implements EmailBuilderInterface {
 
   /**
    * Builds an email message.
@@ -10,7 +10,8 @@ interface EmailBuilderInterface {
    * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
    *   The email to build.
    */
-  public function build(UnrenderedEmailInterface $email);
+  public function build(UnrenderedEmailInterface $email) {
+  }
 
   /**
    * Adjusts an email message.
@@ -18,6 +19,7 @@ interface EmailBuilderInterface {
    * @param \Drupal\symfony_mailer\RenderedEmailInterface $email
    *   The email to adjust.
    */
-  public function adjust(RenderedEmailInterface $email);
+  public function adjust(RenderedEmailInterface $email) {
+  }
 
 }

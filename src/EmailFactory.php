@@ -89,21 +89,11 @@ class EmailFactory {
   public function newEmail($key) {
     $email = new Email($this->mailer, $key);
 
-    $site_config = $this->configFactory->get('system.site');
-    $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
-    $from = new Address($site_mail, $site_config->get('name'));
-    $email->from($from);
-    $email->sender($from);
-    $email->getHeaders()->addTextHeader('X-Mailer', 'Drupal');
-
-    // @todo Configure mail theme.
-    $mail_theme = \Drupal::theme()->getActiveTheme()->getName();
-    $email->addLibrary("$mail_theme/email");
-
     foreach ($email->getKeySuggestions('', '.') as $id) {
       $this->addBuilder($email, $id);
     }
 
+    $email->addAlter('post', [$this, 'defaultHeaders']);
     $email->addAlter('post', [$this, 'tokenReplace']);
     $email->addAlter('post', [$this, 'urlToAbsolute']);
     $email->addAlter('post', [$this, 'htmlToText']);
@@ -114,44 +104,64 @@ class EmailFactory {
   /**
    * {@inheritdoc}
    */
-  public function addBuilder(Email $email, string $id) {
+  public function addBuilder(UnrenderedEmailInterface $email, string $id) {
     if ($this->emailBuilderManager->hasDefinition($id)) {
       $email->addAlter('pre', [$this->emailBuilderManager->createInstance($id), 'build']);
     }
   }
 
   /**
-   * Replaces tokens.
+   * Sets default headers.
    *
-   * @param \Drupal\symfony_mailer\Email $email
+   * @param \Drupal\symfony_mailer\RenderedEmailInterface $email
    *   The email to alter.
    */
-  public function tokenReplace(Email $email) {
+  public function defaultHeaders(RenderedEmailInterface $email) {
+    $site_config = $this->configFactory->get('system.site');
+    $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
+    $from = new Address($site_mail, $site_config->get('name'));
+    $email->getInner()->from($from)
+      ->sender($from)
+      ->getHeaders()->addTextHeader('X-Mailer', 'Drupal');
+
+    // @todo Fallback to default theme.
+    $mail_theme = \Drupal::theme()->getActiveTheme()->getName();
+    $email->addLibrary("$mail_theme/email");
+  }
+
+  /**
+   * Replaces tokens.
+   *
+   * @param \Drupal\symfony_mailer\RenderedEmailInterface $email
+   *   The email to alter.
+   */
+  public function tokenReplace(RenderedEmailInterface $email) {
     $params = $email->getParams();
     $options = $params['token_options'] ?? NULL;
     if (isset($options)) {
-      $email->subject($this->token->replace(Html::escape($email->getSubject()), $params, $options));
-      $email->html($this->token->replace($email->getHtmlBody(), $params, $options));
+      $inner = $email->getInner();
+      $inner->subject($this->token->replace(Html::escape($inner->getSubject()), $params, $options));
+      $email->setHtmlBody($this->token->replace($email->getHtmlBody(), $params, $options));
     }
   }
 
   /**
    * Converts URLs to absolute.
    *
-   * @param \Drupal\symfony_mailer\Email $email
+   * @param \Drupal\symfony_mailer\RenderedEmailInterface $email
    *   The email to alter.
    */
-  public function urlToAbsolute(Email $email) {
-    $email->html(Html::transformRootRelativeUrlsToAbsolute($email->getHtmlBody(), \Drupal::request()->getSchemeAndHttpHost()));
+  public function urlToAbsolute(RenderedEmailInterface $email) {
+    $email->setHtmlBody(Html::transformRootRelativeUrlsToAbsolute($email->getHtmlBody(), \Drupal::request()->getSchemeAndHttpHost()));
   }
 
   /**
    * Converts URLs to absolute.
    *
-   * @param \Drupal\symfony_mailer\Email $email
+   * @param \Drupal\symfony_mailer\RenderedEmailInterface $email
    *   The email to alter.
    */
-  public function inlineCss(Email $email) {
+  public function inlineCss(RenderedEmailInterface $email) {
     // Inline CSS. Request optimization so that the CssOptimizer performs
     // essential processing such as @include.
     $assets = (new AttachedAssets())->setLibraries($email->getLibraries());
@@ -161,20 +171,22 @@ class EmailFactory {
     }
 
     if ($css) {
-      $email->html($this->cssInliner->convert($email->getHtmlBody(), $css));
+      $email->setHtmlBody($this->cssInliner->convert($email->getHtmlBody(), $css));
     }
   }
 
   /**
    * Creates a plain text part from the HTML.
    *
-   * @param \Drupal\symfony_mailer\Email $email
+   * @param \Drupal\symfony_mailer\RenderedEmailInterface $email
    *   The email to alter.
    */
-  public function htmlToText(Email $email) {
-    if (!$email->getTextBody()) {
+  public function htmlToText(RenderedEmailInterface $email) {
+    $inner = $email->getInner();
+
+    if (!$inner->getTextBody()) {
       // @todo Or maybe use league/html-to-markdown as symfony mailer does.
-      $email->text((new Html2Text($email->getHtmlBody()))->getText());
+      $inner->text((new Html2Text($email->getHtmlBody()))->getText());
     }
   }
 

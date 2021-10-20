@@ -2,8 +2,8 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\EmailBuilderInterface;
-use Drupal\symfony_mailer\Email;
+use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
  * Defines the Email Builder plug-in for user module.
@@ -13,12 +13,12 @@ use Drupal\symfony_mailer\Email;
  *   label = @Translation("Email Builder for user module"),
  * )
  */
-class UserEmailBuilder implements EmailBuilderInterface {
+class UserEmailBuilder extends EmailBuilderBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(Email $email) {
+  public function build(UnrenderedEmailInterface $email) {
     $key = $email->getKey()[1];
     $mail_config = \Drupal::config('user.mail');
     $subject = $mail_config->get("$key.subject");
@@ -30,9 +30,9 @@ class UserEmailBuilder implements EmailBuilderInterface {
     $token_options = ['callback' => 'user_mail_tokens', 'clear' => TRUE];
     $params = ['user' => $email->getParam('account'), 'token_options' => $token_options];
 
-    $email->subject($subject)
-      ->content($content)
-      ->params($params);
+    $email->setSubject($subject)
+      ->setBody($content)
+      ->setParams($params);
   }
 
 }

@@ -2,8 +2,8 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\EmailBuilderInterface;
-use Drupal\symfony_mailer\Email;
+use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
  * Defines the Email Builder plug-in for system module.
@@ -13,21 +13,21 @@ use Drupal\symfony_mailer\Email;
  *   label = @Translation("Email Builder for system module"),
  * )
  */
-class SystemEmailBuilder implements EmailBuilderInterface {
+class SystemEmailBuilder extends EmailBuilderBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(Email $email) {
+  public function build(UnrenderedEmailInterface $email) {
     $params = $email->getParams();
     $context = $params['context'];
-    $content = [
+    $body = [
       '#type' => 'processed_text',
       '#text' => $context['message'],
     ];
 
-    $email->subject($context['subject'])
-      ->content($content)
+    $email->setSubject($context['subject'])
+      ->setBody($body)
       ->addParam('token_options', $context);
   }
 
