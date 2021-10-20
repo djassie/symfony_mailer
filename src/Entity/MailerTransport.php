@@ -31,6 +31,7 @@ use Symfony\Component\Mailer\Transport;
  *     "edit-form" = "/admin/config/system/mailer/transport/{mailer_transport}",
  *     "delete-form" = "/admin/config/system/mailer/transport/{mailer_transport}/delete",
  *     "set-default" = "/admin/config/system/mailer/transport/{mailer_transport}/set-default",
+ *     "collection" = "/admin/config/system/mailer/transport",
  *   },
  *   config_export = {
  *     "id",
