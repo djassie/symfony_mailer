@@ -132,14 +132,14 @@ class MailerTransport extends ConfigEntityBase implements MailerTransportInterfa
    * {@inheritdoc}
    */
   public function setAsDefault() {
-    \Drupal::service('config.factory')->getEditable('mailer.settings')->set('default_transport', $this->id())->save();
+    \Drupal::service('config.factory')->getEditable('symfony_mailer.settings')->set('default_transport', $this->id())->save();
   }
 
   /**
    * {@inheritdoc}
    */
   public function isDefault() {
-    return \Drupal::service('config.factory')->getEditable('mailer.settings')->get('default_transport') == $this->id();
+    return \Drupal::service('config.factory')->getEditable('symfony_mailer.settings')->get('default_transport') == $this->id();
   }
 
   /**
@@ -175,7 +175,7 @@ class MailerTransport extends ConfigEntityBase implements MailerTransportInterfa
    *   The default transport.
    */
   public static function loadDefault() {
-    $id = \Drupal::config('mailer.settings')->get('default_transport');
+    $id = \Drupal::config('symfony_mailer.settings')->get('default_transport');
     return $id ? static::load($id) : NULL;
   }
 

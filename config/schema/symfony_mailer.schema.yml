@@ -1,5 +1,13 @@
 # Schema for the configuration files of the Symfony Mailer module.
 
+symfony_mailer.settings:
+  type: config_object
+  label: 'Symfony Mailer settings'
+  mapping:
+    default_transport:
+      type: string
+      label: Default transport ID
+
 symfony_mailer.mailer_transport.*:
   type: config_entity
   label: 'Transport'
@@ -14,12 +22,33 @@ symfony_mailer.mailer_transport.*:
       type: string
       label: 'Plugin'
     configuration:
-      type: symfony_mailer.mailer_transport.[%parent.plugin]
+      type: symfony_mailer.transport_plugin.[%parent.plugin]
 
-symfony_mailer.mailer_transport.dsn:
+symfony_mailer.transport_plugin.native:
+  type: mapping
+  label: 'Native transport'
+
+symfony_mailer.transport_plugin.dsn:
   type: mapping
   label: 'DSN transport'
   mapping:
     dsn:
       type: string
       label: 'DSN'
+
+symfony_mailer.transport_plugin.smtp:
+  type: mapping
+  label: 'SMTP transport'
+  mapping:
+    user:
+      type: string
+      label: 'User name'
+    pass:
+      type: string
+      label: 'Password'
+    host:
+      type: string
+      label: 'Host name'
+    port:
+      type: integer
+      label: 'Port'
