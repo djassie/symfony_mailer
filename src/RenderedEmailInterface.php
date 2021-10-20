@@ -7,7 +7,7 @@ interface RenderedEmailInterface extends BaseEmailInterface {
   /**
    * Gets the inner Symfony email that will be sent.
    *
-   * @return Symfony\Component\Mime\Email
+   * @return \Symfony\Component\Mime\Email
    *   Inner Symfony email.
    */
   public function getInner();

@@ -19,7 +19,7 @@ class MailManagerReplacement extends MailManager {
   /**
    * The email factory.
    *
-   * @var Drupal\symfony_mailer\EmailFactory
+   * @var \Drupal\symfony_mailer\EmailFactory
    */
   protected $emailFactory;
 

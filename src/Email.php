@@ -12,7 +12,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * The mailer.
    *
-   * @var Drupal\symfony_mailer\MailerInterface $mailer
+   * @var \Drupal\symfony_mailer\MailerInterface $mailer
    */
   protected $mailer;
 
@@ -41,7 +41,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    *
    * Use MailerFactory::newEmail() instead of calling this directly.
    *
-   * @param Drupal\symfony_mailer\MailerInterface $mailer
+   * @param \Drupal\symfony_mailer\MailerInterface $mailer
    *   Mailer service.
    * @param array $key
    *   Message key array, in the form [MODULE, TYPE, INSTANCE].

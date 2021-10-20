@@ -41,7 +41,7 @@ interface MailerTransportInterface extends ConfigEntityInterface {
   /**
    * Returns the transport plugin.
    *
-   * @return Drupal\symfony_mailer\TransportPluginInterface
+   * @return \Drupal\symfony_mailer\TransportPluginInterface
    *   The transport plugin used by this mailer transport entity.
    */
   public function getPlugin();

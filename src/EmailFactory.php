@@ -63,9 +63,9 @@ class EmailFactory {
   /**
    * Constructs the Mailer object.
    *
-   * @param Drupal\symfony_mailer\MailerInterface $mailer
+   * @param \Drupal\symfony_mailer\MailerInterface $mailer
    *   The mailer service.
-   * @param Drupal\symfony_mailer\EmailBuilderManager
+   * @param \Drupal\symfony_mailer\EmailBuilderManager
    *   The email builder manager.
    * @param \Drupal\Core\Utility\Token $token
    *   The token service.
