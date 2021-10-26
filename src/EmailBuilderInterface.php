@@ -20,4 +20,12 @@ interface EmailBuilderInterface {
    */
   public function adjust(RenderedEmailInterface $email);
 
+  /**
+   * Gets the weight of the email builder.
+   *
+   * @return int
+   *   The weight.
+   */
+  public function getWeight();
+
 }

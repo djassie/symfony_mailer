@@ -99,25 +99,16 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
   public function getReplyTo();
 
   /**
-   * Gets alter callbacks.
+   * Add an email builder.
    *
-   * @param string $type
-   *   The callback type: pre or post.
-   *
-   * @return array
-   *   Array of callbacks.
+   * @param string $plugin_id
+   *   The ID of the email builder plugin.
+   * @param array $configuration
+   *   (Optional) Email builder configuration.
+   * @param bool $optional
+   *   (Optional) If TRUE, silently skip if the plugin doesn't exist.
    */
-  public function getAlter(string $type);
-
-  /**
-   * Add an alter callback.
-   *
-   * @param string $type
-   *   The callback type: pre or post.
-   * @param callable $callable
-   *   The function to call.
-   */
-  public function addAlter(string $type, callable $callable);
+  public function addBuilder(string $plugin_id, array $configuration = []);
 
   /**
    * Gets the message key.
@@ -183,12 +174,9 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
    *
    * @internal
    *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   *
    * @return RenderedEmailInterface
    *   Rendered email.
    */
-  public function render(RendererInterface $renderer);
+  public function render();
 
 }

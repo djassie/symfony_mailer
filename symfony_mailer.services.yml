@@ -4,7 +4,6 @@ services:
     arguments: ['@event_dispatcher', '@renderer', '@module_handler', '@language.default', '@language_manager']
   email_factory:
     class: Drupal\symfony_mailer\EmailFactory
-    arguments: ['@symfony_mailer', '@plugin.manager.email_builder', '@token', '@asset.resolver', '@config.factory']
   plugin.manager.email_builder:
     class: Drupal\symfony_mailer\EmailBuilderManager
     parent: default_plugin_manager

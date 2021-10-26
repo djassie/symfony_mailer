@@ -2,7 +2,6 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\EmailBuilderBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
@@ -16,8 +15,6 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * )
  */
 class UpdateEmailBuilder extends EmailBuilderBase {
-
-  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}

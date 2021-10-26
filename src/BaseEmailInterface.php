@@ -8,15 +8,12 @@ namespace Drupal\symfony_mailer;
 interface BaseEmailInterface {
 
   /**
-   * Gets alter callbacks.
-   *
-   * @param string $type
-   *   The callback type: pre or post.
+   * Gets all email builders.
    *
    * @return array
-   *   Array of callbacks.
+   *   Array of email builders.
    */
-  public function getAlter(string $type);
+  public function getBuilders();
 
   /**
    * Gets the message key.

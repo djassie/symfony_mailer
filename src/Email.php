@@ -5,6 +5,7 @@ namespace Drupal\symfony_mailer;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Render\RendererInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
 class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
@@ -16,12 +17,26 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   protected $mailer;
 
+  /**
+   * The email builder manager.
+   *
+   * @var \Drupal\symfony_mailer\EmailBuilderManager
+   */
+  protected $emailBuilderManager;
+
+  /**
+   * The renderer.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
   protected array $key;
   protected $subject;
   protected array $body = [];
   protected array $to = [];
   protected array $replyTo = [];
-  protected $alter = ['pre' => [], 'post' => []];
+  protected $builders = [];
   protected $langcode;
   protected $params = [];
 
@@ -39,17 +54,44 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * Constructs the Email object.
    *
-   * Use MailerFactory::newEmail() instead of calling this directly.
-   *
    * @param \Drupal\symfony_mailer\MailerInterface $mailer
    *   Mailer service.
+   * @param \Drupal\symfony_mailer\EmailBuilderManager
+   *   The email builder manager.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
    * @param array $key
    *   Message key array, in the form [MODULE, TYPE, INSTANCE].
    */
-  public function __construct(MailerInterface $mailer, array $key) {
+  public function __construct(MailerInterface $mailer, EmailBuilderManager $email_builder_manager, RendererInterface $renderer, array $key) {
     $this->mailer = $mailer;
+    $this->emailBuilderManager = $email_builder_manager;
+    $this->renderer = $renderer;
     $this->key = $key;
   }
+
+  /**
+   * Creates an email object.
+   *
+   * Use EmailFactory::newEmail() instead of calling this directly.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The current service container.
+   * @param array $key
+   *   Message key array, in the form [MODULE, TYPE, INSTANCE].
+   *
+   * @return static
+   *   A new email object.
+   */
+  public static function create(ContainerInterface $container, array $key) {
+    return new static(
+      $container->get('symfony_mailer'),
+      $container->get('plugin.manager.email_builder'),
+      $container->get('renderer'),
+      $key
+    );
+  }
+
 
   /**
    * {@inheritdoc}
@@ -135,15 +177,19 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAlter(string $type) {
-    return $this->alter[$type];
+  public function addBuilder(string $plugin_id, array $configuration = [], $optional = FALSE) {
+    if (!$optional || $this->emailBuilderManager->hasDefinition($plugin_id)) {
+      $this->builders[$plugin_id] = $this->emailBuilderManager->createInstance($plugin_id, $configuration);
+    }
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addAlter(string $type, callable $callable) {
-    $this->alter[$type][] = $callable;
+  public function getBuilders() {
+    $this->emailBuilderManager->sort($this->builders);
+    return $this->builders;
   }
 
   /**
@@ -224,7 +270,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function render(RendererInterface $renderer) {
+  public function render() {
     // Render subject.
     $subject = ($this->subject instanceof MarkupInterface) ? PlainTextOutput::renderFromHtml($this->subject) : $this->subject;
 
@@ -236,7 +282,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
 
     $this->inner = (new SymfonyEmail())
       ->subject($subject)
-      ->html((string) $renderer->renderPlain($body))
+      ->html((string) $this->renderer->renderPlain($body))
       ->to(...$this->to)
       ->replyTo(...$this->replyTo);
     $this->subject = NULL;

@@ -2,24 +2,29 @@
 
 namespace Drupal\symfony_mailer;
 
-class EmailBuilderBase implements EmailBuilderInterface {
+use Drupal\Core\Plugin\PluginBase;
+
+class EmailBuilderBase extends PluginBase implements EmailBuilderInterface {
+
+  const DEFAULT_WEIGHT = 500;
 
   /**
-   * Builds an email message.
-   *
-   * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
-   *   The email to build.
+   * {@inheritdoc}
    */
   public function build(UnrenderedEmailInterface $email) {
   }
 
   /**
-   * Adjusts an email message.
-   *
-   * @param \Drupal\symfony_mailer\RenderedEmailInterface $email
-   *   The email to adjust.
+   * {@inheritdoc}
    */
   public function adjust(RenderedEmailInterface $email) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getWeight() {
+    return $this->getPluginDefinition()['weight'] ?? static::DEFAULT_WEIGHT;
   }
 
 }

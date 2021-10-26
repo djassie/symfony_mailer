@@ -28,7 +28,7 @@ class SystemEmailBuilder extends EmailBuilderBase {
 
     $email->setSubject($context['subject'])
       ->setBody($body)
-      ->addParam('token_options', $context);
+      ->addBuilder('token_replace', ['options' => $context]);
   }
 
 }

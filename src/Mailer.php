@@ -108,18 +108,22 @@ class Mailer implements MailerInterface {
       $this->changeActiveLanguage($langcode);
     }
 
-    // Call alter hooks.
-    $this->moduleHandler->alter($email->getKeySuggestions('email', '_'), $email);
-
-    // Call pre-render hooks.
-    $this->alter('pre', $email);
+    // Call hooks/builders.
+    $this->invokeAll('pre_build', $email);
+    foreach ($email->getBuilders() as $builder) {
+      $builder->build($email);
+    }
+    $this->invokeAll('pre_render', $email);
 
     // Render.
     /** @var \Drupal\symfony_mailer\RenderedEmailInterface $rendered_email */
-    $rendered_email = $email->render($this->renderer);
+    $rendered_email = $email->render();
 
-    // Call post-render hooks.
-    $this->alter('post', $rendered_email);
+    // Call hooks/builders.
+    foreach ($rendered_email->getBuilders() as $builder) {
+      $builder->adjust($rendered_email);
+    }
+    $this->invokeAll('pre_send', $rendered_email);
 
     // Send.
     $dsn = MailerTransport::loadDsn($rendered_email->getTransport());
@@ -181,16 +185,16 @@ class Mailer implements MailerInterface {
   }
 
   /**
-   * Calls the alter functions.
+   * Invoke hooks.
    *
-   * @param string $type
-   *   The callback type: pre or post.
+   * @param string $hook
+   *   The hook to call.
    * @param \Drupal\symfony_mailer\BaseEmailInterface $email
-   *   The email to alter.
+   *   The email.
    */
-  protected function alter($type, $email) {
-    foreach ($email->getAlter($type) as $callback) {
-      $callback($email);
+  protected function invokeAll($hook, $email) {
+    foreach ($email->getKeySuggestions("email_$hook", '_') as $hook_variant) {
+      $this->moduleHandler->invokeAll($hook_variant, [$email]);
     }
   }
 

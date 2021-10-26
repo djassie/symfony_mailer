@@ -28,4 +28,29 @@ class EmailBuilderManager extends DefaultPluginManager {
     $this->setCacheBackend($cache_backend, 'symfony_mailer_builder_plugins');
   }
 
+  /**
+   * Sorts an array of email builders by weight, lowest first.
+   *
+   * @param \Drupal\symfony_mailer\EmailBuilderInterface[] $builders
+   *   An array of email builders to sort.
+   */
+  public function sort(array &$builders) {
+    uasort($builders, [$this, 'compare']);
+  }
+
+  /**
+   * Compares two email builders for sorting by weight.
+   *
+   * @param \Drupal\symfony_mailer\EmailBuilderInterface $a
+   *   First email builder to compare.
+   * @param \Drupal\symfony_mailer\EmailBuilderInterface $b
+   *   Second email builder to compare.
+   *
+   * @return int
+   *   Comparison result suitable for use in uasort.
+   */
+  protected function compare(EmailBuilderInterface $a, EmailBuilderInterface $b) {
+    return $a->getWeight() - $b->getWeight();
+  }
+
 }

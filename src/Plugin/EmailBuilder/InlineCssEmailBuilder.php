@@ -1,0 +1,84 @@
+<?php
+
+namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
+
+use Drupal\Core\Asset\AssetResolverInterface;
+use Drupal\Core\Asset\AttachedAssets;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\RenderedEmailInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+
+/**
+ * Defines the Inline CSS Email Builder.
+ *
+ * @EmailBuilder(
+ *   id = "inline_css",
+ *   label = @Translation("Inline CSS"),
+ *   description = @Translation("Add inline CSS."),
+ *   weight = 900,
+ * )
+ */
+class InlineCssEmailBuilder extends EmailBuilderBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The asset resolver.
+   *
+   * @var \Drupal\Core\Asset\AssetResolverInterface
+   */
+  protected $assetResolver;
+
+  /**
+   * The CSS inliner.
+   *
+   * @var \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles
+   */
+  protected $cssInliner;
+
+  /**
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Asset\AssetResolverInterface $asset_resolver
+   *   The asset resolver.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, AssetResolverInterface $asset_resolver) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->assetResolver = $asset_resolver;
+    $this->cssInliner = new CssToInlineStyles();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('asset.resolver')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function adjust(RenderedEmailInterface $email) {
+    // Inline CSS. Request optimization so that the CssOptimizer performs
+    // essential processing such as @include.
+    $assets = (new AttachedAssets())->setLibraries($email->getLibraries());
+    $css = '';
+    foreach ($this->assetResolver->getCssAssets($assets, TRUE) as $file) {
+      $css .= file_get_contents($file['data']);
+    }
+
+    if ($css) {
+      $email->setHtmlBody($this->cssInliner->convert($email->getHtmlBody(), $css));
+    }
+  }
+
+}
