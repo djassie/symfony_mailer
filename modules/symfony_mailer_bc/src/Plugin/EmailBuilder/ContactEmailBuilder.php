@@ -45,7 +45,7 @@ class ContactEmailBuilder extends EmailBuilderBase {
       case 'page_mail':
       case 'page_copy':
         $email->setSubject($this->t('[@form] @subject', $variables));
-        $email->appendBodyParagraph($this->t("@sender-name (@sender-url) sent a message using the contact form at @form-url.", $variables));
+        $email->appendBodyParagraph($this->t('<a href="@sender-url">@sender-name</a> sent a message using the contact form <a href="@form-url">@form</a>.', $variables));
         $build = \Drupal::entityTypeManager()
           ->getViewBuilder('contact_message')
           ->view($contact_message, 'mail');
@@ -65,8 +65,8 @@ class ContactEmailBuilder extends EmailBuilderBase {
         ];
         $email->setSubject($this->t('[@site-name] @subject', $variables));
         $email->appendBodyParagraph($this->t('Hello @recipient-name,', $variables));
-        $email->appendBodyParagraph($this->t("@sender-name (@sender-url) has sent you a message via your contact form at @site-name.", $variables));
-        $email->appendBodyParagraph($this->t("If you don't want to receive such emails, you can change your settings at @recipient-edit-url.", $variables));
+        $email->appendBodyParagraph($this->t('<a href="@sender-url">@sender-name</a> has sent you a message via your contact form at @site-name.', $variables));
+        $email->appendBodyParagraph($this->t('If you don\'t want to receive such emails, you can <a href="@recipient-edit-url">change your settings</a>.', $variables));
         $build = \Drupal::entityTypeManager()
           ->getViewBuilder('contact_message')
           ->view($contact_message, 'mail');
