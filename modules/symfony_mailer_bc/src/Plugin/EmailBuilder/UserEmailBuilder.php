@@ -19,7 +19,7 @@ class UserEmailBuilder extends EmailBuilderBase {
    * {@inheritdoc}
    */
   public function build(UnrenderedEmailInterface $email) {
-    $key = $email->getKey()[1];
+    $key = $email->getSubType();
     $mail_config = \Drupal::config('user.mail');
     $subject = $mail_config->get("$key.subject");
     $content = [

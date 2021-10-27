@@ -41,7 +41,7 @@ class ContactEmailBuilder extends EmailBuilderBase {
 
     $email->setParams($variables);
 
-    switch ($email->getKey()[1]) {
+    switch ($email->getSubType()) {
       case 'page_mail':
       case 'page_copy':
         $email->setSubject($this->t('[@form] @subject', $variables));

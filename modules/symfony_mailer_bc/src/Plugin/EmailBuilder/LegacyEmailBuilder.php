@@ -48,7 +48,8 @@ class LegacyEmailBuilder extends EmailBuilderBase {
    *   Message array.
    */
   protected function getMessage(UnrenderedEmailInterface $email) {
-    list($module, $key) = $email->getKey();
+    $module = $email->getType();
+    $key = $email->getSubType();
     $message = [
       'id' => $module . '_' . $key,
       'module' => $module,

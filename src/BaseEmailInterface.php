@@ -16,26 +16,55 @@ interface BaseEmailInterface {
   public function getBuilders();
 
   /**
-   * Gets the message key.
+   * Gets the email type.
    *
-   * @return array
-   *   Message key array, in the form [MODULE, TYPE, INSTANCE].
+   * If the email is associated with a config entity, then this is the entity
+   * type, else it is the module name.
+   *
+   * @return string
+   *   Email type.
    */
-  public function getKey();
+  public function getType();
 
   /**
-   * Gets an array of 'suggestions' for the message key.
+   * Gets the email sub-type.
+   *
+   * The sub-type is a 'key' to distinguish different categories of email with
+   * the same type. Emails with the same sub-type are all built in the same
+   * way, differently from other sub-types.
+   *
+   * @return string
+   *   Email sub-type.
+   */
+  public function getSubType();
+
+  /**
+   * Gets the associated config entity.
+   *
+   * The ID of this entity can be used to select a specific template or apply
+   * specific policy configuration.
+   *
+   * @return ?\Drupal\Core\Config\Entity\ConfigEntityInterface.
+   *   Entity, or NULL if there is no associated entity.
+   */
+  public function getEntity();
+
+  /**
+   * Gets an array of 'suggestions'.
+   *
+   * The suggestions are used to select email builders, templates and policy
+   * configuration in based on email type, sub-type and associated entity ID.
    *
    * @param string $initial
    *   The initial suggestion.
    * @param string $join
-   *   The 'glue' to join each part of the key array with.
+   *   The 'glue' to join each suggestion part with.
    *
    * @return array
-   *   Suggestions, formed by taking the initial part and incrementally adding
-   *   each part of the key.
+   *   Suggestions, formed by taking the initial value and incrementally adding
+   *   the type, sub-type and entity ID.
    */
-  public function getKeySuggestions(string $initial, string $join);
+  public function getSuggestions(string $initial, string $join);
 
   /**
    * Gets the langcode.

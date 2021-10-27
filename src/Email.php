@@ -31,7 +31,8 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   protected $renderer;
 
-  protected array $key;
+  protected string $type;
+  protected string $entity_id;
   protected $subject;
   protected array $body = [];
   protected array $to = [];
@@ -60,38 +61,49 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    *   The email builder manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param array $key
-   *   Message key array, in the form [MODULE, TYPE, INSTANCE].
+   * @param string $type
+   *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
+   * @param string $sub_type
+   *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
+   * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    */
-  public function __construct(MailerInterface $mailer, EmailBuilderManager $email_builder_manager, RendererInterface $renderer, array $key) {
+  public function __construct(MailerInterface $mailer, EmailBuilderManager $email_builder_manager, RendererInterface $renderer, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
     $this->mailer = $mailer;
     $this->emailBuilderManager = $email_builder_manager;
     $this->renderer = $renderer;
-    $this->key = $key;
+    $this->type = $type;
+    $this->subType = $sub_type;
+    $this->entity = $entity;
   }
 
   /**
    * Creates an email object.
    *
-   * Use EmailFactory::newEmail() instead of calling this directly.
+   * Use EmailFactory instead of calling this directly.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The current service container.
-   * @param array $key
-   *   Message key array, in the form [MODULE, TYPE, INSTANCE].
+   * @param string $type
+   *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
+   * @param string $sub_type
+   *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
+   * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    *
    * @return static
    *   A new email object.
    */
-  public static function create(ContainerInterface $container, array $key) {
+  public static function create(ContainerInterface $container, string $type, string $sub_type, ?ConfigEntityInterface $entity = NULL) {
     return new static(
       $container->get('symfony_mailer'),
       $container->get('plugin.manager.email_builder'),
       $container->get('renderer'),
-      $key
+      $type,
+      $sub_type,
+      $entity
     );
   }
-
 
   /**
    * {@inheritdoc}
@@ -195,21 +207,39 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function getKey() {
-    return $this->key;
+  public function getType() {
+    return $this->type;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getKeySuggestions(string $initial, string $join) {
-    $key_array = $this->key;
-    $key = $initial ?: array_shift($key_array);
-    $suggestions[] = $key;
+  public function getSubType() {
+    return $this->subType;
+  }
 
-    while ($key_array) {
-      $key .= $join . array_shift($key_array);
-      $suggestions[] = $key;
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntity() {
+    return $this->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSuggestions(string $initial, string $join) {
+    $part_array = [$this->type, $this->subType];
+    if (isset($this->entity)) {
+      $part_array[] = $this->entity->id();
+    }
+
+    $part = $initial ?: array_shift($part_array);
+    $suggestions[] = $part;
+
+    while ($part_array) {
+      $part .= $join . array_shift($part_array);
+      $suggestions[] = $part;
     }
 
     return $suggestions;

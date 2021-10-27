@@ -193,7 +193,7 @@ class Mailer implements MailerInterface {
    *   The email.
    */
   protected function invokeAll($hook, $email) {
-    foreach ($email->getKeySuggestions("email_$hook", '_') as $hook_variant) {
+    foreach ($email->getSuggestions("email_$hook", '_') as $hook_variant) {
       $this->moduleHandler->invokeAll($hook_variant, [$email]);
     }
   }

@@ -111,28 +111,6 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
   public function addBuilder(string $plugin_id, array $configuration = []);
 
   /**
-   * Gets the message key.
-   *
-   * @return array
-   *   Message key array, in the form [MODULE, TYPE, INSTANCE].
-   */
-  public function getKey();
-
-  /**
-   * Gets an array of 'suggestions' for the message key.
-   *
-   * @param string $initial
-   *   The initial suggestion.
-   * @param string $join
-   *   The 'glue' to join each part of the key array with.
-   *
-   * @return array
-   *   Suggestions, formed by taking the initial part and incrementally adding
-   *   each part of the key.
-   */
-  public function getKeySuggestions(string $initial, string $join);
-
-  /**
    * Sets the langcode.
    *
    * @param string $langcode

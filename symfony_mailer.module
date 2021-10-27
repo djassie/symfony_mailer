@@ -19,7 +19,7 @@ function symfony_mailer_theme($existing, $type, $theme, $path) {
  * Implements hook_theme_suggestions_HOOK() for email.
  */
 function symfony_mailer_theme_suggestions_email(array $variables) {
-  return array_slice($variables['email']->getKeySuggestions('email', '__'), 1);
+  return array_slice($variables['email']->getSuggestions('email', '__'), 1);
 }
 
 /**
