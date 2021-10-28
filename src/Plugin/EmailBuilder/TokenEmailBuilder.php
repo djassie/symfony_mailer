@@ -2,6 +2,7 @@
 
 namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
 
+use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Utility\Token;
@@ -62,7 +63,7 @@ class TokenEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlug
     $params = $email->getParams();
     $options = $this->configuration['options'] ?? [];
     $inner = $email->getInner();
-    $inner->subject($this->token->replace(Html::escape($inner->getSubject()), $params, $options));
+    $inner->subject(PlainTextOutput::renderFromHtml($this->token->replace(Html::escape($inner->getSubject()), $params, $options)));
     $email->setHtmlBody($this->token->replace($email->getHtmlBody(), $params, $options));
   }
 
