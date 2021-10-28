@@ -100,6 +100,9 @@ class Mailer implements MailerInterface {
    * @internal
    */
   public function doSend(UnrenderedEmailInterface $email) {
+    // Call hooks.
+    $this->invokeAll('pre_build', $email);
+
     $langcode = $email->getLangcode();
     $currentLangcode = $this->languageManager->getCurrentLanguage()->getId();
     $mustSwitch = isset($langcode) && $langcode !== $currentLangcode;
@@ -109,7 +112,6 @@ class Mailer implements MailerInterface {
     }
 
     // Call hooks/builders.
-    $this->invokeAll('pre_build', $email);
     foreach ($email->getBuilders() as $builder) {
       $builder->build($email);
     }

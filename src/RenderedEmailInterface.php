@@ -2,6 +2,13 @@
 
 namespace Drupal\symfony_mailer;
 
+/**
+ * Defines the interface for an Email that has already been rendered.
+ *
+ * Any module can use this interface to adjust the email according to site
+ * policy. Contains an inner Symfony email object that will be sent; use this
+ * to configure email headers and other settings.
+ */
 interface RenderedEmailInterface extends BaseEmailInterface {
 
   /**

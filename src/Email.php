@@ -33,7 +33,14 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
 
   protected string $type;
   protected string $entity_id;
+
+  /**
+   * The email subject.
+   *
+   * @var \Drupal\Component\Render\MarkupInterface|string
+   */
   protected $subject;
+
   protected array $body = [];
   protected array $to = [];
   protected array $replyTo = [];
@@ -109,6 +116,8 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function setSubject($subject) {
+    // We must not force conversion of the subject to a string as this could
+    // cause translation before switching to the correct language.
     $this->subject = $subject;
     return $this;
   }

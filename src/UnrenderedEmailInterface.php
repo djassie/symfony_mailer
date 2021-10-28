@@ -5,6 +5,16 @@ namespace Drupal\symfony_mailer;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\RendererInterface;
 
+/**
+ * Defines the interface for an Email that has not yet been rendered.
+ *
+ * Application code in a module that supports sending emails uses this
+ * interface to build the email subject and unrendered body. Afterwards, the
+ * Email is rendered, generating an object of type RenderedEmailInterface,
+ * which has functions to configure other email headers and settings.
+ *
+ * @see \Drupal\symfony_mailer\UnrenderedEmailInterface
+ */
 interface UnrenderedEmailInterface extends BaseEmailInterface {
 
   /**
@@ -26,11 +36,14 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
   public function getSubject();
 
   /**
-   * Sets the email body.
+   * Sets the unrendered email body.
+   *
+   * The email body will be rendered using a template, then used to form both
+   * the HTML and plain text body parts. This process can be customised by the
+   * email builders added to the email.
    *
    * @param array $body
-   *   Render array for the email body. This will be rendered using a template
-   *   that can add header or footer markup.
+   *   Render array for the email body.
    *
    * @return $this
    */
@@ -57,7 +70,7 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
   public function appendBodyParagraph(string $text);
 
   /**
-   * Gets the un-rendered email body.
+   * Gets the unrendered email body.
    *
    * @return array
    *   Body render array.
