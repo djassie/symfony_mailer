@@ -60,11 +60,11 @@ class TokenEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlug
    * {@inheritdoc}
    */
   public function adjust(RenderedEmailInterface $email) {
-    $params = $email->getParams();
     $options = $this->configuration['options'] ?? [];
+    $data = $this->configuration['data'] ?? $email->getParams();
     $inner = $email->getInner();
-    $inner->subject(PlainTextOutput::renderFromHtml($this->token->replace(Html::escape($inner->getSubject()), $params, $options)));
-    $email->setHtmlBody($this->token->replace($email->getHtmlBody(), $params, $options));
+    $inner->subject(PlainTextOutput::renderFromHtml($this->token->replace(Html::escape($inner->getSubject()), $data, $options)));
+    $email->setHtmlBody($this->token->replace($email->getHtmlBody(), $data, $options));
   }
 
 }
