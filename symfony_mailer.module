@@ -8,7 +8,6 @@ function symfony_mailer_theme($existing, $type, $theme, $path) {
     'email' => [
       'variables' => [
         'email' => NULL,
-        'is_html' => TRUE,
       ],
       'mail theme' => TRUE,
     ],
@@ -29,10 +28,12 @@ function symfony_mailer_theme_suggestions_email(array $variables) {
  *
  * @param array $variables
  *   An associative array containing:
- *   - message: An associative array containing the Email object.
- *   - is_html: True if generating HTML output, false for plain text.
+ *   - email: An associative array containing the Email object.
  */
 function template_preprocess_email(&$variables) {
-  $variables['content'] = $variables['email']->getBody();
-  $variables['params'] = $variables['email']->getParams();
+  $email = $variables['email'];
+  $variables['body'] = $email->getBody();
+  foreach ($email->getParams() as $name => $value) {
+    $variables[$name] = $value;
+  }
 }

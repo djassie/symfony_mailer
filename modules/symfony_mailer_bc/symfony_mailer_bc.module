@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function symfony_mailer_bc_theme($existing, $type, $theme, $path) {
+  $templateDir = drupal_get_path('module', 'symfony_mailer_bc') . '/templates';
+  $hooks = [];
+  foreach (glob("$templateDir/email--*") as $template) {
+    $theme = strtr(basename($template, '.html.twig'), '-', '_');
+    $hooks[$theme] = ['base hook' => 'email'];
+  }
+
+  return $hooks;
+}
+

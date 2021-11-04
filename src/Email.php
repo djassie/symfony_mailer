@@ -4,6 +4,8 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
@@ -31,6 +33,13 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   protected $renderer;
 
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
   protected string $type;
   protected string $entity_id;
 
@@ -41,7 +50,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   protected $subject;
 
-  protected array $body = [];
+  protected $body = [];
   protected array $to = [];
   protected array $replyTo = [];
   protected $builders = [];
@@ -68,6 +77,8 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    *   The email builder manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param string $type
    *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
    * @param string $sub_type
@@ -75,10 +86,11 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
    *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    */
-  public function __construct(MailerInterface $mailer, EmailBuilderManager $email_builder_manager, RendererInterface $renderer, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
+  public function __construct(MailerInterface $mailer, EmailBuilderManager $email_builder_manager, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
     $this->mailer = $mailer;
     $this->emailBuilderManager = $email_builder_manager;
     $this->renderer = $renderer;
+    $this->entityTypeManager = $entity_type_manager;
     $this->type = $type;
     $this->subType = $sub_type;
     $this->entity = $entity;
@@ -106,6 +118,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
       $container->get('symfony_mailer'),
       $container->get('plugin.manager.email_builder'),
       $container->get('renderer'),
+      $container->get('entity_type.manager'),
       $type,
       $sub_type,
       $entity
@@ -132,7 +145,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function setBody(array $body) {
+  public function setBody($body) {
     $this->body = $body;
     return $this;
   }
@@ -140,7 +153,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function appendBody(array $body) {
+  public function appendBody($body) {
     $name = 'n' . count($this->body);
     $this->body[$name] = $body;
     return $this;
@@ -148,14 +161,17 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
 
   /**
    * {@inheritdoc}
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to render.
+   * @param string $view_mode
+   *   (optional) The view mode that should be used to render the entity.
    */
-  public function appendBodyParagraph(string $text) {
-    $element = [
-      '#markup' => $text,
-      '#prefix' => '<p>',
-      '#suffix' => '</p>',
-    ];
-    return $this->appendBody($element);
+  public function appendBodyEntity(EntityInterface $entity, $view_mode = 'full') {
+    $build = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId())
+      ->view($entity, $view_mode);
+
+    $this->appendBody($build);
+    return $this;
   }
 
   /**
@@ -280,7 +296,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function addParam(string $key, $value) {
+  public function setParam(string $key, $value) {
     $this->params[$key] = $value;
     return $this;
   }
@@ -297,6 +313,21 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   public function getParam(string $key) {
     return $this->params[$key];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addLibrary(string $library) {
+    $this->libraries[] = $library;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLibraries() {
+    return $this->libraries;
   }
 
   /**
@@ -352,21 +383,6 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   public function getHtmlBody() {
     return $this->inner->getHtmlBody();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addLibrary(string $library) {
-    $this->libraries[] = $library;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getLibraries() {
-    return $this->libraries;
   }
 
   /**

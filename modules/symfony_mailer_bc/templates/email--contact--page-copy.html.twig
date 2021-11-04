@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Template for contact page emails.
+ *
+ * Variables:
+ * - body: Email body content.
+ * - site_name: Site name.
+ * - sender_name: Sender name.
+ * - sender_url: Sender URL or email address.
+ * - form: Contact form name.
+ * - form_url: Contact form URL.
+ *
+ * @see template_preprocess_email()
+ *
+ * @ingroup themeable
+ */
+#}
+
+<p class="contact-email-intro">Here is a copy of the message you sent using the contact form <a href="{{ form_url }}">{{ form }}</a>.</p>
+<hr>
+{{ body }}

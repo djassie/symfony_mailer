@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Template for contact page emails.
+ *
+ * Variables:
+ * - body: Email body content.
+ * - site_name: Site name.
+ * - sender_name: Sender name.
+ * - sender_url: Sender URL or email address.
+ * - recipient_name:', Recipient name.
+ * - recipient_edit_url:', Recipient URL to change settings.
+ *
+ * @see template_preprocess_email()
+ *
+ * @ingroup themeable
+ */
+#}
+
+<p class="contact-email-intro">Hello {{ recipient_name }},<br>
+<a href="{{ sender_url }}">{{ sender_name }}</a> has sent you a message via your contact form at {{ site_name }}.
+If you don't want to receive such emails, you can <a href="{{ recipient_edit_url }}">change your settings</a>.</p>
+
+<hr>
+{{ body }}

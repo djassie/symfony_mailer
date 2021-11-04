@@ -3,6 +3,7 @@
 namespace Drupal\symfony_mailer;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Render\RendererInterface;
 
 /**
@@ -42,32 +43,34 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
    * the HTML and plain text body parts. This process can be customised by the
    * email builders added to the email.
    *
-   * @param array $body
-   *   Render array for the email body.
+   * @param $body
+   *   Unrendered email body.
    *
    * @return $this
    */
-  public function setBody(array $body);
+  public function setBody($body);
 
   /**
    * Appends content to the email body.
    *
-   * @param array $body
-   *   Array to append to the body render array.
+   * @param $body
+   *   Unrendered body part to append to the existing body array.
    *
    * @return $this
    */
-  public function appendBody(array $body);
+  public function appendBody($body);
 
   /**
-   * Appends a string to the email body.
+   * Appends a rendered entity to the email body.
    *
-   * @param string $text
-   *   String to append to the body render array in a paragraph tag.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to render.
+   * @param string $view_mode
+   *   (optional) The view mode that should be used to render the entity.
    *
    * @return $this
    */
-  public function appendBodyParagraph(string $text);
+  public function appendBodyEntity(EntityInterface $entity, $view_mode = 'full');
 
   /**
    * Gets the unrendered email body.
@@ -153,7 +156,7 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
    *
    * @return $this
    */
-  public function addParam(string $key, $value);
+  public function setParam(string $key, $value);
 
   /**
    * Sends the email.

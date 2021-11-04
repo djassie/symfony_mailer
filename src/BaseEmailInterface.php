@@ -93,4 +93,22 @@ interface BaseEmailInterface {
    */
   public function getParam(string $key);
 
+  /**
+   * Adds an asset library to use as mail CSS.
+   *
+   * @param string $library
+   *   Library name, in the form "THEME/LIBRARY".
+   *
+   * @return $this
+   */
+  public function addLibrary(string $library);
+
+  /**
+   * Gets the libraries to use as mail CSS.
+   *
+   * @return array
+   *   Array of library names, in the form "THEME/LIBRARY".
+   */
+  public function getLibraries();
+
 }

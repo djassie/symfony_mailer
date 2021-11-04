@@ -38,24 +38,6 @@ interface RenderedEmailInterface extends BaseEmailInterface {
   public function getHtmlBody();
 
   /**
-   * Adds an asset library to use as mail CSS.
-   *
-   * @param string $library
-   *   Library name, in the form "THEME/LIBRARY".
-   *
-   * @return $this
-   */
-  public function addLibrary(string $library);
-
-  /**
-   * Gets the libraries to use as mail CSS.
-   *
-   * @return array
-   *   Array of library names, in the form "THEME/LIBRARY".
-   */
-  public function getLibraries();
-
-  /**
    * Sets the mail transport ID to use.
    *
    * @param string $transport

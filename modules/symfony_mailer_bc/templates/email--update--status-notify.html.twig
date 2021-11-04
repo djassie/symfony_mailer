@@ -1,0 +1,28 @@
+{#
+/**
+ * @file
+ * Template for contact page emails.
+ *
+ * Variables:
+ * - body: Email body content.
+ * - params: Array of parameters that can be used to replace values in template
+ *   text.
+ *
+ * @see template_preprocess_email()
+ *
+ * @ingroup themeable
+ */
+#}
+
+<p>You need to take action to secure your server {{ site_name }}.</p>
+<ul>
+{% for message in messages %}
+  <li>{{ message }}</li>
+{% endfor %}
+</ul>
+
+<p>See the <a href="{{ update_status }}">available updates</a> page for more information.
+{% if update_manager %}
+  You can automatically install your updates using the <a href="{{ update_manager }}">Update manager</a>.
+{% endif %}
+You can <a href="{{ update_settings }}">change your settings</a> for what update notifications you receive.</p>
