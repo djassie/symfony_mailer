@@ -33,7 +33,5 @@ function symfony_mailer_theme_suggestions_email(array $variables) {
 function template_preprocess_email(&$variables) {
   $email = $variables['email'];
   $variables['body'] = $email->getBody();
-  foreach ($email->getParams() as $name => $value) {
-    $variables[$name] = $value;
-  }
+  $variables = array_merge($variables, $email->getVariables());
 }

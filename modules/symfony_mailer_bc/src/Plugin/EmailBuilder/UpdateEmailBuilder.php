@@ -27,13 +27,13 @@ class UpdateEmailBuilder extends EmailBuilderBase {
 
     $site_name = \Drupal::config('system.site')->get('name');
     $email->setSubject($this->t('New release(s) available for @site_name', ['@site_name' => $site_name]))
-      ->setParam('site_name', $site_name)
-      ->setParam('update_status', Url::fromRoute('update.status')->toString())
-      ->setParam('update_settings', Url::fromRoute('update.settings')->toString())
-      ->setParam('messages', $messages);
+      ->setVariable('site_name', $site_name)
+      ->setVariable('update_status', Url::fromRoute('update.status')->toString())
+      ->setVariable('update_settings', Url::fromRoute('update.settings')->toString())
+      ->setVariable('messages', $messages);
 
     if (Settings::get('allow_authorize_operations', TRUE)) {
-      $email->setParam('update_manager', Url::fromRoute('update.report_update')->toString());
+      $email->setVariable('update_manager', Url::fromRoute('update.report_update')->toString());
     }
   }
 

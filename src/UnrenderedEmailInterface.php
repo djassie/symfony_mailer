@@ -137,17 +137,17 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
   public function setLangcode(string $langcode);
 
   /**
-   * Sets parameters for hooks and to pass to the email template.
+   * Sets parameters used for building the email.
    *
    * @param array $params
-   *   (optional) An array of keyed objects.
+   *   (optional) An array of keyed objects or configuration.
    *
    * @return $this
    */
   public function setParams(array $params = []);
 
   /**
-   * Adds a parameter for hooks and to pass to the email template.
+   * Adds a parameter used for building the email.
    *
    * @param string $key
    *   Parameter key to set.
@@ -157,6 +157,36 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
    * @return $this
    */
   public function setParam(string $key, $value);
+
+  /**
+   * Sets variables available in the email template.
+   *
+   * @param array $variables
+   *   An array of keyed variables.
+   *
+   * @return $this
+   */
+  public function setVariables(array $variables);
+
+  /**
+   * Sets a variable available in the email template.
+   *
+   * @param string $key
+   *   Variable key to set.
+   * @param $value
+   *   Variable value to set.
+   *
+   * @return $this
+   */
+  public function setVariable(string $key, $value);
+
+  /**
+   * Gets variables available in the email template.
+   *
+   * @return array
+   *   An array of keyed variables.
+   */
+  public function getVariables();
 
   /**
    * Sends the email.

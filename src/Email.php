@@ -318,6 +318,29 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
+  public function setVariables(array $variables) {
+    $this->variables = $variables;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setVariable(string $key, $value) {
+    $this->variables[$key] = $value;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getVariables() {
+    return $this->variables;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function addLibrary(string $library) {
     $this->libraries[] = $library;
     return $this;

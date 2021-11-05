@@ -75,7 +75,7 @@ interface BaseEmailInterface {
   public function getLangcode();
 
   /**
-   * Gets parameters to pass to the email template and for token replacement.
+   * Gets parameters used for building the email.
    *
    * @return array
    *   An array of keyed objects.
@@ -83,7 +83,7 @@ interface BaseEmailInterface {
   public function getParams();
 
   /**
-   * Gets a parameter to pass to the email template and for token replacement.
+   * Gets a parameter used for building the email.
    *
    * @param string $key
    *   Parameter key to get.
