@@ -1,5 +1,5 @@
-name: Symfony Mailer Back-comptaibility
+name: Symfony Mailer Back-compatibility
 type: module
-description: Back-comptaibility mapper for Symfony Mailer.
+description: Back-compatibility mapper for Symfony Mailer.
 core_version_requirement: ^9.1
 package: Mail
