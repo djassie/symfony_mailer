@@ -26,12 +26,11 @@ class UserEmailBuilder extends EmailBuilderBase {
       '#text' => $mail_config->get("$key.body"),
       '#format' => $mail_config->get('text_format'),
     ];
-    $token_data = ['user' => $email->getParam('account')];
     $token_options = ['callback' => 'user_mail_tokens', 'clear' => TRUE];
 
     $email->setSubject($mail_config->get("$key.subject"))
       ->setBody($body)
-      ->addBuilder('token_replace', ['data' => $token_data, 'options' => $token_options]);
+      ->addBuilder('token_replace', ['options' => $token_options]);
   }
 
 }

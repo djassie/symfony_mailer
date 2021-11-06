@@ -53,14 +53,24 @@ class MailManagerReplacement extends MailManager {
    * {@inheritdoc}
    */
   public function mail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
-    $email = $this->emailFactory->newModuleEmail($module, $key)
-      ->setTo($to)
+    // Call alter hook.
+    $context = ['module' => $module, 'entity' => NULL];
+    $this->moduleHandler->alter(['email_bc', "email_bc_$module"], $key, $params, $context);
+
+    if ($entity = $context['entity']) {
+      $email = $this->emailFactory->newEntityEmail($entity, $key);
+    }
+    else {
+      $email = $this->emailFactory->newModuleEmail($module, $key);
+    }
+
+    $email->setTo($to)
       ->setLangcode($langcode)
       ->setParams($params);
     if ($reply) {
       $email->setReplyTo($reply);
     }
-    if (!array_key_exists($module, $email->getBuilders())) {
+    if (!array_key_exists($email->getType(), $email->getBuilders())) {
       $email->addBuilder('__legacy');
     }
 

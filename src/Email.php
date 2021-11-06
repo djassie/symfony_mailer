@@ -4,6 +4,7 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
@@ -56,6 +57,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   protected $builders = [];
   protected $langcode;
   protected $params = [];
+  protected $variables = [];
 
   protected SymfonyEmail $inner;
 

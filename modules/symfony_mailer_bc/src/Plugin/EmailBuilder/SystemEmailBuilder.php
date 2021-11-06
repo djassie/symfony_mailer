@@ -19,14 +19,12 @@ class SystemEmailBuilder extends EmailBuilderBase {
    * {@inheritdoc}
    */
   public function build(UnrenderedEmailInterface $email) {
-    $params = $email->getParams();
-    $context = $params['context'];
     $body = [
       '#type' => 'processed_text',
-      '#text' => $context['message'],
+      '#text' => $email->getParam('message'),
     ];
 
-    $email->setSubject($context['subject'])
+    $email->setSubject($email->getParam('subject'))
       ->setBody($body)
       ->addBuilder('token_replace', ['data' => $context]);
   }

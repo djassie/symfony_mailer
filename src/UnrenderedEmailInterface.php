@@ -149,6 +149,9 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
   /**
    * Adds a parameter used for building the email.
    *
+   * If the value is an entity, then the key should be the entity type ID.
+   * Otherwise the value is typically a setting that alters the email build.
+   *
    * @param string $key
    *   Parameter key to set.
    * @param $value

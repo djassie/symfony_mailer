@@ -2,6 +2,8 @@
 
 namespace Drupal\symfony_mailer;
 
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
+
 /**
  * Provides a factory for create email objects.
  */
@@ -34,7 +36,7 @@ class EmailFactory {
    *   A new email object.
    */
   public function newEntityEmail(ConfigEntityInterface $entity, string $sub_type) {
-    return $this->newEmail($entity->getType(), $sub_type, $entity);
+    return $this->newEmail($entity->getEntityTypeId(), $sub_type, $entity);
   }
 
   /**
