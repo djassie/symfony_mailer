@@ -25,16 +25,16 @@ class ContactEmailBuilder extends EmailBuilderBase {
     $subject = $contact_message->getSubject();
     $site_name = \Drupal::config('system.site')->get('name');
 
-    if ($form = $params['contact_form']) {
+    if (isset($params['contact_form'])) {
       // Site form.
-      $form_name = $form->label();
-      $email->setSubject($this->t('[@form] @subject', ['@form' => $form_name, '@subject' => $subject]))
-        ->setVariable('form', $form_name)
+      $form = $params['contact_form']->label();
+      $email->setSubject($this->t('[@form] @subject', ['@form' => $form, '@subject' => $subject]))
+        ->setVariable('form', $form)
         ->setVariable('form_url', Url::fromRoute('<current>')->toString());
     }
     else {
       // Personal form.
-      $email->setSubject($this->t('[@site-name] @subject', ['@site-name' => $site_name, 'subject' => $subject]))
+      $email->setSubject($this->t('[@site-name] @subject', ['@site-name' => $site_name, '@subject' => $subject]))
         ->setVariable('recipient_name', $params['recipient']->getDisplayName())
         ->setVariable('recipient_edit_url', $params['recipient']->toUrl('edit-form')->toString());
     }
