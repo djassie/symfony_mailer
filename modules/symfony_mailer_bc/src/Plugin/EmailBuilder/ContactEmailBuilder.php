@@ -22,45 +22,35 @@ class ContactEmailBuilder extends EmailBuilderBase {
   public function build(UnrenderedEmailInterface $email) {
     $params = $email->getParams();
     $contact_message = $params['contact_message'];
-    /** @var \Drupal\user\UserInterface $sender */
-    $sender = $params['sender'];
+    $subject = $contact_message->getSubject();
     $site_name = \Drupal::config('system.site')->get('name');
-    $form = !empty($params['contact_form']) ? $params['contact_form']->label() : NULL;
 
-    $subject_variables = [
-      '@site-name' => $site_name,
-      '@form' => $form,
-      '@subject' => $contact_message->getSubject(),
-    ];
-
-    $key = $email->getSubType();
-
-    if ($key == 'page_autoreply') {
-      $email->setSubject($this->t('[@form] @subject', $subject_variables))
-        ->setBody($params['contact_form']->getReply());
-      return;
+    if ($form = $params['contact_form']) {
+      // Site form.
+      $form_name = $form->label();
+      $email->setSubject($this->t('[@form] @subject', ['@form' => $form_name, '@subject' => $subject]))
+        ->setVariable('form', $form_name)
+        ->setVariable('form_url', Url::fromRoute('<current>')->toString());
+    }
+    else {
+      // Personal form.
+      $email->setSubject($this->t('[@site-name] @subject', ['@site-name' => $site_name, 'subject' => $subject]))
+        ->setVariable('recipient_name', $params['recipient']->getDisplayName())
+        ->setVariable('recipient_edit_url', $params['recipient']->toUrl('edit-form')->toString());
     }
 
-    $email->appendBodyEntity($contact_message, 'mail')
-      ->addLibrary('symfony_mailer_bc/contact')
-      ->setVariable('site_name', $site_name)
-      ->setVariable('sender_name', $sender->getDisplayName())
-      ->setVariable('sender_url', $sender->isAuthenticated() ? $sender->toUrl('canonical')->toString() : $sender->getEmail());
+    if ($email->getSubType() == 'page_autoreply') {
+      $email->setBody($params['contact_form']->getReply());
+    }
+    else {
+      /** @var \Drupal\user\UserInterface $sender */
+      $sender = $params['sender'];
 
-    switch ($key) {
-      case 'page_mail':
-      case 'page_copy':
-        $email->setSubject($this->t('[@form] @subject', $subject_variables))
-          ->setVariable('form', $form)
-          ->setVariable('form_url', Url::fromRoute('<current>')->toString());
-        break;
-
-      case 'user_mail':
-      case 'user_copy':
-        $email->setSubject($this->t('[@site-name] @subject', $subject_variables))
-          ->setVariable('recipient_name', $params['recipient']->getDisplayName())
-          ->setVariable('recipient_edit_url', $params['recipient']->toUrl('edit-form')->toString());
-        break;
+      $email->appendBodyEntity($contact_message, 'mail')
+        ->addLibrary('symfony_mailer_bc/contact')
+        ->setVariable('site_name', $site_name)
+        ->setVariable('sender_name', $sender->getDisplayName())
+        ->setVariable('sender_url', $sender->isAuthenticated() ? $sender->toUrl('canonical')->toString() : $sender->getEmail());
     }
   }
 
