@@ -14,11 +14,11 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *   label = @Translation("Email Builder for commerce module"),
  * )
  *
- * @todo Integrate notes for adopting Symfony Mailer into commerce. It should
- * be possible to remove the MailHandler service. Classes such as
- * OrderReceiptMail could call directly to UnrenderedEmailInterface or even be
- * converted to an EmailBuilder. The commerce_order_receipt template could be
- * retired, switching instead to the email__commerce__order_receipt.
+ * @todo Notes for adopting Symfony Mailer into commerce. It should be possible
+ * to remove the MailHandler service. Classes such as OrderReceiptMail could
+ * call directly to UnrenderedEmailInterface or even be converted to an
+ * EmailBuilder. The commerce_order_receipt template could be retired,
+ * switching instead to the email__commerce__order_receipt.
  */
 class CommerceEmailBuilder extends EmailBuilderBase {
 
