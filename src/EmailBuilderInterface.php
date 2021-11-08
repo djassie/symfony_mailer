@@ -23,9 +23,12 @@ interface EmailBuilderInterface {
   /**
    * Gets the weight of the email builder.
    *
+   * @param string $function
+   *   The function that will be called: 'build' or 'adjust'.
+   *
    * @return int
    *   The weight.
    */
-  public function getWeight();
+  public function getWeight(string $function);
 
 }

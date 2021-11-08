@@ -70,7 +70,7 @@ class MailManagerReplacement extends MailManager {
     if ($reply) {
       $email->setReplyTo($reply);
     }
-    if (!array_key_exists($email->getType(), $email->getBuilders())) {
+    if (!$email->getBuilder($email->getType())) {
       $email->addBuilder('__legacy');
     }
 

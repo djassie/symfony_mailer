@@ -23,8 +23,9 @@ class EmailBuilderBase extends PluginBase implements EmailBuilderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getWeight() {
-    return $this->getPluginDefinition()['weight'] ?? static::DEFAULT_WEIGHT;
+  public function getWeight(string $function) {
+    $weight = $this->getPluginDefinition()['weight'] ?? static::DEFAULT_WEIGHT;
+    return is_array($weight) ? $weight[$function] : $weight;
   }
 
 }

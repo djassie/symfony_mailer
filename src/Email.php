@@ -55,6 +55,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   protected array $to = [];
   protected array $replyTo = [];
   protected $builders = [];
+  protected $builderIterator = NULL;
   protected $langcode;
   protected $params = [];
   protected $variables = [];
@@ -218,7 +219,11 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   public function addBuilder(string $plugin_id, array $configuration = [], $optional = FALSE) {
     if (!$optional || $this->emailBuilderManager->hasDefinition($plugin_id)) {
-      $this->builders[$plugin_id] = $this->emailBuilderManager->createInstance($plugin_id, $configuration);
+      $builder = $this->emailBuilderManager->createInstance($plugin_id, $configuration);
+      $this->builders[$plugin_id] = $builder;
+      if ($this->builderIterator) {
+        $this->builderIterator->add($builder);
+      }
     }
     return $this;
   }
@@ -227,8 +232,16 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function getBuilders() {
-    $this->emailBuilderManager->sort($this->builders);
-    return $this->builders;
+    $function = isset($this->inner) ? 'adjust' : 'build';
+    $this->builderIterator = new EmailBuilderIterator(array_values($this->builders), $function);
+    return $this->builderIterator;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBuilder(string $plugin_id) {
+    return $this->builders[$plugin_id] ?? NULL;
   }
 
   /**

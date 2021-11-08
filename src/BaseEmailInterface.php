@@ -10,10 +10,21 @@ interface BaseEmailInterface {
   /**
    * Gets all email builders.
    *
-   * @return array
-   *   Array of email builders.
+   * @return \Iterator
+   *   Iterator over email builders.
    */
   public function getBuilders();
+
+  /**
+   * Gets the specified email builder.
+   *
+   * @param string $plugin_id
+   *   The ID of the email builder plugin.
+   *
+   * @return \Drupal\symfony_mailer\EmailBuilderInterface
+   *   The email builder, or NULL if not present.
+   */
+  public function getBuilder(string $plugin_id);
 
   /**
    * Gets the email type.
