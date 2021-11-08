@@ -12,6 +12,9 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *   id = "user",
  *   label = @Translation("Email Builder for user module"),
  * )
+ *
+ * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can
+ * set langcode, to, reply-to so the calling code doesn't need to.
  */
 class UserEmailBuilder extends EmailBuilderBase {
 
@@ -30,7 +33,7 @@ class UserEmailBuilder extends EmailBuilderBase {
 
     $email->setSubject($mail_config->get("$key.subject"))
       ->setBody($body)
-      ->addBuilder('token_replace', ['options' => $token_options]);
+      ->addBuilder('token_replace', ['options' => $token_options, 'pre_render' => TRUE]);
   }
 
 }
