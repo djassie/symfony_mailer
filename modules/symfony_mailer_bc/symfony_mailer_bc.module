@@ -32,6 +32,20 @@ function symfony_mailer_bc_email_bc_system_alter(string &$key, array &$params, a
 }
 
 /**
+ * Implements hook_email_bc_MODULE_alter() for contact.
+ */
+function symfony_mailer_bc_email_bc_contact_alter(string &$key, array &$params, array &$context) {
+  if (isset($params['contact_form'])) {
+    // Set the associated config entity.
+    $context['entity'] = $params['contact_form'];
+  }
+
+  // This creates two separate email types, so no longer need the key to
+  // contain page_ or user_.
+  $key = substr($key, 5);
+}
+
+/**
  * Implements hook_email_bc_MODULE_alter() for simplenews.
  */
 function symfony_mailer_bc_email_bc_simplenews_alter(string &$key, array &$params, array &$context) {
