@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: contact_form
+configuration:
+  subject:
+    value: '[{{ form }}] {{ subject }}'

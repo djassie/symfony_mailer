@@ -21,8 +21,8 @@ class ContactEmailBuilderBase extends EmailBuilderBase {
 
     $email->appendBodyEntity($contact_message, 'mail')
       ->addLibrary('symfony_mailer_bc/contact')
-      ->addBuilder('token_replace')
       ->setVariable('subject', $contact_message->getSubject())
+      ->setVariable('site_name', \Drupal::config('system.site')->get('name'))
       ->setVariable('sender_name', $sender->getDisplayName())
       ->setVariable('sender_url', $sender->isAuthenticated() ? $sender->toUrl('canonical')->toString() : $sender->getEmail());
   }

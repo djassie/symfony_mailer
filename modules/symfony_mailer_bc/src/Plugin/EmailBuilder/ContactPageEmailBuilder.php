@@ -12,6 +12,9 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *   id = "contact_form",
  *   label = @Translation("Email Builder for contact module"),
  * )
+ *
+ * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can
+ * set langcode, to, reply-to so the calling code doesn't need to.
  */
 class ContactPageEmailBuilder extends ContactEmailBuilderBase {
 
@@ -20,8 +23,7 @@ class ContactPageEmailBuilder extends ContactEmailBuilderBase {
    */
   public function build(UnrenderedEmailInterface $email) {
     parent::build($email);
-    $email->setSubject('[[variables:form]] [variables:subject]')
-      ->setVariable('form', $email->getEntity()->label())
+    $email->setVariable('form', $email->getEntity()->label())
       ->setVariable('form_url', Url::fromRoute('<current>')->toString());
 
     if ($email->getSubType() == 'autoreply') {

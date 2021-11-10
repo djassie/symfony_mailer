@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies: {  }
+id: contact.mail
+configuration:
+  body:
+    format: basic_html
+    value: >
+      <p class="contact-email-intro">Hello {{ recipient_name }},<br>
+      <a href="{{ sender_url }}">{{ sender_name }}</a> has sent you a message via your form at [site:name].
+      If you don't want to receive such emails, you can <a href="{{ recipient_edit_url }}">change your settings</a>.</p>
+      <hr>
+      {{ body }}

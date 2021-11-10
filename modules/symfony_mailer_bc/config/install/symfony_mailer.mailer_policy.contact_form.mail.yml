@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: contact_form.mail
+configuration:
+  body:
+    format: basic_html
+    value: >
+      <p class="contact-email-intro"><a href="{{ sender_url }}">{{ sender_name }}</a> sent a message using the contact form <a href="{{ form_url }}">{{ form }}</a>.</p>
+      <hr>
+      {{ body }}
