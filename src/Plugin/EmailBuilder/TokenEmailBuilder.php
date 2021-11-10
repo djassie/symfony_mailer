@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "token_replace",
  *   label = @Translation("Token replace"),
  *   description = @Translation("Replace tokens in subject and body."),
- *   weight = { "build" = 800, "adjust" = 200 }
+ *   weight = 600
  * )
  */
 class TokenEmailBuilder extends EmailBuilderBase implements ContainerFactoryPluginInterface {
@@ -46,8 +46,8 @@ class TokenEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlug
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Token $token) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->token = $token;
+    $this->data = $configuration['data'] ?? $configuration['email']->getParams();
     $this->options = $configuration['options'] ?? [];
-    $this->options['callback'] = [$this, 'tokens'];
   }
 
   /**
@@ -65,51 +65,40 @@ class TokenEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlug
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
-    $this->data = $configuration['data'] ?? $email->getParams();
-    $this->data['variables'] = $email->getVariables();
-
-    if (!empty($this->configuration['pre_render'])) {
-      // Need to replace tokens before rendering so that the filters in the
-      // text format can convert them to links.
-      $body = $email->getBody();
-
-      if ($body['#type'] == 'processed_text') {
-        $body['#text'] = $this->token->replace($body['#text'], $this->data, $this->options);
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function adjust(RenderedEmailInterface $email) {
-    $this->data['variables']['body'] = $email->getHtmlBody();
     $inner = $email->getInner();
-    $inner->subject(PlainTextOutput::renderFromHtml($this->token->replace(Html::escape($inner->getSubject()), $this->data, $this->options)));
-    $email->setHtmlBody($this->token->replace($email->getHtmlBody(), $this->data, $this->options));
+    if ($subject = $inner->getSubject()) {
+      $inner->subject($this->replacePlain($subject));
+    }
+    if ($body = $email->getHtmlBody()) {
+      $email->setHtmlBody($this->replaceMarkup($body));
+    }
   }
 
   /**
-   * Provides a callback for replacing tokens of type 'variable'.
+   * Replaces tokens in a plain-text string.
    *
-   * @param array $replacements
-   *   An associative array variable containing mappings from token names to
-   *   values (for use with strtr()).
-   * @param array $data
-   *   An array of keyed objects.
-   * @param array $options
-   *   A keyed array of settings and flags to control the token replacement
-   *   process. See \Drupal\Core\Utility\Token::replace().
+   * @param string $plain
+   *   The plain-text string.
    *
-   * @internal
+   * @return string
+   *   The plain-text result.
    */
-  public function tokens(array &$replacements, array $data, array $options) {
-    if (!empty($data['variables'])) {
-      foreach ($data['variables'] as $name => $value) {
-        $replacements["[variables:$name]"] = $value;
-      }
-    }
+  public function replacePlain(string $plain) {
+    return PlainTextOutput::renderFromHtml($this->token->replace(Html::escape($plain), $this->data, $this->options));
+  }
+
+  /**
+   * Replaces tokens in an HTML markup string.
+   *
+   * @param string $markup
+   *   The markup string.
+   *
+   * @return string
+   *   The markup result.
+   */
+  public function replaceMarkup(string $markup) {
+    return $this->token->replace($markup, $this->data, $this->options);
   }
 
 }

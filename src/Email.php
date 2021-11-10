@@ -219,6 +219,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   public function addBuilder(string $plugin_id, array $configuration = [], $optional = FALSE) {
     if (!$optional || $this->emailBuilderManager->hasDefinition($plugin_id)) {
+      $configuration['email'] = $this;
       $builder = $this->emailBuilderManager->createInstance($plugin_id, $configuration);
       $this->builders[$plugin_id] = $builder;
       if ($this->builderIterator) {
@@ -232,6 +233,8 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function getBuilders() {
+    // @todo We are no longer using the feature to add builders during
+    // iteration so maybe we can remove EmailBuilderIterator.
     $function = isset($this->inner) ? 'adjust' : 'build';
     $this->builderIterator = new EmailBuilderIterator(array_values($this->builders), $function);
     return $this->builderIterator;
@@ -389,10 +392,12 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
     ];
 
     $this->inner = (new SymfonyEmail())
-      ->subject($subject)
       ->html((string) $this->renderer->renderPlain($body))
       ->to(...$this->to)
       ->replyTo(...$this->replyTo);
+    if ($subject) {
+      $this->inner->subject($subject);
+    }
     $this->subject = NULL;
     $this->body = [];
     $this->to = [];

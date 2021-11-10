@@ -3,6 +3,7 @@
 namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\symfony_mailer\Entity\MailerPolicy;
 
 /**
  * Provides a factory for create email objects.
@@ -55,10 +56,23 @@ class EmailFactory {
   protected function newEmail(string $type, string $sub_type, ?ConfigEntityInterface $entity = NULL) {
     $email = Email::create(\Drupal::getContainer(), $type, $sub_type, $entity);
 
+    // Load builders and policy with matching ID.
     foreach ($email->getSuggestions('', '.') as $id) {
       $email->addBuilder($id, [], TRUE);
+      if ($policy = MailerPolicy::load($id)) {
+        $policy_config[] = $policy->getConfiguration();
+      }
     }
 
+    if (isset($policy_config)) {
+      $policy_config = array_merge(...$policy_config);
+      foreach ($policy_config as $plugin_id => $config) {
+        $email->addBuilder($plugin_id, $config, TRUE);
+      }
+    }
+
+    // @todo Could move this into the policy config so it's visible and
+    // customisable from the GUI.
     $email->addBuilder('default_headers')
       ->addBuilder('url_to_absolute')
       ->addBuilder('html_to_text')
