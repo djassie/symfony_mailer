@@ -53,4 +53,7 @@ function symfony_mailer_bc_email_bc_simplenews_alter(string &$key, array &$param
     // Set the associated config entity.
     $context['entity'] = $params['simplenews_mail']->getNewsletter();
   }
+  elseif ($key == 'subscribe_combined') {
+    $key = 'subscribe';
+  }
 }
