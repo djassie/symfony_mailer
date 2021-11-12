@@ -1,0 +1,12 @@
+langcode: en
+status: true
+dependencies: {  }
+id: user.status_blocked
+configuration:
+  subject:
+    value: 'Account details for [user:display-name] at [site:name] (blocked)'
+  body:
+    format: basic_html
+    value: >
+      <p>[user:display-name],</p>
+      <p>Your account on <a href="[site:url]">[site:name]</a> has been blocked.</p>
