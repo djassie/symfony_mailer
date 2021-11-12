@@ -3,9 +3,9 @@ status: true
 dependencies: {  }
 id: user.register_admin_created
 configuration:
-  subject:
+  email_subject:
     value: 'An administrator created an account for you at [site:name]'
-  body:
+  email_body:
     format: basic_html
     value: >
       <p>[user:display-name],</p>

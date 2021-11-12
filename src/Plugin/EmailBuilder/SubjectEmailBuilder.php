@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Defines the Subject header Email Builder.
  *
  * @EmailBuilder(
- *   id = "subject",
+ *   id = "email_subject",
  *   label = @Translation("Subject"),
  *   description = @Translation("Sets the email subject."),
  * )

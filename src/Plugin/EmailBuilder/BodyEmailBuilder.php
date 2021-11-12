@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Defines the Body Email Builder.
  *
  * @EmailBuilder(
- *   id = "body",
+ *   id = "email_body",
  *   label = @Translation("Body"),
  *   description = @Translation("Sets the email body."),
  * )

@@ -3,9 +3,9 @@ status: true
 dependencies: {  }
 id: user.status_blocked
 configuration:
-  subject:
+  email_subject:
     value: 'Account details for [user:display-name] at [site:name] (blocked)'
-  body:
+  email_body:
     format: basic_html
     value: >
       <p>[user:display-name],</p>

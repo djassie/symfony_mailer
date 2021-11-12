@@ -3,5 +3,5 @@ status: true
 dependencies: {  }
 id: contact_form
 configuration:
-  subject:
+  email_subject:
     value: '[{{ form }}] {{ subject }}'

@@ -3,9 +3,9 @@ status: true
 dependencies: {  }
 id: user.status_activated
 configuration:
-  subject:
+  email_subject:
     value: 'Your account details for [user:display-name] at [site:name] ([site:url])'
-  body:
+  email_body:
     format: basic_html
     value: >
       <p>[user:display-name],</p>

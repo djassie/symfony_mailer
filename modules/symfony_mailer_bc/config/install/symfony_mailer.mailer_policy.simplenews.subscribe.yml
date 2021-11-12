@@ -3,9 +3,9 @@ status: true
 dependencies: {  }
 id: simplenews.subscribe
 configuration:
-  subject:
+  email_subject:
     value: 'Confirmation for [site:name]'
-  body:
+  email_body:
     format: basic_html
     value: >
       <p>We have received a request to subscribe [simplenews-subscriber:mail] at <a href="[site:url]">[site:name]</a>.
