@@ -8,7 +8,6 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\symfony_mailer\EmailBuilderBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -30,7 +29,6 @@ class TokenEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlug
    */
   protected $token;
 
-  protected array $data;
   protected array $options;
 
   /**
@@ -46,7 +44,6 @@ class TokenEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlug
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Token $token) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->token = $token;
-    $this->data = $configuration['data'] ?? $configuration['email']->getParams();
     $this->options = $configuration['options'] ?? [];
   }
 
@@ -66,39 +63,16 @@ class TokenEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlug
    * {@inheritdoc}
    */
   public function adjust(RenderedEmailInterface $email) {
+    $data = $this->configuration['data'] ?? $email->getParams();
     $inner = $email->getInner();
+
     if ($subject = $inner->getSubject()) {
-      $inner->subject($this->replacePlain($subject));
+      $subject = PlainTextOutput::renderFromHtml($this->token->replace(Html::escape($subject), $data, $this->options));
+      $inner->subject($subject);
     }
     if ($body = $email->getHtmlBody()) {
-      $email->setHtmlBody($this->replaceMarkup($body));
+      $email->setHtmlBody($this->token->replace($body, $data, $this->options));
     }
-  }
-
-  /**
-   * Replaces tokens in a plain-text string.
-   *
-   * @param string $plain
-   *   The plain-text string.
-   *
-   * @return string
-   *   The plain-text result.
-   */
-  public function replacePlain(string $plain) {
-    return PlainTextOutput::renderFromHtml($this->token->replace(Html::escape($plain), $this->data, $this->options));
-  }
-
-  /**
-   * Replaces tokens in an HTML markup string.
-   *
-   * @param string $markup
-   *   The markup string.
-   *
-   * @return string
-   *   The markup result.
-   */
-  public function replaceMarkup(string $markup) {
-    return $this->token->replace($markup, $this->data, $this->options);
   }
 
 }

@@ -219,7 +219,6 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   public function addBuilder(string $plugin_id, array $configuration = [], $optional = FALSE) {
     if (!$optional || $this->emailBuilderManager->hasDefinition($plugin_id)) {
-      $configuration['email'] = $this;
       $builder = $this->emailBuilderManager->createInstance($plugin_id, $configuration);
       $this->builders[$plugin_id] = $builder;
       if ($this->builderIterator) {
@@ -383,21 +382,23 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   public function render() {
     // Render subject.
-    $subject = ($this->subject instanceof MarkupInterface) ? PlainTextOutput::renderFromHtml($this->subject) : $this->subject;
+    $subject = $this->subject;
+    if (is_array($subject)) {
+      $subject = $this->renderer->renderPlain($subject);
+    }
+    if ($subject instanceof MarkupInterface) {
+      $subject = PlainTextOutput::renderFromHtml($subject);
+    }
 
     // Render body.
-    $body = [
-      '#theme' => 'email',
-      '#email' => $this,
-    ];
+    $body = ['#theme' => 'email', '#email' => $this];
+    $body = $this->renderer->renderPlain($body);
 
     $this->inner = (new SymfonyEmail())
-      ->html((string) $this->renderer->renderPlain($body))
+      ->html($body)
+      ->subject($subject)
       ->to(...$this->to)
       ->replyTo(...$this->replyTo);
-    if ($subject) {
-      $this->inner->subject($subject);
-    }
     $this->subject = NULL;
     $this->body = [];
     $this->to = [];

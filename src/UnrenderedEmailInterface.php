@@ -21,7 +21,7 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
   /**
    * Sets the email subject.
    *
-   * @param \Drupal\Component\Render\MarkupInterface|string $subject
+   * @param \Drupal\Component\Render\MarkupInterface|string|array $subject
    *   The email subject.
    *
    * @return $this
