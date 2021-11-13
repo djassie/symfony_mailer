@@ -11,6 +11,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @EmailBuilder(
  *   id = "system",
  *   label = @Translation("Email Builder for system module"),
+ *   sub_types = { "action_send_email" },
  * )
  */
 class SystemEmailBuilder extends EmailBuilderBase {

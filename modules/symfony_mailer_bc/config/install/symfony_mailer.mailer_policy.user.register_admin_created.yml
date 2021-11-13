@@ -1,6 +1,8 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - user
 id: user.register_admin_created
 configuration:
   email_subject:

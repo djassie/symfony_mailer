@@ -1,6 +1,8 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - simplenews
 id: simplenews.validate
 configuration:
   email_subject:

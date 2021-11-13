@@ -27,4 +27,22 @@ class EmailBuilder extends Plugin {
    */
   public $label;
 
+  /**
+   * List of sub-types.
+   *
+   * Only present for a builder representing an email type.
+   *
+   * @var string[]
+   */
+  public $sub_types;
+
+  /**
+   * Whether the plugin is associated with a config entity.
+   *
+   * Only present for a builder representing an email type.
+   *
+   * @var bool
+   */
+  public $has_entity = FALSE;
+
 }

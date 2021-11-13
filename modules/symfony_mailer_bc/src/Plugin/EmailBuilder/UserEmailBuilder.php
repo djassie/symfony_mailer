@@ -11,6 +11,17 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @EmailBuilder(
  *   id = "user",
  *   label = @Translation("Email Builder for user module"),
+ *   sub_types = {
+ *     "cancel_confirm",
+ *     "password_reset",
+ *     "register_admin_created",
+ *     "register_no_approval_required",
+ *     "register_pending_approval",
+ *     "register_pending_approval_admin",
+ *     "status_activated",
+ *     "status_blocked",
+ *     "status_canceled",
+ *   },
  * )
  *
  * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can

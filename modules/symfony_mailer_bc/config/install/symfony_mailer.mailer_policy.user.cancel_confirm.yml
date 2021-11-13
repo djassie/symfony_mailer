@@ -1,6 +1,8 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - user
 id: user.cancel_confirm
 configuration:
   email_subject:

@@ -12,6 +12,8 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @EmailBuilder(
  *   id = "simplenews_newsletter",
  *   label = @Translation("Email Builder for simplenews newsletters"),
+ *   sub_types = { "node", "test" },
+ *   has_entity = TRUE,
  * )
  *
  * @todo Notes for adopting Symfony Mailer into simplenews. Can remove the
