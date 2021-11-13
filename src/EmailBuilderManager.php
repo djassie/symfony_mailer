@@ -26,6 +26,7 @@ class EmailBuilderManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/EmailBuilder', $namespaces, $module_handler, 'Drupal\symfony_mailer\EmailBuilderInterface', 'Drupal\symfony_mailer\Annotation\EmailBuilder');
     $this->setCacheBackend($cache_backend, 'symfony_mailer_builder_plugins');
+    $this->alterInfo('email_builder');
   }
 
 }

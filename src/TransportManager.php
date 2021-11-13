@@ -25,6 +25,7 @@ class TransportManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/MailerTransport', $namespaces, $module_handler, 'Drupal\symfony_mailer\TransportPluginInterface', 'Drupal\symfony_mailer\Annotation\MailerTransport');
     $this->setCacheBackend($cache_backend, 'symfony_mailer_transport_plugins');
+    $this->alterInfo('mailer_transport');
   }
 
 }
