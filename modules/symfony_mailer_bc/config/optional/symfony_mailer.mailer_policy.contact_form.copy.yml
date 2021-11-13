@@ -6,7 +6,6 @@ dependencies:
 id: contact_form.copy
 configuration:
   email_body:
-    format: basic_html
     value: >
       <p class="contact-email-intro">Here is a copy of the message you sent using the contact form <a href="{{ form_url }}">{{ form }}</a>.</p>
       <hr>

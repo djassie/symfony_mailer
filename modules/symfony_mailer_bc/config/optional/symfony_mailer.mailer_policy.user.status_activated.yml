@@ -8,7 +8,6 @@ configuration:
   email_subject:
     value: 'Your account details for [user:display-name] at [site:name] ([site:url])'
   email_body:
-    format: basic_html
     value: >
       <p>[user:display-name],</p>
       <p>Your account at <a href="[site:url]">[site:name]</a> has been activated.

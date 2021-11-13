@@ -6,7 +6,6 @@ dependencies:
 id: contact.mail
 configuration:
   email_body:
-    format: basic_html
     value: >
       <p class="contact-email-intro">Hello {{ recipient_name }},<br>
       <a href="{{ sender_url }}">{{ sender_name }}</a> has sent you a message via your form at {{ site_name }}.

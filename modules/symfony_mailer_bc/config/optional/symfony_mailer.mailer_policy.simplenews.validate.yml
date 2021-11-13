@@ -8,7 +8,6 @@ configuration:
   email_subject:
     value: 'Manage your subscriptions at [site:name]'
   email_body:
-    format: basic_html
     value: >
       <p>We have received a request to manage your subscriptions for [simplenews-subscriber:mail] at <a href="[site:url]">[site:name]</a>.
       Please use this link to <a href="[simplenews-subscriber:manage-url]">proceed</a>.</p>
