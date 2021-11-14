@@ -23,7 +23,7 @@
  * @see \Drupal\Core\Mail\MailManagerInterface::mail()
  * @see \Drupal\symfony_mailer\EmailFactory
  */
-function hook_email_bc_alter(string &$key, array &$params, array &$context) {
+function hook_mailer_bc_alter(string &$key, array &$params, array &$context) {
 }
 
 /**
@@ -38,5 +38,5 @@ function hook_email_bc_alter(string &$key, array &$params, array &$context) {
  *   - module: The email type, known as 'module' on the old interface.
  *   - entity: The associated config entity, always null on the old interface.
  */
-function hook_email_bc_MODULE_alter(string &$key, array &$params, array &$context) {
+function hook_mailer_bc_MODULE_alter(string &$key, array &$params, array &$context) {
 }

@@ -15,26 +15,26 @@ function symfony_mailer_bc_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implements hook_email_bc_MODULE_alter() for user.
+ * Implements hook_mailer_bc_MODULE_alter() for user.
  */
-function symfony_mailer_bc_email_bc_user_alter(string &$key, array &$params, array &$context) {
+function symfony_mailer_bc_mailer_bc_user_alter(string &$key, array &$params, array &$context) {
   // Use the entity type as the parameter key.
   // @see \Drupal\symfony_mailer\UnrenderedEmailInterface::setParam()
   $params = ['user' => $params['account']];
 }
 
 /**
- * Implements hook_email_bc_MODULE_alter() for system.
+ * Implements hook_mailer_bc_MODULE_alter() for system.
  */
-function symfony_mailer_bc_email_bc_system_alter(string &$key, array &$params, array &$context) {
+function symfony_mailer_bc_mailer_bc_system_alter(string &$key, array &$params, array &$context) {
   // Simplify the params.
   $params = $params['context'];
 }
 
 /**
- * Implements hook_email_bc_MODULE_alter() for contact.
+ * Implements hook_mailer_bc_MODULE_alter() for contact.
  */
-function symfony_mailer_bc_email_bc_contact_alter(string &$key, array &$params, array &$context) {
+function symfony_mailer_bc_mailer_bc_contact_alter(string &$key, array &$params, array &$context) {
   if (isset($params['contact_form'])) {
     // Set the associated config entity.
     $context['entity'] = $params['contact_form'];
@@ -46,9 +46,9 @@ function symfony_mailer_bc_email_bc_contact_alter(string &$key, array &$params, 
 }
 
 /**
- * Implements hook_email_bc_MODULE_alter() for simplenews.
+ * Implements hook_mailer_bc_MODULE_alter() for simplenews.
  */
-function symfony_mailer_bc_email_bc_simplenews_alter(string &$key, array &$params, array &$context) {
+function symfony_mailer_bc_mailer_bc_simplenews_alter(string &$key, array &$params, array &$context) {
   if ($key == 'node' || $key == 'test') {
     // Set the associated config entity.
     $context['entity'] = $params['simplenews_mail']->getNewsletter();

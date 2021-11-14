@@ -17,7 +17,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
  *   The email.
  */
-function hook_email_pre_build(UnrenderedEmailInterface $email) {
+function hook_mailer_pre_build(UnrenderedEmailInterface $email) {
 }
 
 /**
@@ -28,7 +28,7 @@ function hook_email_pre_build(UnrenderedEmailInterface $email) {
  * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
  *   The email.
  */
-function hook_email_pre_render(UnrenderedEmailInterface $email) {
+function hook_mailer_pre_render(UnrenderedEmailInterface $email) {
 }
 
 /**
@@ -39,7 +39,7 @@ function hook_email_pre_render(UnrenderedEmailInterface $email) {
  * @param \Drupal\symfony_mailer\RenderedEmailInterface $email
  *   The email.
  */
-function hook_email_pre_send(RenderedEmailInterface $email) {
+function hook_mailer_pre_send(RenderedEmailInterface $email) {
 }
 
 // @todo Versions with __TYPE, __SUBTYPE
@@ -47,17 +47,17 @@ function hook_email_pre_send(RenderedEmailInterface $email) {
 /**
  * Alters email builder plug-in definitions.
  *
- * @param \Drupal\symfony_mailer\EmailBuilderInterface[] $email_builders
+ * @param array $email_builders
  *   An associative array of all email builder definitions, keyed by the ID.
  */
-function hook_email_builder_alter(array &$email_builders) {
+function hook_mailer_builder_info_alter(array &$email_builders) {
 }
 
 /**
  * Alters mailer transport plug-in definitions.
  *
- * @param \Drupal\symfony_mailer\TransportPluginInterface[] $mailer_transports
+ * @param array $mailer_transports
  *   An associative array of all mailer transport definitions, keyed by the ID.
  */
-function hook_mailer_transport_alter(array &$mailer_transports) {
+function hook_mailer_transport_info_alter(array &$mailer_transports) {
 }

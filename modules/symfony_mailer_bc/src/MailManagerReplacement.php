@@ -55,7 +55,7 @@ class MailManagerReplacement extends MailManager {
   public function mail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
     // Call alter hook.
     $context = ['module' => $module, 'entity' => NULL];
-    $this->moduleHandler->alter(['email_bc', "email_bc_$module"], $key, $params, $context);
+    $this->moduleHandler->alter(['mailer_bc', "mailer_bc_$module"], $key, $params, $context);
 
     if ($entity = $context['entity']) {
       $email = $this->emailFactory->newEntityEmail($entity, $key);
