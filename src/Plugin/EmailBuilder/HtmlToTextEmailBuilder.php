@@ -10,7 +10,7 @@ use Html2Text\Html2Text;
  * Defines the HTML to text Email Builder.
  *
  * @EmailBuilder(
- *   id = "html_to_text",
+ *   id = "mailer_html_to_text",
  *   label = @Translation("HTML to text"),
  *   description = @Translation("Create a plain text part from the HTML."),
  *   weight = 800,

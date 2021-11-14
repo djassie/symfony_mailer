@@ -9,7 +9,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for simplenews module.
  *
  * @EmailBuilder(
- *   id = "simplenews",
+ *   id = "type.simplenews",
  *   label = @Translation("Email Builder for simplenews module"),
  *   sub_types = { "subscribe", "validate" },
  * )
@@ -20,7 +20,7 @@ class SimplenewsEmailBuilder extends EmailBuilderBase {
    * {@inheritdoc}
    */
   public function build(UnrenderedEmailInterface $email) {
-    $email->addBuilder('token_replace', ['data' => $email->getParam('context')]);
+    $email->addBuilder('mailer_token_replace', ['data' => $email->getParam('context')]);
   }
 
 }

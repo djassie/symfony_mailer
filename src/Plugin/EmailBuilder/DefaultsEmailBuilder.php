@@ -15,7 +15,7 @@ use Symfony\Component\Mime\Address;
  * Defines the Default headers Email Builder.
  *
  * @EmailBuilder(
- *   id = "default_headers",
+ *   id = "mailer_default_headers",
  *   label = @Translation("Default headers"),
  *   description = @Translation("Set default headers."),
  *   weight = 100,

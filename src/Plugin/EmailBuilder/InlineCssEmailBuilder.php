@@ -14,7 +14,7 @@ use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
  * Defines the Inline CSS Email Builder.
  *
  * @EmailBuilder(
- *   id = "inline_css",
+ *   id = "mailer_inline_css",
  *   label = @Translation("Inline CSS"),
  *   description = @Translation("Add inline CSS."),
  *   weight = 900,

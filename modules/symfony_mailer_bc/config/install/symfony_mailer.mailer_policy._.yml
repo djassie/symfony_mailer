@@ -3,7 +3,7 @@ status: true
 dependencies: {}
 id: _
 configuration:
-  default_headers: {}
-  url_to_absolute: {}
-  html_to_text: {}
-  inline_css: {}
+  mailer_default_headers: {}
+  mailer_url_to_absolute: {}
+  mailer_html_to_text: {}
+  mailer_inline_css: {}

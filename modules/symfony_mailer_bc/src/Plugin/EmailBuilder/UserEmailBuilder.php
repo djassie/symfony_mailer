@@ -9,7 +9,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for user module.
  *
  * @EmailBuilder(
- *   id = "user",
+ *   id = "type.user",
  *   label = @Translation("Email Builder for user module"),
  *   sub_types = {
  *     "cancel_confirm",
@@ -34,7 +34,7 @@ class UserEmailBuilder extends EmailBuilderBase {
    */
   public function build(UnrenderedEmailInterface $email) {
     $token_options = ['callback' => 'user_mail_tokens', 'clear' => TRUE];
-    $email->addBuilder('token_replace', ['options' => $token_options]);
+    $email->addBuilder('mailer_token_replace', ['options' => $token_options]);
   }
 
 }

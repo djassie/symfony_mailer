@@ -10,7 +10,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for commerce module.
  *
  * @EmailBuilder(
- *   id = "commerce",
+ *   id = "type.commerce",
  *   label = @Translation("Email Builder for commerce module"),
  * )
  *

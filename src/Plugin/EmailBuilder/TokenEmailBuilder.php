@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Defines the Token replace Email Builder.
  *
  * @EmailBuilder(
- *   id = "token_replace",
+ *   id = "mailer_token_replace",
  *   label = @Translation("Token replace"),
  *   description = @Translation("Replace tokens in subject and body."),
  *   weight = 600

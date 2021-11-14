@@ -9,7 +9,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for contact module page forms.
  *
  * @EmailBuilder(
- *   id = "contact_form",
+ *   id = "type.contact_form",
  *   label = @Translation("Email Builder for contact module"),
  *   sub_types = { "mail", "copy", "autoreply" },
  *   has_entity = TRUE,
