@@ -12,7 +12,10 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @EmailBuilder(
  *   id = "type.simplenews_newsletter",
  *   label = @Translation("Email Builder for simplenews newsletters"),
- *   sub_types = { "node", "test" },
+ *   sub_types = {
+ *     "node" = @Translation("Issue"),
+ *     "test" = @Translation("Test"),
+ *   },
  *   has_entity = TRUE,
  * )
  *

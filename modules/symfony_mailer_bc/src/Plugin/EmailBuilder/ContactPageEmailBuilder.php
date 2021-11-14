@@ -11,7 +11,11 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @EmailBuilder(
  *   id = "type.contact_form",
  *   label = @Translation("Email Builder for contact module"),
- *   sub_types = { "mail", "copy", "autoreply" },
+ *   sub_types = {
+ *     "mail" = @Translation("Message"),
+ *     "copy" = @Translation("Sender copy"),
+ *     "autoreply" = @Translation("Auto-reply"),
+ *   },
  *   has_entity = TRUE,
  * )
  *

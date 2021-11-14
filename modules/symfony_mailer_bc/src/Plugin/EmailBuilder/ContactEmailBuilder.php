@@ -10,7 +10,10 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @EmailBuilder(
  *   id = "type.contact",
  *   label = @Translation("Email Builder for contact module"),
- *   sub_types = { "mail", "copy" },
+ *   sub_types = {
+ *     "mail" = @Translation("Message"),
+ *     "copy" = @Translation("Sender copy"),
+ *   },
  * )
  *
  * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can

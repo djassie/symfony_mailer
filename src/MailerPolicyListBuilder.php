@@ -65,7 +65,7 @@ class MailerPolicyListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['type'] = $entity->getTypeLabel();
-    $row['sub_type'] = $entity->getSubType();
+    $row['sub_type'] = $entity->getSubTypeLabel();
     $row['entity'] = $entity->getEntityLabel();
     return $row + parent::buildRow($entity);
   }

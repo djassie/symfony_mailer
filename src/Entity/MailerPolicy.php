@@ -3,6 +3,7 @@
 namespace Drupal\symfony_mailer\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -59,6 +60,25 @@ class MailerPolicy extends ConfigEntityBase {
   protected $configuration = [];
 
   /**
+   * {@inheritdoc}
+   */
+  public function __construct(array $values, $entity_type) {
+    parent::__construct($values, $entity_type);
+    // The root policy with ID '_' has no type.
+    if ($this->id == '_') {
+      return;
+    }
+
+    list($this->type, $this->subType, $this->entityId) = array_pad(explode('.', $this->id), 3, NULL);
+    $this->emailBuilderManager = \Drupal::service('plugin.manager.email_builder');
+    $this->builderDefinition = $this->emailBuilderManager->getDefinition("type.$this->type");
+
+    if ($this->builderDefinition['has_entity']) {
+      $this->entityType = $this->entityTypeManager()->getDefinition($this->type);
+    }
+  }
+
+  /**
    * Gets the email type this policy applies to.
    *
    * @return ?string
@@ -85,8 +105,23 @@ class MailerPolicy extends ConfigEntityBase {
    *   Email type label.
    */
   public function getTypeLabel() {
-    if (!$this->type) return $this->t('All');
-    return $this->entityType ? $this->entityType->getLabel() : \Drupal::moduleHandler()->getName($this->type);
+    if ($this->type) {
+      return $this->entityType ? $this->entityType->getLabel() : \Drupal::moduleHandler()->getName($this->type);
+    }
+    return $this->t('<b>*All*</b>');
+  }
+
+  /**
+   * Gets a human-readable label for the the email sub-type.
+   *
+   * @return ?string
+   *   Email sub-type label, or NULL if the policy applies to all sub-types.
+   */
+  public function getSubTypeLabel() {
+    if ($this->subType) {
+      return $this->builderDefinition['sub_types'][$this->subType];
+    }
+    return $this->t('<b>*All*</b>');
   }
 
   /**
@@ -120,25 +155,6 @@ class MailerPolicy extends ConfigEntityBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $values, $entity_type) {
-    parent::__construct($values, $entity_type);
-    // The root policy with ID '_' has no type.
-    if ($this->id == '_') {
-      return;
-    }
-
-    list($this->type, $this->subType, $this->entityId) = array_pad(explode('.', $this->id), 3, NULL);
-    $this->emailBuilderManager = \Drupal::service('plugin.manager.email_builder');
-    $this->builderDefinition = $this->emailBuilderManager->getDefinition("type.$this->type");
-
-    if ($this->builderDefinition['has_entity']) {
-      $this->entityType = $this->entityTypeManager()->getDefinition($this->type);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function calculateDependencies() {
     parent::calculateDependencies();
     if ($this->type) {
@@ -146,6 +162,15 @@ class MailerPolicy extends ConfigEntityBase {
       $this->addDependency('module', $module);
     }
     return $this;
+  }
+
+  /**
+   * Helper callback to sort entities.
+   */
+  public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
+    return strnatcasecmp($a->getTypeLabel(), $b->getTypeLabel()) ?:
+      strnatcasecmp($a->getSubTypeLabel(), $b->getSubTypeLabel()) ?:
+      strnatcasecmp($a->getEntityLabel(), $b->getEntityLabel());
   }
 
 }

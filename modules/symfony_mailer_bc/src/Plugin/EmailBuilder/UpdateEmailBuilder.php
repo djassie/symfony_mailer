@@ -13,7 +13,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @EmailBuilder(
  *   id = "type.update",
  *   label = @Translation("Email Builder for update module"),
- *   sub_types = { "status_notify" },
+ *   sub_types = { "status_notify" = @Translation("Available updates") },
  * )
  */
 class UpdateEmailBuilder extends EmailBuilderBase {

@@ -11,7 +11,10 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @EmailBuilder(
  *   id = "type.simplenews",
  *   label = @Translation("Email Builder for simplenews module"),
- *   sub_types = { "subscribe", "validate" },
+ *   sub_types = {
+ *     "subscribe" = @Translation("Subscription confirmation"),
+ *     "validate" = @Translation("Validate"),
+ *   },
  * )
  */
 class SimplenewsEmailBuilder extends EmailBuilderBase {
