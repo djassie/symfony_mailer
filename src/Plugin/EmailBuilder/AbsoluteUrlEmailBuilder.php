@@ -10,7 +10,7 @@ use Drupal\symfony_mailer\RenderedEmailInterface;
  * Defines the URL to absolute Email Builder.
  *
  * @EmailBuilder(
- *   id = "url_to_absolute",
+ *   id = "mailer_url_to_absolute",
  *   label = @Translation("URL to absolute"),
  *   description = @Translation("Convert URLs to absolute."),
  *   weight = 700,

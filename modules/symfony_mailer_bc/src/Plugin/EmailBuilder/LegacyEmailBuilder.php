@@ -55,7 +55,7 @@ class LegacyEmailBuilder extends EmailBuilderBase {
       'module' => $module,
       'key' => $key,
       'to' => $email->getTo()[0],
-      'reply-to' => $email->getReplyTo()[0],
+      'reply-to' => $email->getReplyTo()[0] ?? NULL,
       'langcode' => $email->getLangcode(),
       'params' => $email->getParams(),
       'send' => TRUE,
