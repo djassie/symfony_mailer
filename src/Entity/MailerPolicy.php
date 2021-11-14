@@ -3,6 +3,7 @@
 namespace Drupal\symfony_mailer\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Defines a Mailer Policy configuration entity class.
@@ -34,6 +35,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * )
  */
 class MailerPolicy extends ConfigEntityBase {
+  use StringTranslationTrait;
 
   /**
    * The unique ID of the policy record.
@@ -55,6 +57,54 @@ class MailerPolicy extends ConfigEntityBase {
    * with value as an array of configured settings.
    */
   protected $configuration = [];
+
+  /**
+   * Gets the email type this policy applies to.
+   *
+   * @return ?string
+   *   Email type, or NULL if the policy applies to all types.
+   */
+  public function getType() {
+    return $this->type;
+  }
+
+  /**
+   * Gets the email sub-type this policy applies to.
+   *
+   * @return ?string
+   *   Email sub-type, or NULL if the policy applies to all sub-types.
+   */
+  public function getSubType() {
+    return $this->subType;
+  }
+
+  /**
+   * Gets a human-readable label for the email type this policy applies to.
+   *
+   * @return string
+   *   Email type label.
+   */
+  public function getTypeLabel() {
+    if (!$this->type) return $this->t('All');
+    return $this->entityType ? $this->entityType->getLabel() : \Drupal::moduleHandler()->getName($this->type);
+  }
+
+  /**
+   * Gets a human-readable label for the config entity this policy applies to.
+   *
+   * @return string
+   *   Email config entity label, or NULL if the policy applies to all
+   *   entities.
+   */
+  public function getEntityLabel() {
+    if (!$this->entityId) {
+      return NULL;
+    }
+    if (!$this->entity) {
+      $this->entity = $this->entityTypeManager()->getStorage($this->entityType)->load($this->entityId);
+    }
+    return $this->entity->label();
+  }
 
   /**
    * Gets the email builder configuration for this policy record.
