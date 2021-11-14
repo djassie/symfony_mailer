@@ -72,10 +72,14 @@ class MailerPolicy extends ConfigEntityBase {
    */
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
-    list($this->type, $this->subType, $this->entityId) = array_pad(explode('.', $this->id), 3, NULL);
+    // The root policy with ID '_' has no type.
+    if ($this->id == '_') {
+      return;
+    }
 
+    list($this->type, $this->subType, $this->entityId) = array_pad(explode('.', $this->id), 3, NULL);
     $this->emailBuilderManager = \Drupal::service('plugin.manager.email_builder');
-    $this->builderDefinition = $this->emailBuilderManager->getDefinition($this->type);
+    $this->builderDefinition = $this->emailBuilderManager->getDefinition("type.$this->type");
 
     if ($this->builderDefinition['has_entity']) {
       $this->entityType = $this->entityTypeManager()->getDefinition($this->type);
@@ -87,8 +91,10 @@ class MailerPolicy extends ConfigEntityBase {
    */
   public function calculateDependencies() {
     parent::calculateDependencies();
-    $module = $this->entityType ? $this->entityType->getProvider() : $this->type;
-    $this->addDependency('module', $module);
+    if ($this->type) {
+      $module = $this->entityType ? $this->entityType->getProvider() : $this->type;
+      $this->addDependency('module', $module);
+    }
     return $this;
   }
 

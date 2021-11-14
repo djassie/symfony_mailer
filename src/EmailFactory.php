@@ -56,6 +56,11 @@ class EmailFactory {
   protected function newEmail(string $type, string $sub_type, ?ConfigEntityInterface $entity = NULL) {
     $email = Email::create(\Drupal::getContainer(), $type, $sub_type, $entity);
 
+    // Load the root policy that applies to all messages.
+    if ($policy = MailerPolicy::load('_')) {
+      $policy_config[] = $policy->getConfiguration();
+    }
+
     // Load builders and policy with matching ID.
     foreach ($email->getSuggestions('', '.') as $id) {
       $email->addBuilder($id, [], TRUE);
@@ -70,13 +75,6 @@ class EmailFactory {
         $email->addBuilder($plugin_id, $config, TRUE);
       }
     }
-
-    // @todo Could move this into the policy config so it's visible and
-    // customisable from the GUI.
-    $email->addBuilder('default_headers')
-      ->addBuilder('url_to_absolute')
-      ->addBuilder('html_to_text')
-      ->addBuilder('inline_css');
 
     return $email;
   }
