@@ -111,9 +111,9 @@ class Mailer implements MailerInterface {
       $this->changeActiveLanguage($langcode);
     }
 
-    // Call hooks/builders.
-    foreach ($email->getBuilders() as $builder) {
-      $builder->build($email);
+    // Call hooks/processors.
+    foreach ($email->getProcessors() as $processor) {
+      $processor->preRender($email);
     }
     $this->invokeAll('pre_render', $email);
 
@@ -121,9 +121,9 @@ class Mailer implements MailerInterface {
     /** @var \Drupal\symfony_mailer\RenderedEmailInterface $rendered_email */
     $rendered_email = $email->render();
 
-    // Call hooks/builders.
-    foreach ($rendered_email->getBuilders() as $builder) {
-      $builder->adjust($rendered_email);
+    // Call hooks/processors.
+    foreach ($rendered_email->getProcessors() as $processor) {
+      $processor->postRender($rendered_email);
     }
     $this->invokeAll('pre_send', $rendered_email);
 

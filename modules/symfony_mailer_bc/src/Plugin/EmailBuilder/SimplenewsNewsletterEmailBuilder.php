@@ -2,7 +2,7 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
@@ -21,23 +21,23 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @todo Notes for adopting Symfony Mailer into simplenews. Can remove the
  * MailBuilder class, and many methods of MailEntity.
  */
-class SimplenewsNewsletterEmailBuilder extends EmailBuilderBase {
+class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
     /** @var \Drupal\simplenews\Mail\MailEntity $mail */
     $mail = $email->getParam('simplenews_mail');
     $email->setSubject($mail->getSubject())
       ->setBody($mail->getBody())
-      ->addBuilder('mailer_token_replace');
+      ->addProcessor('mailer_token_replace');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function adjust(RenderedEmailInterface $email) {
+  public function postRender(RenderedEmailInterface $email) {
     $headers = $email->getInner()->getHeaders();
     $headers->addTextHeader('Precedence', 'bulk');
     if ($unsubscribe_url = \Drupal::token()->replace('[simplenews-subscriber:unsubscribe-url]', $email->getParams())) {

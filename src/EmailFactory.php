@@ -63,16 +63,17 @@ class EmailFactory {
 
     // Load builders and policy with matching ID.
     foreach ($email->getSuggestions('', '.') as $id) {
-      $email->addBuilder($id, [], TRUE);
+      $email->addProcessor($id, [], 'builder');
       if ($policy = MailerPolicy::load($id)) {
         $policy_config[] = $policy->getConfiguration();
       }
     }
 
+    // Load adjusters.
     if (isset($policy_config)) {
       $policy_config = array_merge(...$policy_config);
       foreach ($policy_config as $plugin_id => $config) {
-        $email->addBuilder($plugin_id, $config, TRUE);
+        $email->addProcessor($plugin_id, $config);
       }
     }
 

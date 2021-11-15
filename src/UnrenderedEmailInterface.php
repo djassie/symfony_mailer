@@ -115,16 +115,16 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
   public function getReplyTo();
 
   /**
-   * Add an email builder.
+   * Add an email processor.
    *
    * @param string $plugin_id
-   *   The ID of the email builder plugin.
+   *   The plugin ID.
    * @param array $configuration
-   *   (Optional) Email builder configuration.
-   * @param bool $optional
-   *   (Optional) If TRUE, silently skip if the plugin doesn't exist.
+   *   (Optional) Plugin configuration.
+   * @param bool $type
+   *   (Optional) The plugin type, 'adjuster' (default) or 'builder'.
    */
-  public function addBuilder(string $plugin_id, array $configuration = []);
+  public function addProcessor(string $plugin_id, array $configuration = [], $type = 'adjuster');
 
   /**
    * Sets the langcode.

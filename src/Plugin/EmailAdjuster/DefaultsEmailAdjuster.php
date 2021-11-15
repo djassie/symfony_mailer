@@ -1,27 +1,27 @@
 <?php
 
-namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
+namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Address;
 
 /**
- * Defines the Default headers Email Builder.
+ * Defines the Default headers Email Adjuster.
  *
- * @EmailBuilder(
+ * @EmailAdjuster(
  *   id = "mailer_default_headers",
  *   label = @Translation("Default headers"),
  *   description = @Translation("Set default headers."),
  *   weight = 100,
  * )
  */
-class DefaultsEmailBuilder extends EmailBuilderBase implements ContainerFactoryPluginInterface {
+class DefaultsEmailAdjuster extends EmailProcessorBase implements ContainerFactoryPluginInterface {
 
   /**
    * The configuration factory.
@@ -82,7 +82,7 @@ class DefaultsEmailBuilder extends EmailBuilderBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public function adjust(RenderedEmailInterface $email) {
+  public function postRender(RenderedEmailInterface $email) {
     $site_config = $this->configFactory->get('system.site');
     $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
     $from = new Address($site_mail, $site_config->get('name'));

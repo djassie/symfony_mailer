@@ -3,26 +3,26 @@
 namespace Drupal\symfony_mailer;
 
 /**
- * Provides a dynamic Iterator for EmailsBuilders.
+ * Provides a dynamic Iterator for Email Processors.
  *
  * This iterator allows adding items during iteration.
  */
-class EmailBuilderIterator implements \Iterator {
+class EmailProcessorIterator implements \Iterator {
 
-  protected $builders;
+  protected $processors;
   protected $function;
   protected $position = 0;
 
   /**
    * Constructs the Email iterator object.
    *
-   * @param \Drupal\symfony_mailer\EmailBuilderInterface[] $builders
-   *   Array of email builders.
+   * @param \Drupal\symfony_mailer\EmailProcessorInterface[] $processors
+   *   Array of email processors.
    * @param string $function
    *   The function being called, either 'build' or 'adjust'.
    */
-  public function __construct(array $builders, string $function) {
-    $this->builders = $builders;
+  public function __construct(array $processors, string $function) {
+    $this->processors = $processors;
     $this->function = $function;
     $this->sort();
   }
@@ -30,12 +30,12 @@ class EmailBuilderIterator implements \Iterator {
   /**
    * Adds an email builder to the iteration.
    *
-   * @param \Drupal\symfony_mailer\EmailBuilderInterface $builder
+   * @param \Drupal\symfony_mailer\EmailProcessorInterface $builder
    */
-  public function add(EmailBuilderInterface $builder) {
-    $this->builders[] = $builder;
+  public function add(EmailProcessorInterface $builder) {
+    $this->processors[] = $builder;
     $this->sort();
-    $key = array_search($builder, $this->builders, TRUE);
+    $key = array_search($builder, $this->processors, TRUE);
     if ($key <= $this->position) {
       $this->position++;
     }
@@ -52,7 +52,7 @@ class EmailBuilderIterator implements \Iterator {
    * {@inheritdoc}
    */
   public function current() {
-    return $this->builders[$this->position];
+    return $this->processors[$this->position];
   }
 
   /**
@@ -73,14 +73,14 @@ class EmailBuilderIterator implements \Iterator {
    * {@inheritdoc}
    */
   public function valid() {
-    return isset($this->builders[$this->position]);
+    return isset($this->processors[$this->position]);
   }
 
   /**
-   * Sorts an array of email builders by weight, lowest first.
+   * Sorts an array of email processors by weight, lowest first.
    */
   protected function sort() {
-    usort($this->builders, function($a, $b) {
+    usort($this->processors, function($a, $b) {
       return $a->getWeight($this->function) <=> $b->getWeight($this->function);
     });
   }

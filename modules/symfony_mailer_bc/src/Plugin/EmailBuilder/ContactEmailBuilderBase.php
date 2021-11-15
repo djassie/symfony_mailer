@@ -2,19 +2,19 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
  * Defines a base class for contact module email builders.
  * )
  */
-class ContactEmailBuilderBase extends EmailBuilderBase {
+class ContactEmailBuilderBase extends EmailProcessorBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
     /** @var \Drupal\user\UserInterface $sender */
     $sender = $email->getParam('sender');
     $contact_message = $email->getParam('contact_message');

@@ -2,7 +2,7 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
@@ -10,7 +10,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *
  * @EmailBuilder(
  *   id = "user",
-  *   sub_types = {
+ *   sub_types = {
  *     "cancel_confirm" = @Translation("Account cancellation confirmation"),
  *     "password_reset" = @Translation("Password recovery"),
  *     "register_admin_created" = @Translation("Account created by administrator"),
@@ -26,14 +26,14 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can
  * set langcode, to, reply-to so the calling code doesn't need to.
  */
-class UserEmailBuilder extends EmailBuilderBase {
+class UserEmailBuilder extends EmailProcessorBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
     $token_options = ['callback' => 'user_mail_tokens', 'clear' => TRUE];
-    $email->addBuilder('mailer_token_replace', ['options' => $token_options]);
+    $email->addProcessor('mailer_token_replace', ['options' => $token_options]);
   }
 
 }

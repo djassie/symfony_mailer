@@ -1,26 +1,26 @@
 <?php
 
-namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
+namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 /**
- * Defines the Inline CSS Email Builder.
+ * Defines the Inline CSS Email Adjuster.
  *
- * @EmailBuilder(
+ * @EmailAdjuster(
  *   id = "mailer_inline_css",
  *   label = @Translation("Inline CSS"),
  *   description = @Translation("Add inline CSS."),
  *   weight = 900,
  * )
  */
-class InlineCssEmailBuilder extends EmailBuilderBase implements ContainerFactoryPluginInterface {
+class InlineCssEmailAdjuster extends EmailProcessorBase implements ContainerFactoryPluginInterface {
 
   /**
    * The asset resolver.
@@ -67,7 +67,7 @@ class InlineCssEmailBuilder extends EmailBuilderBase implements ContainerFactory
   /**
    * {@inheritdoc}
    */
-  public function adjust(RenderedEmailInterface $email) {
+  public function postRender(RenderedEmailInterface $email) {
     // Inline CSS. Request optimization so that the CssOptimizer performs
     // essential processing such as @include.
     $assets = (new AttachedAssets())->setLibraries($email->getLibraries());

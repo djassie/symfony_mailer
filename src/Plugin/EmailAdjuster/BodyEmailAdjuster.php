@@ -1,27 +1,27 @@
 <?php
 
-namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
+namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Render\Markup;
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
- * Defines the Body Email Builder.
+ * Defines the Body Email Adjuster.
  *
- * @EmailBuilder(
+ * @EmailAdjuster(
  *   id = "email_body",
  *   label = @Translation("Body"),
  *   description = @Translation("Sets the email body."),
  * )
  */
-class BodyEmailBuilder extends EmailBuilderBase {
+class BodyEmailAdjuster extends EmailProcessorBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
     $body = $this->configuration['value'];
 
     $variables = $email->getVariables();

@@ -1,27 +1,27 @@
 <?php
 
-namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
+namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Html2Text\Html2Text;
 
 /**
- * Defines the HTML to text Email Builder.
+ * Defines the HTML to text Email Adjuster.
  *
- * @EmailBuilder(
+ * @EmailAdjuster(
  *   id = "mailer_html_to_text",
  *   label = @Translation("HTML to text"),
  *   description = @Translation("Create a plain text part from the HTML."),
  *   weight = 800,
  * )
  */
-class HtmlToTextEmailBuilder extends EmailBuilderBase {
+class HtmlToTextEmailAdjuster extends EmailProcessorBase {
 
   /**
    * {@inheritdoc}
    */
-  public function adjust(RenderedEmailInterface $email) {
+  public function postRender(RenderedEmailInterface $email) {
     $inner = $email->getInner();
 
     if (!$inner->getTextBody()) {

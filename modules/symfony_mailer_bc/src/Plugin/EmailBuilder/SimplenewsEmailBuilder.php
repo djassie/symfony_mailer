@@ -2,7 +2,7 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
@@ -10,19 +10,19 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *
  * @EmailBuilder(
  *   id = "simplenews",
-  *   sub_types = {
+ *   sub_types = {
  *     "subscribe" = @Translation("Subscription confirmation"),
  *     "validate" = @Translation("Validate"),
  *   },
  * )
  */
-class SimplenewsEmailBuilder extends EmailBuilderBase {
+class SimplenewsEmailBuilder extends EmailProcessorBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
-    $email->addBuilder('mailer_token_replace', ['data' => $email->getParam('context')]);
+  public function preRender(UnrenderedEmailInterface $email) {
+    $email->addProcessor('mailer_token_replace', ['data' => $email->getParam('context')]);
   }
 
 }

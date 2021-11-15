@@ -2,7 +2,7 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
@@ -19,12 +19,12 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * EmailBuilder. The commerce_order_receipt template could be retired,
  * switching instead to the email__commerce__order_receipt.
  */
-class CommerceEmailBuilder extends EmailBuilderBase {
+class CommerceEmailBuilder extends EmailProcessorBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
     $email->setSubject($email->getParam('subject'))
       ->setBody($email->getParam('body'));
   }
@@ -32,7 +32,7 @@ class CommerceEmailBuilder extends EmailBuilderBase {
   /**
    * {@inheritdoc}
    */
-  public function adjust(RenderedEmailInterface $email) {
+  public function postRender(RenderedEmailInterface $email) {
     if ($from = $email->getParam('from')) {
       // @todo This respects the email address of the store, but it loses the
       // display name.

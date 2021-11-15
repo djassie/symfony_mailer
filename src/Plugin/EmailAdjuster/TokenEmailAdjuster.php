@@ -1,26 +1,26 @@
 <?php
 
-namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
+namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Utility\Token;
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines the Token replace Email Builder.
+ * Defines the Token replace Email Adjuster.
  *
- * @EmailBuilder(
+ * @EmailAdjuster(
  *   id = "mailer_token_replace",
  *   label = @Translation("Token replace"),
  *   description = @Translation("Replace tokens in subject and body."),
  *   weight = 600
  * )
  */
-class TokenEmailBuilder extends EmailBuilderBase implements ContainerFactoryPluginInterface {
+class TokenEmailAdjuster extends EmailProcessorBase implements ContainerFactoryPluginInterface {
 
   /**
    * The token service.
@@ -62,7 +62,7 @@ class TokenEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlug
   /**
    * {@inheritdoc}
    */
-  public function adjust(RenderedEmailInterface $email) {
+  public function postRender(RenderedEmailInterface $email) {
     $data = $this->configuration['data'] ?? $email->getParams();
     $inner = $email->getInner();
 

@@ -4,20 +4,20 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Plugin\PluginBase;
 
-class EmailBuilderBase extends PluginBase implements EmailBuilderInterface {
+class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
 
   const DEFAULT_WEIGHT = 500;
 
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function adjust(RenderedEmailInterface $email) {
+  public function postRender(RenderedEmailInterface $email) {
   }
 
   /**

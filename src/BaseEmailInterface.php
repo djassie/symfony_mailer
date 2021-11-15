@@ -8,23 +8,12 @@ namespace Drupal\symfony_mailer;
 interface BaseEmailInterface {
 
   /**
-   * Gets all email builders.
+   * Gets all email processors.
    *
    * @return \Iterator
-   *   Iterator over email builders.
+   *   Iterator over email processors.
    */
-  public function getBuilders();
-
-  /**
-   * Gets the specified email builder.
-   *
-   * @param string $plugin_id
-   *   The ID of the email builder plugin.
-   *
-   * @return \Drupal\symfony_mailer\EmailBuilderInterface
-   *   The email builder, or NULL if not present.
-   */
-  public function getBuilder(string $plugin_id);
+  public function getProcessors();
 
   /**
    * Gets the email type.

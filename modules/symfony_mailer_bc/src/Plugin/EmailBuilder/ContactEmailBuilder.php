@@ -9,7 +9,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *
  * @EmailBuilder(
  *   id = "contact",
-  *   sub_types = {
+ *   sub_types = {
  *     "mail" = @Translation("Message"),
  *     "copy" = @Translation("Sender copy"),
  *   },
@@ -23,7 +23,7 @@ class ContactEmailBuilder extends ContactEmailBuilderBase {
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
     parent::build($email);
     $recipient = $email->getParams()['recipient'];
 

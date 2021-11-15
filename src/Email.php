@@ -21,11 +21,11 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   protected $mailer;
 
   /**
-   * The email builder manager.
+   * The email processor managers.
    *
-   * @var \Drupal\symfony_mailer\EmailBuilderManager
+   * @var \Drupal\Component\Plugin\PluginManagerInterface[]
    */
-  protected $emailBuilderManager;
+  protected array $managers;
 
   /**
    * The renderer.
@@ -54,8 +54,8 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   protected $body = [];
   protected array $to = [];
   protected array $replyTo = [];
-  protected $builders = [];
-  protected $builderIterator = NULL;
+  protected $processors = [];
+  protected $processorIterator = NULL;
   protected $langcode;
   protected $params = [];
   protected $variables = [];
@@ -76,8 +76,10 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    *
    * @param \Drupal\symfony_mailer\MailerInterface $mailer
    *   Mailer service.
-   * @param \Drupal\symfony_mailer\EmailBuilderManager
+   * @param \Drupal\symfony_mailer\EmailBuilderManager $email_builder_manager
    *   The email builder manager.
+   * @param \Drupal\symfony_mailer\EmailAdjusterManager $email_adjuster_manager
+   *   The email adjuster manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -89,9 +91,10 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
    *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    */
-  public function __construct(MailerInterface $mailer, EmailBuilderManager $email_builder_manager, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
+  public function __construct(MailerInterface $mailer, EmailBuilderManager $email_builder_manager, EmailAdjusterManager $email_adjuster_manager, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
     $this->mailer = $mailer;
-    $this->emailBuilderManager = $email_builder_manager;
+    $this->managers['builder'] = $email_builder_manager;
+    $this->managers['adjuster'] = $email_adjuster_manager;
     $this->renderer = $renderer;
     $this->entityTypeManager = $entity_type_manager;
     $this->type = $type;
@@ -120,6 +123,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
     return new static(
       $container->get('symfony_mailer'),
       $container->get('plugin.manager.email_builder'),
+      $container->get('plugin.manager.email_adjuster'),
       $container->get('renderer'),
       $container->get('entity_type.manager'),
       $type,
@@ -217,12 +221,12 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function addBuilder(string $plugin_id, array $configuration = [], $optional = FALSE) {
-    if (!$optional || $this->emailBuilderManager->hasDefinition($plugin_id)) {
-      $builder = $this->emailBuilderManager->createInstance($plugin_id, $configuration);
-      $this->builders[$plugin_id] = $builder;
-      if ($this->builderIterator) {
-        $this->builderIterator->add($builder);
+  public function addProcessor(string $plugin_id, array $configuration = [], $type = 'adjuster') {
+    if ($this->managers[$type]->hasDefinition($plugin_id)) {
+      $processor = $this->managers[$type]->createInstance($plugin_id, $configuration);
+      $this->processors[$plugin_id] = $processor;
+      if ($this->processorIterator) {
+        $this->processorIterator->add($processor);
       }
     }
     return $this;
@@ -231,19 +235,12 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function getBuilders() {
+  public function getProcessors() {
     // @todo We are no longer using the feature to add builders during
-    // iteration so maybe we can remove EmailBuilderIterator.
-    $function = isset($this->inner) ? 'adjust' : 'build';
-    $this->builderIterator = new EmailBuilderIterator(array_values($this->builders), $function);
-    return $this->builderIterator;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBuilder(string $plugin_id) {
-    return $this->builders[$plugin_id] ?? NULL;
+    // iteration so maybe we can remove EmailProcessorIterator.
+    $function = isset($this->inner) ? 'postRender' : 'preRender';
+    $this->processorIterator = new EmailProcessorIterator(array_values($this->processors), $function);
+    return $this->processorIterator;
   }
 
   /**

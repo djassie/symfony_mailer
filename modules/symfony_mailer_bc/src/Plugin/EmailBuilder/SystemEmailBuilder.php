@@ -2,7 +2,7 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
@@ -10,15 +10,15 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *
  * @EmailBuilder(
  *   id = "system",
-  *   sub_types = { "action_send_email" = @Translation("Send mail") },
+ *   sub_types = { "action_send_email" = @Translation("Send mail") },
  * )
  */
-class SystemEmailBuilder extends EmailBuilderBase {
+class SystemEmailBuilder extends EmailProcessorBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
     $body = [
       '#type' => 'processed_text',
       '#text' => $email->getParam('message'),
@@ -26,7 +26,7 @@ class SystemEmailBuilder extends EmailBuilderBase {
 
     $email->setSubject($email->getParam('subject'))
       ->setBody($body)
-      ->addBuilder('mailer_token_replace');
+      ->addProcessor('mailer_token_replace');
   }
 
 }

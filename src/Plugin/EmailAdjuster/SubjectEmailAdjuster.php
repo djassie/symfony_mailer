@@ -1,25 +1,25 @@
 <?php
 
-namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
+namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
- * Defines the Subject header Email Builder.
+ * Defines the Subject header Email Adjuster.
  *
- * @EmailBuilder(
+ * @EmailAdjuster(
  *   id = "email_subject",
  *   label = @Translation("Subject"),
  *   description = @Translation("Sets the email subject."),
  * )
  */
-class SubjectEmailBuilder extends EmailBuilderBase {
+class SubjectEmailAdjuster extends EmailProcessorBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
     $subject = $this->configuration['value'];
 
     if ($variables = $email->getVariables()) {

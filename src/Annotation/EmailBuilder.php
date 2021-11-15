@@ -27,7 +27,7 @@ class EmailBuilder extends Plugin {
    * Array of sub-types.
    *
    * The array key is the sub-type value and the value is the human-readable
-   * label. Only present for a builder representing an email type.
+   * label.
    *
    * @var string[]
    */
@@ -35,8 +35,6 @@ class EmailBuilder extends Plugin {
 
   /**
    * Whether the plugin is associated with a config entity.
-   *
-   * Only present for a builder representing an email type.
    */
   public bool $has_entity = FALSE;
 

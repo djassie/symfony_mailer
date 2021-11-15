@@ -15,6 +15,28 @@ function symfony_mailer_bc_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Implements hook_mailer_builder_info_alter().
+ */
+function symfony_mailer_bc_mailer_builder_info_alter(array &$email_builders) {
+  // Add EmailBuilder definitions for any implementations of hook_mail() that
+  // don't already have one, using LegacyEmailBuilder.
+  $module_handler = \Drupal::moduleHandler();
+  $mail_hooks = $module_handler->getImplementations('mail');
+  $missing = array_diff($mail_hooks, array_keys($email_builders));
+
+  foreach ($missing as $type) {
+    $email_builders[$type] = [
+      'id' => $type,
+      'label' => $module_handler->getName($type),
+      'sub_types' => [],
+      'has_entity' => FALSE,
+      'class' => "Drupal\symfony_mailer_bc\Plugin\EmailBuilder\LegacyEmailBuilder",
+      'provider' => $type,
+    ];
+  }
+}
+
+/**
  * Implements hook_mailer_bc_MODULE_alter() for user.
  */
 function symfony_mailer_bc_mailer_bc_user_alter(string &$key, array &$params, array &$context) {

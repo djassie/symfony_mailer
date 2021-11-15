@@ -4,7 +4,7 @@ namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
-use Drupal\symfony_mailer\EmailBuilderBase;
+use Drupal\symfony_mailer\EmailProcessorBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
@@ -12,15 +12,15 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *
  * @EmailBuilder(
  *   id = "update",
-  *   sub_types = { "status_notify" = @Translation("Available updates") },
+ *   sub_types = { "status_notify" = @Translation("Available updates") },
  * )
  */
-class UpdateEmailBuilder extends EmailBuilderBase {
+class UpdateEmailBuilder extends EmailProcessorBase {
 
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
     foreach ($email->getParams() as $msg_type => $msg_reason) {
       $messages[] = _update_message_text($msg_type, $msg_reason);
     }

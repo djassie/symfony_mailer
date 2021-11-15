@@ -10,7 +10,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *
  * @EmailBuilder(
  *   id = "contact_form",
-  *   sub_types = {
+ *   sub_types = {
  *     "mail" = @Translation("Message"),
  *     "copy" = @Translation("Sender copy"),
  *     "autoreply" = @Translation("Auto-reply"),
@@ -26,7 +26,7 @@ class ContactPageEmailBuilder extends ContactEmailBuilderBase {
   /**
    * {@inheritdoc}
    */
-  public function build(UnrenderedEmailInterface $email) {
+  public function preRender(UnrenderedEmailInterface $email) {
     parent::build($email);
     $email->setVariable('form', $email->getEntity()->label())
       ->setVariable('form_url', Url::fromRoute('<current>')->toString());
