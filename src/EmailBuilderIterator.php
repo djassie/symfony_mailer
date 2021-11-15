@@ -81,23 +81,8 @@ class EmailBuilderIterator implements \Iterator {
    */
   protected function sort() {
     usort($this->builders, function($a, $b) {
-      return $a->getWeight($this->function) - $b->getWeight($this->function);
+      return $a->getWeight($this->function) <=> $b->getWeight($this->function);
     });
-  }
-
-  /**
-   * Compares two email builders for sorting by weight.
-   *
-   * @param \Drupal\symfony_mailer\EmailBuilderInterface $a
-   *   First email builder to compare.
-   * @param \Drupal\symfony_mailer\EmailBuilderInterface $b
-   *   Second email builder to compare.
-   *
-   * @return int
-   *   Comparison result suitable for use in uasort.
-   */
-  protected function compare(EmailBuilderInterface $a, EmailBuilderInterface $b) {
-    return $a->getWeight($this->function) - $b->getWeight($this->function);
   }
 
 }

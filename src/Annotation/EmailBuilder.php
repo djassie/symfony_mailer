@@ -13,36 +13,31 @@ class EmailBuilder extends Plugin {
 
   /**
    * The plugin ID.
-   *
-   * @var string
    */
-  public $id;
+  public string $id;
 
   /**
    * The label of the plugin.
    *
-   * @var \Drupal\Core\Annotation\Translation
-   *
    * @ingroup plugin_translatable
    */
-  public $label;
+  public string $label;
 
   /**
-   * List of sub-types.
+   * Array of sub-types.
    *
-   * Only present for a builder representing an email type.
+   * The array key is the sub-type value and the value is the human-readable
+   * label. Only present for a builder representing an email type.
    *
    * @var string[]
    */
-  public $sub_types;
+  public array $sub_types = [];
 
   /**
    * Whether the plugin is associated with a config entity.
    *
    * Only present for a builder representing an email type.
-   *
-   * @var bool
    */
-  public $has_entity = FALSE;
+  public bool $has_entity = FALSE;
 
 }

@@ -67,7 +67,7 @@ class MailerTransportListBuilder extends ConfigEntityListBuilder {
     $row['label'] = $entity->label();
     $definition = $entity->getPlugin()->getPluginDefinition();
     $row['plugin'] = $definition['label'];
-      $row['default'] = $entity->isDefault() ? $this->t('Default') : '';
+    $row['default'] = $entity->isDefault() ? $this->t('Default') : '';
     return $row + parent::buildRow($entity);
   }
 
