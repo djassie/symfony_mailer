@@ -9,9 +9,8 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for simplenews module.
  *
  * @EmailBuilder(
- *   id = "type.simplenews",
- *   label = @Translation("Email Builder for simplenews module"),
- *   sub_types = {
+ *   id = "simplenews",
+  *   sub_types = {
  *     "subscribe" = @Translation("Subscription confirmation"),
  *     "validate" = @Translation("Validate"),
  *   },

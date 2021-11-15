@@ -11,9 +11,8 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for update module.
  *
  * @EmailBuilder(
- *   id = "type.update",
- *   label = @Translation("Email Builder for update module"),
- *   sub_types = { "status_notify" = @Translation("Available updates") },
+ *   id = "update",
+  *   sub_types = { "status_notify" = @Translation("Available updates") },
  * )
  */
 class UpdateEmailBuilder extends EmailBuilderBase {

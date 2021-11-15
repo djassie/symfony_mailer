@@ -6,6 +6,7 @@ services:
     class: Drupal\symfony_mailer\EmailFactory
   plugin.manager.email_builder:
     class: Drupal\symfony_mailer\EmailBuilderManager
+    arguments: ['@entity_type.manager']
     parent: default_plugin_manager
   plugin.manager.mailer_transport:
     class: Drupal\symfony_mailer\TransportManager

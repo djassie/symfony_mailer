@@ -10,8 +10,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for simplenews_newsletter entity.
  *
  * @EmailBuilder(
- *   id = "type.simplenews_newsletter",
- *   label = @Translation("Email Builder for simplenews newsletters"),
+ *   id = "simplenews_newsletter",
  *   sub_types = {
  *     "node" = @Translation("Issue"),
  *     "test" = @Translation("Test"),

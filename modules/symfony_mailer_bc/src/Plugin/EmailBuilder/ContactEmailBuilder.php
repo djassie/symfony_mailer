@@ -8,9 +8,8 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for contact module personal forms.
  *
  * @EmailBuilder(
- *   id = "type.contact",
- *   label = @Translation("Email Builder for contact module"),
- *   sub_types = {
+ *   id = "contact",
+  *   sub_types = {
  *     "mail" = @Translation("Message"),
  *     "copy" = @Translation("Sender copy"),
  *   },

@@ -9,9 +9,8 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for user module.
  *
  * @EmailBuilder(
- *   id = "type.user",
- *   label = @Translation("Email Builder for user module"),
- *   sub_types = {
+ *   id = "user",
+  *   sub_types = {
  *     "cancel_confirm" = @Translation("Account cancellation confirmation"),
  *     "password_reset" = @Translation("Password recovery"),
  *     "register_admin_created" = @Translation("Account created by administrator"),

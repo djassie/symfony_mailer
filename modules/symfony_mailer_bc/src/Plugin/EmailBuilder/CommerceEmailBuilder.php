@@ -10,9 +10,8 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for commerce module.
  *
  * @EmailBuilder(
- *   id = "type.commerce",
- *   label = @Translation("Email Builder for commerce module"),
- * )
+ *   id = "commerce",
+  * )
  *
  * @todo Notes for adopting Symfony Mailer into commerce. It should be possible
  * to remove the MailHandler service. Classes such as OrderReceiptMail could

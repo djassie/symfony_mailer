@@ -9,9 +9,8 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * Defines the Email Builder plug-in for system module.
  *
  * @EmailBuilder(
- *   id = "type.system",
- *   label = @Translation("Email Builder for system module"),
- *   sub_types = { "action_send_email" = @Translation("Send mail") },
+ *   id = "system",
+  *   sub_types = { "action_send_email" = @Translation("Send mail") },
  * )
  */
 class SystemEmailBuilder extends EmailBuilderBase {
