@@ -17,13 +17,6 @@ class EmailBuilder extends Plugin {
   public string $id;
 
   /**
-   * The label of the plugin.
-   *
-   * @ingroup plugin_translatable
-   */
-  public string $label;
-
-  /**
    * Array of sub-types.
    *
    * The array key is the sub-type value and the value is the human-readable

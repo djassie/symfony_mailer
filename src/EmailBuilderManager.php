@@ -36,7 +36,11 @@ class EmailBuilderManager extends DefaultPluginManager {
    * {@inheritdoc}
    */
   public function processDefinition(&$definition, $plugin_id) {
-    list($type, $subType) = array_pad(explode('.', $plugin_id), 2, NULL);
+    $parts = explode('.', $plugin_id);
+    $type = $definition['type'] = array_shift($parts);
+    if ($parts) {
+      $definition['sub_type'] = array_shift($parts);
+    }
 
     if ($definition['has_entity']) {
       if ($entity_type = $this->entityTypeManager->getDefinition($type, FALSE)) {

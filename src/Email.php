@@ -224,7 +224,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   public function addProcessor(string $plugin_id, array $configuration = [], $type = 'adjuster') {
     if ($this->managers[$type]->hasDefinition($plugin_id)) {
       $processor = $this->managers[$type]->createInstance($plugin_id, $configuration);
-      $this->processors[$plugin_id] = $processor;
+      $this->processors["$type.$plugin_id"] = $processor;
       if ($this->processorIterator) {
         $this->processorIterator->add($processor);
       }

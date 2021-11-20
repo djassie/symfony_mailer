@@ -21,7 +21,7 @@ interface EmailProcessorInterface {
   public function postRender(RenderedEmailInterface $email);
 
   /**
-   * Gets the weight of the email builder.
+   * Gets the weight of the email processor.
    *
    * @param string $function
    *   The function that will be called: 'preRender' or 'postRender'.
