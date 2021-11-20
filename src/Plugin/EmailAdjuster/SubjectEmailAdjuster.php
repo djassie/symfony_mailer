@@ -2,7 +2,8 @@
 
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
-use Drupal\symfony_mailer\EmailProcessorBase;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\symfony_mailer\ConfigurableAdjusterBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
@@ -14,7 +15,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *   description = @Translation("Sets the email subject."),
  * )
  */
-class SubjectEmailAdjuster extends EmailProcessorBase {
+class SubjectEmailAdjuster extends ConfigurableAdjusterBase {
 
   /**
    * {@inheritdoc}
@@ -32,6 +33,20 @@ class SubjectEmailAdjuster extends EmailProcessorBase {
     }
 
     $email->setSubject($subject);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $form['value'] = [
+      '#type' => 'textfield',
+      '#default_value' => $this->configuration['value'] ?? NULL,
+      '#required' => TRUE,
+      '#description' => t('Email subject.'),
+    ];
+
+    return $form;
   }
 
 }

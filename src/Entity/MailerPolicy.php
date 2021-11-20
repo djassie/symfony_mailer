@@ -4,7 +4,9 @@ namespace Drupal\symfony_mailer\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\symfony_mailer\AdjusterPluginCollection;
 
 /**
  * Defines a Mailer Policy configuration entity class.
@@ -35,7 +37,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  *   }
  * )
  */
-class MailerPolicy extends ConfigEntityBase {
+class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectionInterface {
   use StringTranslationTrait;
 
   /**
@@ -72,6 +74,13 @@ class MailerPolicy extends ConfigEntityBase {
    * ID with value as an array of configured settings.
    */
   protected $configuration = [];
+
+  /**
+   * The collection of email adjuster plug-ins configured in this policy.
+   *
+   * @var \Drupal\Core\Plugin\DefaultLazyPluginCollection;
+   */
+  protected $pluginCollection;
 
   /**
    * {@inheritdoc}
@@ -163,6 +172,19 @@ class MailerPolicy extends ConfigEntityBase {
   public function getEntityLabel() {
     return $this->entity ? $this->entity->label() : NULL;
   }
+
+  /**
+   * Sets the configuration for an adjuster plugin instance.
+   *
+   * @param string $plugin_id
+   *   The ID of an adjuster plugin to set the configuration for.
+   * @param array $configuration
+   *   The adjuster plugin configuration to set.
+   */
+  public function setAdjusterConfig($plugin_id, array $configuration) {
+    $this->configuration[$plugin_id] = $configuration;
+    if (isset($this->pluginCollection)) {
+      $this->pluginCollection->setInstanceConfiguration($plugin_id, $configuration);
     }
   }
 
@@ -175,6 +197,23 @@ class MailerPolicy extends ConfigEntityBase {
    */
   public function getConfiguration() {
     return $this->configuration;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function adjusters($instance_id = NULL) {
+    if (!isset($this->pluginCollection)) {
+      $this->pluginCollection = new AdjusterPluginCollection($this->emailAdjusterManager, $this->configuration);
+    }
+    return isset($instance_id) ? $this->pluginCollection->get($instance_id) : $this->pluginCollection;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginCollections() {
+    return ['adjusters' => $this->adjusters()];
   }
 
   /**
