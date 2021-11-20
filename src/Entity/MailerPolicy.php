@@ -52,17 +52,24 @@ class MailerPolicy extends ConfigEntityBase {
    */
   protected $emailBuilderManager;
 
+  /**
+   * The email adjuster manager.
+   *
+   * @var \Drupal\symfony_mailer\EmailAdjusterManager
+   */
+  protected $emailAdjusterManager;
+
   protected $type;
   protected $subType;
-  protected $entityId;
+  protected $entity;
   protected $entityLabel;
   protected $builderDefinition;
 
   /**
    * Email builder configuration for this policy record.
    *
-   * An associative array of builder configuration, keyed by the plug-in ID
-   * with value as an array of configured settings.
+   * An associative array of email adjuster configuration, keyed by the plug-in
+   * ID with value as an array of configured settings.
    */
   protected $configuration = [];
 
@@ -72,6 +79,7 @@ class MailerPolicy extends ConfigEntityBase {
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
     $this->emailBuilderManager = \Drupal::service('plugin.manager.email_builder');
+    $this->emailAdjusterManager = \Drupal::service('plugin.manager.email_adjuster');
     $this->labelUnknown = $this->t('Unknown');
     $this->labelAll = $this->t('<b>*All*</b>');
     $this->labelInvalid = $this->t('<b>*Invalid*</b>');
@@ -82,14 +90,13 @@ class MailerPolicy extends ConfigEntityBase {
       return;
     }
 
-    list($this->type, $this->subType, $this->entityId) = array_pad(explode('.', $this->id), 3, NULL);
+    list($this->type, $this->subType, $entityId) = array_pad(explode('.', $this->id), 3, NULL);
     $this->builderDefinition = $this->emailBuilderManager->getDefinition($this->type, FALSE);
-
     if (!$this->builderDefinition) {
       $this->builderDefinition = ['label' => $this->labelUnknown];
     }
-    elseif (!$this->builderDefinition['has_entity'] && $this->entityId) {
-      $this->entityLabel = $this->labelInvalid;
+    if ($entityId && $this->builderDefinition['has_entity']) {
+      $this->entity = $this->entityTypeManager()->getStorage($this->type)->load($entityId);
     }
   }
 
@@ -114,6 +121,16 @@ class MailerPolicy extends ConfigEntityBase {
   }
 
   /**
+   * Gets the config entity this policy applies to.
+   *
+   * @return ?\Drupal\Core\Config\Entity\ConfigEntityInterface.
+   *   Entity, or NULL if the policy applies to all entities.
+   */
+  public function getEntity() {
+    return $this->entity;
+  }
+
+  /**
    * Gets a human-readable label for the email type this policy applies to.
    *
    * @return string
@@ -126,8 +143,8 @@ class MailerPolicy extends ConfigEntityBase {
   /**
    * Gets a human-readable label for the the email sub-type.
    *
-   * @return ?string
-   *   Email sub-type label, or NULL if the policy applies to all sub-types.
+   * @return string
+   *   Email sub-type label.
    */
   public function getSubTypeLabel() {
     if ($this->subType) {
@@ -144,12 +161,8 @@ class MailerPolicy extends ConfigEntityBase {
    *   entities.
    */
   public function getEntityLabel() {
-    if ($this->entityId) {
-      if (!$this->entityLabel) {
-        $entity = $this->entityTypeManager()->getStorage($this->type)->load($this->entityId);
-        $this->entityLabel = $entity ? $entity->label() : $this->labelUnknown;
-      }
-      return $this->entityLabel;
+    return $this->entity ? $this->entity->label() : NULL;
+  }
     }
   }
 
@@ -173,7 +186,7 @@ class MailerPolicy extends ConfigEntityBase {
   public function getSummary() {
     $summary = [];
     foreach (array_keys($this->getConfiguration()) as $plugin_id) {
-      if ($definition = $this->emailBuilderManager->getDefinition($plugin_id, FALSE)) {
+      if ($definition = $this->emailAdjusterManager->getDefinition($plugin_id, FALSE)) {
         $summary[] = $definition['label'];
       }
     }
@@ -185,8 +198,10 @@ class MailerPolicy extends ConfigEntityBase {
    */
   public function calculateDependencies() {
     parent::calculateDependencies();
-    if ($provider = $this->builderDefinition['provider'] ?? NULL) {
-      // @todo If $entityId then instead depend on that specific entity.
+    if ($this->entity) {
+      $this->addDependency('config', $this->entity->getConfigDependencyName());
+    }
+    elseif ($provider = $this->builderDefinition['provider'] ?? NULL) {
       $this->addDependency('module', $provider);
     }
     return $this;
