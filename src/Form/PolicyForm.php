@@ -5,7 +5,6 @@ namespace Drupal\symfony_mailer\Form;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\symfony_mailer\ConfigurableAdjusterInterface;
-use Drupal\symfony_mailer\Entity\MailerPolicy;
 
 /**
  * Mailer policy edit form.

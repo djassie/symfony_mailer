@@ -14,8 +14,9 @@ class AdjusterPluginCollection extends DefaultLazyPluginCollection {
    * {@inheritdoc}
    */
   protected function initializePlugin($instance_id) {
-    $configuration = $this->configurations[$instance_id] ?? [];
-    $this->set($instance_id, $this->manager->createInstance($instance_id, $configuration));
+    if ($configuration = $this->configurations[$instance_id] ?? []) {
+      $this->set($instance_id, $this->manager->createInstance($instance_id, $configuration));
+    }
   }
 
 }

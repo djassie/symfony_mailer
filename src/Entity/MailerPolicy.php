@@ -157,7 +157,10 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    */
   public function getSubTypeLabel() {
     if ($this->subType) {
-      return $this->builderDefinition['sub_types'][$this->subType] ?? $this->labelUnknown;
+      if ($sub_types = $this->builderDefinition['sub_types']) {
+        return $sub_types[$this->subType] ?? $this->labelUnknown;
+      }
+      return $this->subType;
     }
     return $this->labelAll;
   }
