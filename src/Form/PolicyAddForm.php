@@ -28,7 +28,6 @@ class PolicyAddForm extends EntityForm {
     $ajax = [
       'callback' => '::ajaxUpdate',
       'wrapper' => 'mailer-policy-add-form',
-      'effect' => 'fade',
     ];
 
     $form['type'] = [
@@ -112,14 +111,15 @@ class PolicyAddForm extends EntityForm {
   }
 
   /**
-   * Return the entire widget updated.
+   * Ajax callback to update the form.
    */
-  public function ajaxUpdate($form, FormStateInterface $form_state) {
+  public static function ajaxUpdate($form, FormStateInterface $form_state) {
+    // Return the entire form updated.
     return $form;
   }
 
   /**
-   * Returns the action form element.
+   * {@inheritdoc}
    */
   protected function actionsElement(array $form, FormStateInterface $form_state) {
     $element = parent::actionsElement($form, $form_state);

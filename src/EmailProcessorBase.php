@@ -32,7 +32,7 @@ class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
    * {@inheritdoc}
    */
   public function getLabel() {
-    return $this->pluginDefinition['id'];
+    return $this->pluginDefinition['label'];
   }
 
 }
