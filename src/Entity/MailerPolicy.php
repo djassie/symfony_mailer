@@ -17,7 +17,7 @@ use Drupal\symfony_mailer\AdjusterPluginCollection;
  *   handlers = {
  *     "list_builder" = "Drupal\symfony_mailer\MailerPolicyListBuilder",
  *     "form" = {
- *       "edit" = "Drupal\symfony_mailer\Form\PolicyForm",
+ *       "edit" = "Drupal\symfony_mailer\Form\PolicyEditForm",
  *       "add" = "Drupal\symfony_mailer\Form\PolicyAddForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     }
@@ -177,25 +177,27 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   }
 
   /**
-   * Sets the configuration for an adjuster plugin instance.
+   * Sets the email adjuster configuration for this policy record.
    *
-   * @param string $plugin_id
-   *   The ID of an adjuster plugin to set the configuration for.
    * @param array $configuration
-   *   The adjuster plugin configuration to set.
+   *   An associative array of adjuster configuration, keyed by the plug-in ID
+   *   with value as an array of configured settings.
+   *
+   * @return $this
    */
-  public function setAdjusterConfig($plugin_id, array $configuration) {
-    $this->configuration[$plugin_id] = $configuration;
-    if (isset($this->pluginCollection)) {
-      $this->pluginCollection->setInstanceConfiguration($plugin_id, $configuration);
+  public function setConfiguration(array $configuration) {
+    $this->configuration = $configuration;
+    if ($this->pluginCollection) {
+      $this->pluginCollection->setConfiguration($configuration);
     }
+    return $this;
   }
 
   /**
-   * Gets the email builder configuration for this policy record.
+   * Gets the email adjuster configuration for this policy record.
    *
    * @return array
-   *   An associative array of builder configuration, keyed by the plug-in ID
+   *   An associative array of adjuster configuration, keyed by the plug-in ID
    *   with value as an array of configured settings.
    */
   public function getConfiguration() {
@@ -203,20 +205,26 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the ordered collection of configured adjuster plugin instances.
+   *
+   * @return \Drupal\filter\AdjusterPluginCollection
+   *   The adjuster collection.
    */
-  public function adjusters($instance_id = NULL) {
+  public function adjusters() {
     if (!isset($this->pluginCollection)) {
       $this->pluginCollection = new AdjusterPluginCollection($this->emailAdjusterManager, $this->configuration);
     }
-    return isset($instance_id) ? $this->pluginCollection->get($instance_id) : $this->pluginCollection;
+    return $this->pluginCollection;
   }
 
   /**
-   * {@inheritdoc}
+   * Returns all available adjuster plugin definitions.
+   *
+   * @return array
+   *   An associative array of plugin definitions, keyed by the plug-in ID.
    */
-  public function getPluginCollections() {
-    return ['adjusters' => $this->adjusters()];
+  public function adjusterDefinitions() {
+    return $this->emailAdjusterManager->getDefinitions();
   }
 
   /**
@@ -233,6 +241,13 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
       }
     }
     return implode(', ', $summary);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginCollections() {
+    return ['adjusters' => $this->adjusters()];
   }
 
   /**
