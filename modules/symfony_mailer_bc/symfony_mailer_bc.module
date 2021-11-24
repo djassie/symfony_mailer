@@ -37,23 +37,6 @@ function symfony_mailer_bc_mailer_builder_info_alter(array &$email_builders) {
 }
 
 /**
- * Implements hook_mailer_bc_MODULE_alter() for user.
- */
-function symfony_mailer_bc_mailer_bc_user_alter(string &$key, array &$params, array &$context) {
-  // Use the entity type as the parameter key.
-  // @see \Drupal\symfony_mailer\UnrenderedEmailInterface::setParam()
-  $params = ['user' => $params['account']];
-}
-
-/**
- * Implements hook_mailer_bc_MODULE_alter() for system.
- */
-function symfony_mailer_bc_mailer_bc_system_alter(string &$key, array &$params, array &$context) {
-  // Simplify the params.
-  $params = $params['context'];
-}
-
-/**
  * Implements hook_mailer_bc_MODULE_alter() for contact.
  */
 function symfony_mailer_bc_mailer_bc_contact_alter(string &$key, array &$params, array &$context) {
@@ -78,4 +61,21 @@ function symfony_mailer_bc_mailer_bc_simplenews_alter(string &$key, array &$para
   elseif ($key == 'subscribe_combined') {
     $key = 'subscribe';
   }
+}
+
+/**
+ * Implements hook_mailer_bc_MODULE_alter() for system.
+ */
+function symfony_mailer_bc_mailer_bc_system_alter(string &$key, array &$params, array &$context) {
+  // Simplify the params.
+  $params = $params['context'];
+}
+
+/**
+ * Implements hook_mailer_bc_MODULE_alter() for user.
+ */
+function symfony_mailer_bc_mailer_bc_user_alter(string &$key, array &$params, array &$context) {
+  // Use the entity type as the parameter key.
+  // @see \Drupal\symfony_mailer\UnrenderedEmailInterface::setParam()
+  $params = ['user' => $params['account']];
 }
