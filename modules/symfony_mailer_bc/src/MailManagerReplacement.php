@@ -72,7 +72,8 @@ class MailManagerReplacement extends MailManager {
     }
 
     $result = $email->send();
-    return ['result' => $result];
+    // Set the 'send' element for Webform module.
+    return ['result' => $result, 'send' => TRUE];
   }
 
 }
