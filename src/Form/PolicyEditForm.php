@@ -50,6 +50,7 @@ class PolicyEditForm extends EntityForm {
         $options[$name] = $definition['label'];
       }
     }
+    asort($options);
 
     $form['add_actions']['add_select'] = [
       '#type' => 'select',
@@ -70,7 +71,7 @@ class PolicyEditForm extends EntityForm {
       '#type' => 'container',
     ];
 
-    foreach ($adjusters as $name => $adjuster) {
+    foreach ($adjusters->sort() as $name => $adjuster) {
       $form['config'][$name] = [
         '#type' => 'details',
         '#title' => $adjuster->getLabel(),

@@ -17,4 +17,13 @@ class AdjusterPluginCollection extends DefaultLazyPluginCollection {
     $this->set($instance_id, $this->manager->createInstance($instance_id, $configuration));
   }
 
+  /**
+   * Provides uasort() callback to sort plugins.
+   */
+  public function sortHelper($aID, $bID) {
+    $a = $this->get($aID);
+    $b = $this->get($bID);
+    return strnatcasecmp($a->getPluginDefinition()['label'], $b->getPluginDefinition()['label']);
+  }
+
 }
