@@ -117,14 +117,12 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
   /**
    * Add an email processor.
    *
-   * @param string $plugin_id
-   *   The plugin ID.
-   * @param array $configuration
-   *   (Optional) Plugin configuration.
-   * @param bool $type
-   *   (Optional) The plugin type, 'adjuster' (default) or 'builder'.
+   * @param \Drupal\symfony_mailer\EmailProcessorInterface $processor
+   *   The email processor.
+   *
+   * @return $this
    */
-  public function addProcessor(string $plugin_id, array $configuration = [], $type = 'adjuster');
+  public function addProcessor(EmailProcessorInterface $processor);
 
   /**
    * Sets the langcode.

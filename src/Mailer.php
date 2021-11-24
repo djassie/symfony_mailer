@@ -7,7 +7,6 @@ use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
-use Drupal\symfony_mailer\Entity\MailerTransport;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -128,8 +127,7 @@ class Mailer implements MailerInterface {
     $this->invokeAll('pre_send', $rendered_email);
 
     // Send.
-    $dsn = MailerTransport::loadDsn($rendered_email->getTransport());
-    $mailer = new SymfonyMailer($dsn, NULL, $this->dispatcher);
+    $mailer = new SymfonyMailer($rendered_email->getTransport(), NULL, $this->dispatcher);
 
     try {
       //ksm($rendered_email, $rendered_email->getInner()->getHeaders());

@@ -131,6 +131,13 @@ class MailerTransport extends ConfigEntityBase implements MailerTransportInterfa
   /**
    * {@inheritdoc}
    */
+  public function getSymfony() {
+    return Transport::fromDsn($this->getDsn());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setAsDefault() {
     \Drupal::service('config.factory')->getEditable('symfony_mailer.settings')->set('default_transport', $this->id())->save();
   }
@@ -140,32 +147,6 @@ class MailerTransport extends ConfigEntityBase implements MailerTransportInterfa
    */
   public function isDefault() {
     return \Drupal::service('config.factory')->getEditable('symfony_mailer.settings')->get('default_transport') == $this->id();
-  }
-
-  /**
-   * Gets the DSN for the specified transport.
-   *
-   * @param ?string $id
-   *   The id of the transport to load.
-   *
-   * @return string
-   *   The DSN.
-   */
-  public static function loadDsn(?string $id) {
-    if ($id) {
-      $transport_entity = static::load($id);
-      if (!$transport_entity) {
-        throw new \Exception("Mailer Transport $id not found");
-      }
-    }
-    else {
-      $transport_entity = static::loadDefault();
-      if (!$transport_entity) {
-        throw new \Exception("No default Mailer Transport found");
-      }
-    }
-
-    return Transport::fromDsn($transport_entity->getDsn());
   }
 
   /**

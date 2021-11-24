@@ -3,7 +3,7 @@
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\ConfigurableAdjusterBase;
+use Drupal\symfony_mailer\EmailAdjusterBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
@@ -15,7 +15,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *   description = @Translation("Sets the email subject."),
  * )
  */
-class SubjectEmailAdjuster extends ConfigurableAdjusterBase {
+class SubjectEmailAdjuster extends EmailAdjusterBase {
 
   /**
    * {@inheritdoc}

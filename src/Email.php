@@ -9,37 +9,25 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
 class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
 
   /**
    * The mailer.
-   *
-   * @var \Drupal\symfony_mailer\MailerInterface $mailer
    */
-  protected $mailer;
-
-  /**
-   * The email processor managers.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface[]
-   */
-  protected array $managers;
+  protected MailerInterface $mailer;
 
   /**
    * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   protected string $type;
   protected string $entity_id;
@@ -54,32 +42,26 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   protected $body = [];
   protected array $to = [];
   protected array $replyTo = [];
-  protected $processors = [];
+  protected array $processors = [];
   protected $processorIterator = NULL;
-  protected $langcode;
-  protected $params = [];
-  protected $variables = [];
+  protected string $langcode;
+  protected array $params = [];
+  protected array $variables = [];
 
   protected SymfonyEmail $inner;
 
-  protected $libraries = [];
+  protected array $libraries = [];
 
   /**
-   * The mail transport ID.
-   *
-   * @var string
+   * The mail transport.
    */
-  protected string $transport = '';
+  protected TransportInterface $transport;
 
   /**
    * Constructs the Email object.
    *
    * @param \Drupal\symfony_mailer\MailerInterface $mailer
    *   Mailer service.
-   * @param \Drupal\symfony_mailer\EmailBuilderManager $email_builder_manager
-   *   The email builder manager.
-   * @param \Drupal\symfony_mailer\EmailAdjusterManager $email_adjuster_manager
-   *   The email adjuster manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -91,10 +73,8 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
    *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    */
-  public function __construct(MailerInterface $mailer, EmailBuilderManager $email_builder_manager, EmailAdjusterManager $email_adjuster_manager, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
+  public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
     $this->mailer = $mailer;
-    $this->managers['builder'] = $email_builder_manager;
-    $this->managers['adjuster'] = $email_adjuster_manager;
     $this->renderer = $renderer;
     $this->entityTypeManager = $entity_type_manager;
     $this->type = $type;
@@ -122,8 +102,6 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   public static function create(ContainerInterface $container, string $type, string $sub_type, ?ConfigEntityInterface $entity = NULL) {
     return new static(
       $container->get('symfony_mailer'),
-      $container->get('plugin.manager.email_builder'),
-      $container->get('plugin.manager.email_adjuster'),
       $container->get('renderer'),
       $container->get('entity_type.manager'),
       $type,
@@ -221,13 +199,10 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function addProcessor(string $plugin_id, array $configuration = [], $type = 'adjuster') {
-    if ($this->managers[$type]->hasDefinition($plugin_id)) {
-      $processor = $this->managers[$type]->createInstance($plugin_id, $configuration);
-      $this->processors["$type.$plugin_id"] = $processor;
-      if ($this->processorIterator) {
-        $this->processorIterator->add($processor);
-      }
+  public function addProcessor(EmailProcessorInterface $processor) {
+    $this->processors[] = $processor;
+    if ($this->processorIterator) {
+      $this->processorIterator->add($processor);
     }
     return $this;
   }
@@ -429,7 +404,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function setTransport(string $transport) {
+  public function setTransport(TransportInterface $transport) {
     $this->transport = $transport;
     return $this;
   }

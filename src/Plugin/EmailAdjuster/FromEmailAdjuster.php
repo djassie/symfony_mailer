@@ -3,7 +3,7 @@
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\ConfigurableAdjusterBase;
+use Drupal\symfony_mailer\EmailAdjusterBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Symfony\Component\Mime\Address;
 
@@ -16,7 +16,7 @@ use Symfony\Component\Mime\Address;
  *   description = @Translation("Sets the email from header."),
  * )
  */
-class FromEmailAdjuster extends ConfigurableAdjusterBase {
+class FromEmailAdjuster extends EmailAdjusterBase {
   // @todo Extend from AddressBuilderBase, adding others for cc, Bcc, To, etc.
   // @todo Allow multiple values
   // @todo Setting whether to replace existing addresses or add to them.

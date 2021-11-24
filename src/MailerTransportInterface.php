@@ -63,12 +63,20 @@ interface MailerTransportInterface extends ConfigEntityInterface {
   public function setPluginId($plugin_id);
 
   /**
-   * Gets the DSN
+   * Gets the DSN.
    *
    * @return string
    *   The DSN.
    */
   public function getDsn();
+
+  /**
+   * Gets the Symfony transport.
+   *
+   * @return \Symfony\Component\Mailer\Transport\TransportInterface
+   *   The Symfony transport.
+   */
+  public function getSymfony();
 
   /**
    * Sets this as the default transport.

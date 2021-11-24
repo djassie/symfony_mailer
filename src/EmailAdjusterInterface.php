@@ -4,7 +4,7 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Form\FormStateInterface;
 
-interface ConfigurableAdjusterInterface {
+interface EmailAdjusterInterface extends EmailProcessorInterface {
 
   /**
    * Generates an adjuster's settings form.
@@ -19,5 +19,12 @@ interface ConfigurableAdjusterInterface {
    *   filter. The submitted form values should match $this->configuration.
    */
   public function settingsForm(array $form, FormStateInterface $form_state);
+
+  /**
+   * Returns the administrative label for this plugin.
+   *
+   * @return string
+   */
+  public function getLabel();
 
 }

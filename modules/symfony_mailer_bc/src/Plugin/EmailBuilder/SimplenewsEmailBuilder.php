@@ -3,6 +3,7 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\EmailProcessorBase;
+use Drupal\symfony_mailer\TokenEmailProcessor;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
@@ -22,7 +23,7 @@ class SimplenewsEmailBuilder extends EmailProcessorBase {
    * {@inheritdoc}
    */
   public function preRender(UnrenderedEmailInterface $email) {
-    $email->addProcessor('mailer_token_replace', ['data' => $email->getParam('context')]);
+    $email->addProcessor(new TokenEmailProcessor($email->getParam('context')));
   }
 
 }

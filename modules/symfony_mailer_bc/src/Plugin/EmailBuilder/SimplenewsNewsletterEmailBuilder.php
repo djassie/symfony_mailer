@@ -3,6 +3,7 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\EmailProcessorBase;
+use Drupal\symfony_mailer\TokenEmailProcessor;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
@@ -31,7 +32,7 @@ class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase {
     $mail = $email->getParam('simplenews_mail');
     $email->setSubject($mail->getSubject())
       ->setBody($mail->getBody())
-      ->addProcessor('mailer_token_replace');
+      ->addProcessor(new TokenEmailProcessor());
   }
 
   /**

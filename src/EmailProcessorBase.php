@@ -28,11 +28,4 @@ class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
     return is_array($weight) ? $weight[$function] : $weight;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getLabel() {
-    return $this->pluginDefinition['label'];
-  }
-
 }

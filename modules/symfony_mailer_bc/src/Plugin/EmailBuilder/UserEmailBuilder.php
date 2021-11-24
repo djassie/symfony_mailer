@@ -3,6 +3,7 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\EmailProcessorBase;
+use Drupal\symfony_mailer\TokenEmailProcessor;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
@@ -33,7 +34,7 @@ class UserEmailBuilder extends EmailProcessorBase {
    */
   public function preRender(UnrenderedEmailInterface $email) {
     $token_options = ['callback' => 'user_mail_tokens', 'clear' => TRUE];
-    $email->addProcessor('mailer_token_replace', ['options' => $token_options]);
+    $email->addProcessor(new TokenEmailProcessor(NULL, $token_options));
   }
 
 }

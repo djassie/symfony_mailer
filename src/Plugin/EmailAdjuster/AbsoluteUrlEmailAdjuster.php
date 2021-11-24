@@ -3,7 +3,7 @@
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Component\Utility\Html;
-use Drupal\symfony_mailer\EmailProcessorBase;
+use Drupal\symfony_mailer\EmailAdjusterBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\symfony_mailer\RenderedEmailInterface;
  *   weight = 700,
  * )
  */
-class AbsoluteUrlEmailAdjuster extends EmailProcessorBase {
+class AbsoluteUrlEmailAdjuster extends EmailAdjusterBase {
 
   /**
    * {@inheritdoc}

@@ -31,11 +31,4 @@ interface EmailProcessorInterface {
    */
   public function getWeight(string $function);
 
-  /**
-   * Returns the administrative label for this plugin.
-   *
-   * @return string
-   */
-  public function getLabel();
-
 }

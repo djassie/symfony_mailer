@@ -3,12 +3,27 @@
 namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\symfony_mailer\Entity\MailerPolicy;
 
 /**
- * Provides a factory for create email objects.
+ * Provides a factory for creating email objects.
  */
 class EmailFactory {
+  /**
+   * The email builder manager.
+   *
+   * @var \Drupal\symfony_mailer\EmailBuilderManager
+   */
+  protected $emailBuilderManager;
+
+  /**
+   * Constructs the EmailFactory object.
+   *
+   * @param \Drupal\symfony_mailer\EmailBuilderManager $email_builder_manager
+   *   The email builder manager.
+   */
+  public function __construct(EmailBuilderManager $email_builder_manager) {
+    $this->emailBuilderManager = $email_builder_manager;
+  }
 
   /**
    * Creates an email object unrelated to a config entity.
@@ -56,24 +71,10 @@ class EmailFactory {
   protected function newEmail(string $type, string $sub_type, ?ConfigEntityInterface $entity = NULL) {
     $email = Email::create(\Drupal::getContainer(), $type, $sub_type, $entity);
 
-    // Load the root policy that applies to all messages.
-    if ($policy = MailerPolicy::load('_')) {
-      $policy_config[] = $policy->getConfiguration();
-    }
-
-    // Load builders and policy with matching ID.
-    foreach ($email->getSuggestions('', '.') as $id) {
-      $email->addProcessor($id, [], 'builder');
-      if ($policy = MailerPolicy::load($id)) {
-        $policy_config[] = $policy->getConfiguration();
-      }
-    }
-
-    // Load adjusters.
-    if (isset($policy_config)) {
-      $policy_config = array_merge(...$policy_config);
-      foreach ($policy_config as $plugin_id => $config) {
-        $email->addProcessor($plugin_id, $config);
+    // Load builders with matching ID.
+    foreach ($email->getSuggestions('', '.') as $plugin_id) {
+      if ($this->emailBuilderManager->hasDefinition($plugin_id)) {
+        $email->addProcessor($this->emailBuilderManager->createInstance($plugin_id));
       }
     }
 

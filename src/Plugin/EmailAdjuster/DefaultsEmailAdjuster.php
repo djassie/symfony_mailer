@@ -6,8 +6,9 @@ use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Drupal\symfony_mailer\EmailProcessorBase;
-use Drupal\symfony_mailer\RenderedEmailInterface;
+use Drupal\symfony_mailer\EmailAdjusterBase;
+use Drupal\symfony_mailer\Entity\MailerTransport;
+ use Drupal\symfony_mailer\RenderedEmailInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Address;
 
@@ -21,7 +22,7 @@ use Symfony\Component\Mime\Address;
  *   weight = 100,
  * )
  */
-class DefaultsEmailAdjuster extends EmailProcessorBase implements ContainerFactoryPluginInterface {
+class DefaultsEmailAdjuster extends EmailAdjusterBase implements ContainerFactoryPluginInterface {
 
   /**
    * The configuration factory.
@@ -95,6 +96,10 @@ class DefaultsEmailAdjuster extends EmailProcessorBase implements ContainerFacto
       $theme = $this->configFactory->get('system.theme')->get('default');
     }
     $email->addLibrary("$theme/email");
+
+    if ($default_transport = MailerTransport::loadDefault()) {
+      $email->setTransport($default_transport->getSymfony());
+    }
   }
 
 }

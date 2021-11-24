@@ -6,7 +6,6 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\RemoveCommand;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\ConfigurableAdjusterInterface;
 
 /**
  * Mailer policy edit form.
@@ -80,9 +79,7 @@ class PolicyEditForm extends EntityForm {
         '#parents' => ['config', $name],
       ];
 
-      if ($adjuster instanceof ConfigurableAdjusterInterface) {
-        $form['config'][$name] += $adjuster->settingsForm([], $form_state);
-      }
+      $form['config'][$name] += $adjuster->settingsForm([], $form_state);
 
       $form['config'][$name]['remove_button'] = [
         '#type' => 'submit',

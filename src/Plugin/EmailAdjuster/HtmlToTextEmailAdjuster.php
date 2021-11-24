@@ -2,7 +2,7 @@
 
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
-use Drupal\symfony_mailer\EmailProcessorBase;
+use Drupal\symfony_mailer\EmailAdjusterBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Html2Text\Html2Text;
 
@@ -16,7 +16,7 @@ use Html2Text\Html2Text;
  *   weight = 800,
  * )
  */
-class HtmlToTextEmailAdjuster extends EmailProcessorBase {
+class HtmlToTextEmailAdjuster extends EmailAdjusterBase {
 
   /**
    * {@inheritdoc}

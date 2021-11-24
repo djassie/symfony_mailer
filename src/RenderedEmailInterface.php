@@ -2,6 +2,8 @@
 
 namespace Drupal\symfony_mailer;
 
+use Symfony\Component\Mailer\Transport\TransportInterface;
+
 /**
  * Defines the interface for an Email that has already been rendered.
  *
@@ -38,20 +40,20 @@ interface RenderedEmailInterface extends BaseEmailInterface {
   public function getHtmlBody();
 
   /**
-   * Sets the mail transport ID to use.
+   * Sets the mail transport to use.
    *
-   * @param string $transport
-   *   Transport ID.
+   * @param \Symfony\Component\Mailer\Transport\TransportInterface $transport
+   *   Symfony mail transport.
    *
    * @return $this
    */
-  public function setTransport(string $transport);
+  public function setTransport(TransportInterface $transport);
 
   /**
-   * Gets the mail transport ID to use.
+   * Gets the mail transport that will be used.
    *
-   * @return string
-   *   Transport ID.
+   * @return \Symfony\Component\Mailer\Transport\TransportInterface
+   *   Transport.
    */
   public function getTransport();
 
