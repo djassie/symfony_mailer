@@ -11,7 +11,8 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  *
  * @EmailBuilder(
  *   id = "commerce",
-  * )
+ *   sub_types = { "order_receipt" = @Translation("Order receipt") },
+ * )
  *
  * @todo Notes for adopting Symfony Mailer into commerce. It should be possible
  * to remove the MailHandler service. Classes such as OrderReceiptMail could
