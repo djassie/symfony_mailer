@@ -27,7 +27,7 @@ class ContactPageEmailBuilder extends ContactEmailBuilderBase {
    * {@inheritdoc}
    */
   public function preRender(UnrenderedEmailInterface $email) {
-    parent::build($email);
+    parent::preRender($email);
     $email->setVariable('form', $email->getEntity()->label())
       ->setVariable('form_url', Url::fromRoute('<current>')->toString());
 

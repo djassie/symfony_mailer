@@ -24,7 +24,7 @@ class ContactEmailBuilder extends ContactEmailBuilderBase {
    * {@inheritdoc}
    */
   public function preRender(UnrenderedEmailInterface $email) {
-    parent::build($email);
+    parent::preRender($email);
     $recipient = $email->getParams()['recipient'];
 
     $email->setVariable('recipient_name', $recipient->getDisplayName())
