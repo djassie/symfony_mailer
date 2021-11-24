@@ -43,7 +43,7 @@ class SubjectEmailAdjuster extends EmailAdjusterBase {
       '#type' => 'textfield',
       '#default_value' => $this->configuration['value'] ?? NULL,
       '#required' => TRUE,
-      '#description' => t('Email subject.'),
+      '#description' => t('Email subject. This field may support tokens or Twig template syntax – please check the supplied default policy for possible values.'),
     ];
 
     return $form;

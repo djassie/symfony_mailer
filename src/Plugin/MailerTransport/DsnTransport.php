@@ -12,6 +12,7 @@ use Symfony\Component\Mailer\Transport;
  * @MailerTransport(
  *   id = "dsn",
  *   label = @Translation("DSN"),
+ *   description = @Translation("The DSN transport is a generic fallback and should only be used if there is no specific implementation available."),
  * )
  */
 class DsnTransport extends TransportBase {

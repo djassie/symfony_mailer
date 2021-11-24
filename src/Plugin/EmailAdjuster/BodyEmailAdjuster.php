@@ -58,7 +58,7 @@ class BodyEmailAdjuster extends EmailAdjusterBase {
       '#type' => 'textarea',
       '#default_value' => $this->configuration['value'] ?? NULL,
       '#required' => TRUE,
-      '#description' => t('Email body.'),
+      '#description' => t('Email body. This field may support tokens or Twig template syntax – please check the supplied default policy for possible values.'),
     ];
 
     return $form;

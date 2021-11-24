@@ -38,6 +38,15 @@ class TransportForm extends EntityForm {
     $form = parent::form($form, $form_state);
     $transport = $this->entity;
 
+    $definition = $transport->getPlugin()->getPluginDefinition();
+    $form['type'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Type'),
+      '#disabled' => TRUE,
+      '#default_value' => $definition['label'],
+      '#description' => $definition['description'] ?? '',
+    ];
+
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
@@ -57,11 +66,6 @@ class TransportForm extends EntityForm {
       ],
       '#required' => TRUE,
       '#disabled' => !$transport->isNew(),
-    ];
-
-    $form['plugin'] = [
-      '#type' => 'value',
-      '#value' => $transport->getPluginId(),
     ];
 
     $form += $this->plugin->buildConfigurationForm($form, $form_state);
