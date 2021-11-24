@@ -34,9 +34,11 @@ class CommerceEmailBuilder extends EmailProcessorBase {
    */
   public function postRender(RenderedEmailInterface $email) {
     if ($from = $email->getParam('from')) {
-      // @todo This respects the email address of the store, but it loses the
-      // display name.
       $email->getInner()->from($from);
+    }
+
+    if ($bcc = $email->getParam('bcc')) {
+      $email->getInner()->bcc($bcc);
     }
   }
 
