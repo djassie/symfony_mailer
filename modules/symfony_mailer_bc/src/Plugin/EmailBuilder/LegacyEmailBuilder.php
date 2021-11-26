@@ -3,7 +3,7 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Component\Render\MarkupInterface;
-use Drupal\symfony_mailer\EmailProcessorBase;
+use Drupal\symfony_mailer\Processor\EmailProcessorBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**

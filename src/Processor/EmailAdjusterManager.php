@@ -1,11 +1,12 @@
 <?php
 
-namespace Drupal\symfony_mailer;
+namespace Drupal\symfony_mailer\Processor;
 
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
+use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**
  * Provides the email adjuster plugin manager.
@@ -24,7 +25,7 @@ class EmailAdjusterManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/EmailAdjuster', $namespaces, $module_handler, 'Drupal\symfony_mailer\EmailAdjusterInterface', 'Drupal\symfony_mailer\Annotation\EmailAdjuster');
+    parent::__construct('Plugin/EmailAdjuster', $namespaces, $module_handler, 'Drupal\symfony_mailer\Processor\EmailAdjusterInterface', 'Drupal\symfony_mailer\Annotation\EmailAdjuster');
     $this->setCacheBackend($cache_backend, 'symfony_mailer_adjuster_plugins');
     $this->alterInfo('mailer_adjuster_info');
   }

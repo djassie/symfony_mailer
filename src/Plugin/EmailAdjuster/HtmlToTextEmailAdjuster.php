@@ -2,7 +2,7 @@
 
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
-use Drupal\symfony_mailer\EmailAdjusterBase;
+use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Html2Text\Html2Text;
 

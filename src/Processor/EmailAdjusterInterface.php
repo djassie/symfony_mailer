@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\symfony_mailer;
+namespace Drupal\symfony_mailer\Processor;
 
 use Drupal\Core\Form\FormStateInterface;
 

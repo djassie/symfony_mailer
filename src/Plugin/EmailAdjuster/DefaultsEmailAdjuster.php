@@ -6,7 +6,7 @@ use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Drupal\symfony_mailer\EmailAdjusterBase;
+use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
 use Drupal\symfony_mailer\Entity\MailerTransport;
  use Drupal\symfony_mailer\RenderedEmailInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;

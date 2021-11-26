@@ -2,8 +2,8 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\EmailProcessorBase;
-use Drupal\symfony_mailer\TokenEmailProcessor;
+use Drupal\symfony_mailer\Processor\EmailProcessorBase;
+use Drupal\symfony_mailer\Processor\TokenEmailProcessor;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\symfony_mailer;
+namespace Drupal\symfony_mailer\Processor;
 
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -26,7 +26,7 @@ class EmailBuilderManager extends DefaultPluginManager {
    *   The entity type manager.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager) {
-    parent::__construct('Plugin/EmailBuilder', $namespaces, $module_handler, 'Drupal\symfony_mailer\EmailProcessorInterface', 'Drupal\symfony_mailer\Annotation\EmailBuilder');
+    parent::__construct('Plugin/EmailBuilder', $namespaces, $module_handler, 'Drupal\symfony_mailer\Processor\EmailProcessorInterface', 'Drupal\symfony_mailer\Annotation\EmailBuilder');
     $this->entityTypeManager = $entity_type_manager;
     $this->setCacheBackend($cache_backend, 'symfony_mailer_builder_plugins');
     $this->alterInfo('mailer_builder_info');

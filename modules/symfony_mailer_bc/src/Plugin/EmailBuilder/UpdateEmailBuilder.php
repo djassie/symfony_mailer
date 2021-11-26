@@ -4,7 +4,7 @@ namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
-use Drupal\symfony_mailer\EmailProcessorBase;
+use Drupal\symfony_mailer\Processor\EmailProcessorBase;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 /**

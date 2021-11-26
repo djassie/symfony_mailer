@@ -5,6 +5,7 @@ namespace Drupal\symfony_mailer;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\symfony_mailer\Processor\EmailProcessorInterface;
 
 /**
  * Defines the interface for an Email that has not yet been rendered.
@@ -117,7 +118,7 @@ interface UnrenderedEmailInterface extends BaseEmailInterface {
   /**
    * Add an email processor.
    *
-   * @param \Drupal\symfony_mailer\EmailProcessorInterface $processor
+   * @param \Drupal\symfony_mailer\Processor\EmailProcessorInterface $processor
    *   The email processor.
    *
    * @return $this

@@ -6,7 +6,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\symfony_mailer\AdjusterPluginCollection;
+use Drupal\symfony_mailer\Processor\AdjusterPluginCollection;
 
 /**
  * Defines a Mailer Policy configuration entity class.
@@ -50,14 +50,14 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   /**
    * The email builder manager.
    *
-   * @var \Drupal\symfony_mailer\EmailBuilderManager
+   * @var \Drupal\symfony_mailer\Processor\EmailBuilderManager
    */
   protected $emailBuilderManager;
 
   /**
    * The email adjuster manager.
    *
-   * @var \Drupal\symfony_mailer\EmailAdjusterManager
+   * @var \Drupal\symfony_mailer\Processor\EmailAdjusterManager
    */
   protected $emailAdjusterManager;
 
@@ -207,7 +207,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   /**
    * Returns the ordered collection of configured adjuster plugin instances.
    *
-   * @return \Drupal\filter\AdjusterPluginCollection
+   * @return \Drupal\symfony_mailer\Processor\AdjusterPluginCollection
    *   The adjuster collection.
    */
   public function adjusters() {

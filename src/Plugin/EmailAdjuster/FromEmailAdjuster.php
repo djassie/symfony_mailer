@@ -3,7 +3,7 @@
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\EmailAdjusterBase;
+use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Symfony\Component\Mime\Address;
 

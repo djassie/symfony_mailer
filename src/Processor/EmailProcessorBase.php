@@ -1,8 +1,10 @@
 <?php
 
-namespace Drupal\symfony_mailer;
+namespace Drupal\symfony_mailer\Processor;
 
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\symfony_mailer\RenderedEmailInterface;
+use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
 class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
 

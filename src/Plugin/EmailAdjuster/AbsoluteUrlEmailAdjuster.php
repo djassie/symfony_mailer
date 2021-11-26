@@ -3,7 +3,7 @@
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Component\Utility\Html;
-use Drupal\symfony_mailer\EmailAdjusterBase;
+use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 
 /**
