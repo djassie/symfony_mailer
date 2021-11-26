@@ -98,7 +98,7 @@ class DefaultsEmailAdjuster extends EmailAdjusterBase implements ContainerFactor
     $email->addLibrary("$theme/email");
 
     if ($default_transport = MailerTransport::loadDefault()) {
-      $email->setTransport($default_transport->getSymfony());
+      $email->setTransportDsn($default_transport->getDsn());
     }
   }
 

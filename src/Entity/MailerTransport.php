@@ -6,7 +6,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\symfony_mailer\MailerTransportInterface;
-use Symfony\Component\Mailer\Transport;
 
 /**
  * Defines a Mailer Transport configuration entity class.
@@ -126,13 +125,6 @@ class MailerTransport extends ConfigEntityBase implements MailerTransportInterfa
    */
   public function getDsn() {
     return $this->getPlugin()->getDsn();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getSymfony() {
-    return Transport::fromDsn($this->getDsn());
   }
 
   /**

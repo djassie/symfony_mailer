@@ -53,9 +53,9 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   protected array $libraries = [];
 
   /**
-   * The mail transport.
+   * The mail transport DSN.
    */
-  protected TransportInterface $transport;
+  protected string $transportDsn;
 
   /**
    * Constructs the Email object.
@@ -404,16 +404,16 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function setTransport(TransportInterface $transport) {
-    $this->transport = $transport;
+  public function setTransportDsn(string $dsn) {
+    $this->transportDsn = $dsn;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getTransport() {
-    return $this->transport;
+  public function getTransportDsn() {
+    return $this->transportDsn;
   }
 
 }
