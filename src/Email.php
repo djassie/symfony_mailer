@@ -211,11 +211,11 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function getProcessors() {
-    // @todo We are no longer using the feature to add builders during
-    // iteration so maybe we can remove EmailProcessorIterator.
     $function = isset($this->inner) ? 'postRender' : 'preRender';
-    $this->processorIterator = new EmailProcessorIterator(array_values($this->processors), $function);
-    return $this->processorIterator;
+    usort($this->processors, function($a, $b) use($function) {
+      return $a->getWeight($function) <=> $b->getWeight($function);
+    });
+    return $this->processors;
   }
 
   /**
