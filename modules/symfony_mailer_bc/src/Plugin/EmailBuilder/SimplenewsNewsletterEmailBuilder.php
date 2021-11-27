@@ -3,7 +3,7 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\Processor\EmailProcessorBase;
-use Drupal\symfony_mailer\Processor\TokenEmailProcessor;
+use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
@@ -23,6 +23,7 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * MailBuilder class, and many methods of MailEntity.
  */
 class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase {
+  use TokenProcessorTrait;
 
   /**
    * {@inheritdoc}
@@ -31,8 +32,7 @@ class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase {
     /** @var \Drupal\simplenews\Mail\MailEntity $mail */
     $mail = $email->getParam('simplenews_mail');
     $email->setSubject($mail->getSubject())
-      ->setBody($mail->getBody())
-      ->addProcessor(new TokenEmailProcessor());
+      ->setBody($mail->getBody());
   }
 
   /**
