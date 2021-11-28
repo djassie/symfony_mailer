@@ -3,7 +3,6 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\Processor\EmailProcessorBase;
-use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
 use Drupal\symfony_mailer\RenderedEmailInterface;
 use Drupal\symfony_mailer\UnrenderedEmailInterface;
 
@@ -23,7 +22,6 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * MailBuilder class, and many methods of MailEntity.
  */
 class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase {
-  use TokenProcessorTrait;
 
   /**
    * {@inheritdoc}
@@ -41,7 +39,7 @@ class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase {
   public function postRender(RenderedEmailInterface $email) {
     $headers = $email->getInner()->getHeaders();
     $headers->addTextHeader('Precedence', 'bulk');
-    if ($unsubscribe_url = \Drupal::token()->replace('[simplenews-subscriber:unsubscribe-url]', $email->getParams())) {
+    if ($unsubscribe_url = \Drupal::token()->replace('[simplenews-subscriber:unsubscribe-url]', $email->getParams(), ['clear' => TRUE])) {
       $headers->addTextHeader('List-Unsubscribe', "<$unsubscribe_url>");
     }
   }
