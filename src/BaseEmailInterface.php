@@ -1,9 +1,9 @@
 <?php
 
+namespace Drupal\symfony_mailer;
+
 use Drupal\Component\Render\MarkupInterface;
 use Symfony\Component\Mime\Part\DataPart;
-
-namespace Drupal\symfony_mailer;
 
 interface BaseEmailInterface {
 
