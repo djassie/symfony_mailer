@@ -7,6 +7,8 @@ use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationManager;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
@@ -16,6 +18,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * Provides a Mailer service based on Symfony Mailer.
  */
 class Mailer implements MailerInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The event dispatcher to notify of routes.
