@@ -298,7 +298,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function getParam(string $key) {
-    return $this->params[$key];
+    return $this->params[$key] ?? NULL;
   }
 
   /**

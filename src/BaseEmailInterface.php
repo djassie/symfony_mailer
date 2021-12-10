@@ -89,7 +89,7 @@ interface BaseEmailInterface {
    *   Parameter key to get.
    *
    * @return mixed
-   *   Parameter value.
+   *   Parameter value, or NULL if the parameter is not set.
    */
   public function getParam(string $key);
 
