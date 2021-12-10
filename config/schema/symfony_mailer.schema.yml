@@ -52,3 +52,59 @@ symfony_mailer.transport_plugin.smtp:
     port:
       type: integer
       label: 'Port'
+
+symfony_mailer.mailer_policy.*:
+  type: config_entity
+  label: 'Policy'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    configuration:
+      type: sequence
+      label: 'Configuration'
+      sequence:
+        type: symfony_mailer.email_adjuster_plugin.[%key]
+
+symfony_mailer.email_adjuster_plugin.email_body:
+  type: mapping
+  label: 'Body'
+  mapping:
+    value:
+      type: text
+      label: 'Email body'
+
+symfony_mailer.email_adjuster_plugin.email_from:
+  type: mapping
+  label: 'From header'
+  mapping:
+    value:
+      type: email
+      label: 'E-mail address'
+    display:
+      type: label
+      label: 'Display name'
+
+symfony_mailer.email_adjuster_plugin.email_subject:
+  type: mapping
+  label: 'Subject'
+  mapping:
+    value:
+      type: label
+      label: 'Email subject'
+
+symfony_mailer.email_adjuster_plugin.mailer_default_headers:
+  type: mapping
+  label: 'Default headers'
+
+symfony_mailer.email_adjuster_plugin.mailer_html_to_text:
+  type: mapping
+  label: 'HTML to text'
+
+symfony_mailer.email_adjuster_plugin.mailer_inline_css:
+  type: mapping
+  label: 'Inline CSS'
+
+symfony_mailer.email_adjuster_plugin.mailer_url_to_absolute:
+  type: mapping
+  label: 'URL to absolute'
