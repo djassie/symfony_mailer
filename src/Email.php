@@ -44,7 +44,6 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   protected array $to = [];
   protected array $replyTo = [];
   protected array $processors = [];
-  protected $processorIterator = NULL;
   protected string $langcode;
   protected array $params = [];
   protected array $variables = [];
@@ -202,9 +201,6 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   public function addProcessor(EmailProcessorInterface $processor) {
     $this->processors[] = $processor;
-    if ($this->processorIterator) {
-      $this->processorIterator->add($processor);
-    }
     return $this;
   }
 
