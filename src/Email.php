@@ -10,7 +10,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\symfony_mailer\Processor\EmailProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
 class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
@@ -55,7 +54,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * The mail transport DSN.
    */
-  protected string $transportDsn;
+  protected string $transportDsn = '';
 
   /**
    * Constructs the Email object.

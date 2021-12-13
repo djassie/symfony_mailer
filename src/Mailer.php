@@ -9,6 +9,8 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationManager;
+use Drupal\Core\Url;
+use Drupal\symfony_mailer\Exception\MissingTransportException;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
@@ -131,14 +133,26 @@ class Mailer implements MailerInterface {
     }
     $this->invokeAll('pre_send', $rendered_email);
 
-    // Send.
-    $transport = Transport::fromDsn($rendered_email->getTransportDsn());
-    $mailer = new SymfonyMailer($transport, NULL, $this->dispatcher);
 
     try {
+      // Send.
+      $transport_dsn = $rendered_email->getTransportDsn();
+      if (empty($transport_dsn)) {
+        throw new MissingTransportException('Missing email transport: please configure a default.');
+      }
+
+      $transport = Transport::fromDsn($transport_dsn);
+      $mailer = new SymfonyMailer($transport, NULL, $this->dispatcher);
+
       //ksm($rendered_email, $rendered_email->getInner()->getHeaders());
       $mailer->send($rendered_email->getInner());
       $result = TRUE;
+    }
+    catch (MissingTransportException $e) {
+      \Drupal::messenger()->addWarning($this->t('Missing email transport: please configure a <a href=":url">default</a>.', [
+        ':url' => Url::fromRoute('entity.mailer_transport.collection')->toString(),
+      ]));
+      $result = FALSE;
     }
     catch (RuntimeException $e) {
       // @todo Log exception, print user-focused message.
