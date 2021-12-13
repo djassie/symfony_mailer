@@ -42,6 +42,9 @@ class EmailBuilderManager extends DefaultPluginManager {
       $definition['sub_type'] = array_shift($parts);
     }
 
+    // Set a dummy provider that will cause the definition to be removed.
+    // @see DefaultPluginManager::findDefinitions()
+    $definition['provider'] = '_';
     if ($definition['has_entity']) {
       if ($entity_type = $this->entityTypeManager->getDefinition($type, FALSE)) {
         $definition['label'] = $entity_type->getLabel();
