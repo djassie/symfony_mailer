@@ -3,8 +3,7 @@
 namespace Drupal\symfony_mailer\Processor;
 
 use Drupal\Core\Plugin\PluginBase;
-use Drupal\symfony_mailer\RenderedEmailInterface;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
 
@@ -13,13 +12,19 @@ class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
   /**
    * {@inheritdoc}
    */
-  public function preRender(UnrenderedEmailInterface $email) {
+  public function preBuild(EmailInterface $email) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function postRender(RenderedEmailInterface $email) {
+  public function preRender(EmailInterface $email) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postRender(EmailInterface $email) {
   }
 
   /**

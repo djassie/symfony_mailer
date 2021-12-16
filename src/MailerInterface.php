@@ -10,12 +10,12 @@ interface MailerInterface
   /**
    * Sends an email.
    *
-   * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
+   * @param \Drupal\symfony_mailer\InternalEmailInterface $email
    *   The email to send.
    *
    * @return bool
    *   Whether successful.
    */
-  public function send(UnrenderedEmailInterface $email);
+  public function send(InternalEmailInterface $email);
 
 }

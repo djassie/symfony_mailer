@@ -2,7 +2,7 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines the Email Builder plug-in for contact module personal forms.
@@ -23,7 +23,7 @@ class ContactEmailBuilder extends ContactEmailBuilderBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(UnrenderedEmailInterface $email) {
+  public function preRender(EmailInterface $email) {
     parent::preRender($email);
     $recipient = $email->getParams()['recipient'];
 

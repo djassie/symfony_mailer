@@ -3,8 +3,7 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\Processor\EmailProcessorBase;
-use Drupal\symfony_mailer\RenderedEmailInterface;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines the Email Builder plug-in for simplenews_newsletter entity.
@@ -26,21 +25,15 @@ class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(UnrenderedEmailInterface $email) {
+  public function preRender(EmailInterface $email) {
     /** @var \Drupal\simplenews\Mail\MailEntity $mail */
     $mail = $email->getParam('simplenews_mail');
     $email->setSubject($mail->getSubject())
-      ->setBody($mail->getBody());
-  }
+      ->setBody($mail->getBody())
+      ->addTextHeader('Precedence', 'bulk');
 
-  /**
-   * {@inheritdoc}
-   */
-  public function postRender(RenderedEmailInterface $email) {
-    $headers = $email->getInner()->getHeaders();
-    $headers->addTextHeader('Precedence', 'bulk');
     if ($unsubscribe_url = \Drupal::token()->replace('[simplenews-subscriber:unsubscribe-url]', $email->getParams(), ['clear' => TRUE])) {
-      $headers->addTextHeader('List-Unsubscribe', "<$unsubscribe_url>");
+      $email->addTextHeader('List-Unsubscribe', "<$unsubscribe_url>");
     }
   }
 

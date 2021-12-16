@@ -3,112 +3,236 @@
 namespace Drupal\symfony_mailer;
 
 use Drupal\Component\Render\MarkupInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\DataPart;
 
+/**
+ * Defines an interface related to the Symfony Email object.
+ *
+ * The functions are mostly identical, except that set accessors are explicitly
+ * named, e.g. setSubject() instead of subject().
+ */
 interface BaseEmailInterface {
 
   /**
-   * Gets all email processors.
+   * Sets the email subject.
    *
-   * @return \Iterator
-   *   Iterator over email processors.
-   */
-  public function getProcessors();
-
-  /**
-   * Gets the email type.
-   *
-   * If the email is associated with a config entity, then this is the entity
-   * type, else it is the module name.
-   *
-   * @return string
-   *   Email type.
-   */
-  public function getType();
-
-  /**
-   * Gets the email sub-type.
-   *
-   * The sub-type is a 'key' to distinguish different categories of email with
-   * the same type. Emails with the same sub-type are all built in the same
-   * way, differently from other sub-types.
-   *
-   * @return string
-   *   Email sub-type.
-   */
-  public function getSubType();
-
-  /**
-   * Gets the associated config entity.
-   *
-   * The ID of this entity can be used to select a specific template or apply
-   * specific policy configuration.
-   *
-   * @return ?\Drupal\Core\Config\Entity\ConfigEntityInterface.
-   *   Entity, or NULL if there is no associated entity.
-   */
-  public function getEntity();
-
-  /**
-   * Gets an array of 'suggestions'.
-   *
-   * The suggestions are used to select email builders, templates and policy
-   * configuration in based on email type, sub-type and associated entity ID.
-   *
-   * @param string $initial
-   *   The initial suggestion.
-   * @param string $join
-   *   The 'glue' to join each suggestion part with.
-   *
-   * @return array
-   *   Suggestions, formed by taking the initial value and incrementally adding
-   *   the type, sub-type and entity ID.
-   */
-  public function getSuggestions(string $initial, string $join);
-
-  /**
-   * Gets the langcode.
-   *
-   * @return string
-   *   Language code to use to compose the email.
-   */
-  public function getLangcode();
-
-  /**
-   * Gets parameters used for building the email.
-   *
-   * @return array
-   *   An array of keyed objects.
-   */
-  public function getParams();
-
-  /**
-   * Gets a parameter used for building the email.
-   *
-   * @param string $key
-   *   Parameter key to get.
-   *
-   * @return mixed
-   *   Parameter value, or NULL if the parameter is not set.
-   */
-  public function getParam(string $key);
-
-  /**
-   * Adds an asset library to use as mail CSS.
-   *
-   * @param string $library
-   *   Library name, in the form "THEME/LIBRARY".
+   * @param \Drupal\Component\Render\MarkupInterface|string $subject
+   *   The email subject.
    *
    * @return $this
    */
-  public function addLibrary(string $library);
+  public function setSubject($subject);
 
   /**
-   * Gets the libraries to use as mail CSS.
+   * Gets the email subject.
    *
-   * @return array
-   *   Array of library names, in the form "THEME/LIBRARY".
+   * @return \Drupal\Component\Render\MarkupInterface|string $subject
+   *   The email subject.
    */
-  public function getLibraries();
+  public function getSubject();
 
-}
+  /**
+   * @return $this
+   */
+  public function setDate(\DateTimeInterface $dateTime);
+
+  public function getDate(): ?\DateTimeImmutable;
+
+  /**
+   * @return $this
+   */
+  public function setReturnPath($address);
+
+  public function getReturnPath(): ?Address;
+
+  /**
+   * @return $this
+   */
+  public function setSender($address);
+
+  public function getSender(): ?Address;
+
+  /**
+   * @return $this
+   */
+  public function addFrom(...$addresses);
+
+  /**
+   * @return $this
+   */
+  public function setFrom(...$addresses);
+
+  /**
+   * @return Address[]
+   */
+  public function getFrom(): array;
+
+  /**
+   * Sets one or more reply-to addresses.
+   *
+   * @param ...$addresses
+   *
+   * @return $this
+   */
+  public function addReplyTo(...$addresses);
+
+  /**
+   * @return $this
+   */
+  public function setReplyTo(...$addresses);
+
+  /**
+   * Gets the reply-to addresses.
+   *
+   * @return Address[]
+   *   The reply-to addresses.
+   */
+  public function getReplyTo(): array;
+
+  /**
+   * @return $this
+   */
+  public function addTo(...$addresses);
+
+  /**
+   * Sets one or more to addresses.
+   *
+   * @param ...$addresses
+   *
+   * @return $this
+   */
+  public function setTo(...$addresses);
+
+  /**
+   * Gets the to addresses.
+   *
+   * @return Address[]
+   *   The to addresses.
+   */
+  public function getTo(): array;
+
+  /**
+   * @return $this
+   */
+  public function addCc(...$addresses);
+
+  /**
+   * @return $this
+   */
+  public function setCc(...$addresses);
+
+  /**
+   * @return Address[]
+   */
+  public function getCc(): array;
+
+  /**
+   * @return $this
+   */
+  public function addBcc(...$addresses);
+
+  /**
+   * @return $this
+   */
+  public function setBcc(...$addresses);
+
+  /**
+   * @return Address[]
+   */
+  public function getBcc(): array;
+
+  /**
+   * Sets the priority of this message.
+   *
+   * The value is an integer where 1 is the highest priority and 5 is the lowest.
+   *
+   * @return $this
+   */
+  public function setPriority(int $priority);
+
+  /**
+   * Get the priority of this message.
+   *
+   * The returned value is an integer where 1 is the highest priority and 5
+   * is the lowest.
+   */
+  public function getPriority(): int;
+
+  /**
+   * @param string $body
+   *
+   * @return $this
+   */
+  public function setTextBody(string $body);
+
+  /**
+   * @return ?string
+   */
+  public function getTextBody();
+
+  /**
+   * Sets the HTML body.
+   *
+   * Valid: after rendering.
+   *
+   * @param ?string $body
+   *   HTML body.
+   *
+   * @return $this
+   */
+  public function setHtmlBody(?string $body);
+
+  /**
+   * Gets the HTML body.
+   *
+   * Valid: after rendering.
+   *
+   * @return ?string
+   *   HTML body.
+   */
+  public function getHtmlBody();
+
+  /**
+   * @param string $body
+   *
+   * @return $this
+   */
+  // public function attach(string $body, string $name = null, string $contentType = null);
+
+  /**
+   * @return $this
+   */
+  // public function attachFromPath(string $path, string $name = null, string $contentType = null);
+
+  /**
+   * @param string $body
+   *
+   * @return $this
+   */
+  // public function embed(string $body, string $name = null, string $contentType = null);
+
+  /**
+   * @return $this
+   */
+  // public function embedFromPath(string $path, string $name = null, string $contentType = null);
+
+  /**
+   * @return $this
+   */
+  // public function attachPart(DataPart $part);
+
+  /**
+   * @return array|DataPart[]
+   */
+  // public function getAttachments(): array;
+
+  public function getHeaders(): Headers;
+
+  /**
+   * @return $this
+   */
+  public function addTextHeader(string $name, string $value);
+
+};

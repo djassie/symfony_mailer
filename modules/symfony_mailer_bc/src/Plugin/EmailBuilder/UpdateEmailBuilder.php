@@ -5,7 +5,7 @@ namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\Processor\EmailProcessorBase;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines the Email Builder plug-in for update module.
@@ -20,7 +20,7 @@ class UpdateEmailBuilder extends EmailProcessorBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(UnrenderedEmailInterface $email) {
+  public function preRender(EmailInterface $email) {
     foreach ($email->getParams() as $msg_type => $msg_reason) {
       $messages[] = _update_message_text($msg_type, $msg_reason);
     }

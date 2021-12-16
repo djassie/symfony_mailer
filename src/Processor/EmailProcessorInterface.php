@@ -2,32 +2,40 @@
 
 namespace Drupal\symfony_mailer\Processor;
 
-use Drupal\symfony_mailer\RenderedEmailInterface;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 interface EmailProcessorInterface {
 
   /**
-   * Runs pre-render functions to build an email message.
+   * Runs the pre-build function on an email message.
    *
-   * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
-   *   The email to pre-render.
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email to process.
    */
-  public function preRender(UnrenderedEmailInterface $email);
+  public function preBuild(EmailInterface $email);
 
   /**
-   * Runs post-render functions to adjust an email message.
+   * Runs the pre-render function on an email message.
    *
-   * @param \Drupal\symfony_mailer\RenderedEmailInterface $email
-   *   The email to post-render.
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email to process.
    */
-  public function postRender(RenderedEmailInterface $email);
+  public function preRender(EmailInterface $email);
+
+  /**
+   * Runs the post-render function on an email message.
+   *
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email to process.
+   */
+  public function postRender(EmailInterface $email);
 
   /**
    * Gets the weight of the email processor.
    *
    * @param string $function
-   *   The function that will be called: 'preRender' or 'postRender'.
+   *   The function that will be called: 'preBuild', 'preRender' or
+   *   'postRender'.
    *
    * @return int
    *   The weight.

@@ -6,7 +6,7 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines the Body Email Adjuster.
@@ -22,7 +22,7 @@ class BodyEmailAdjuster extends EmailAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(UnrenderedEmailInterface $email) {
+  public function preRender(EmailInterface $email) {
     $body = $this->configuration['value'];
 
     $variables = $email->getVariables();

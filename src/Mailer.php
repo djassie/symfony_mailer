@@ -83,7 +83,7 @@ class Mailer implements MailerInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(UnrenderedEmailInterface $email) {
+  public function send(InternalEmailInterface $email) {
     // Mailing can invoke rendering (e.g., generating URLs, replacing tokens),
     // but e-mails are not HTTP responses: they're not cached, they don't have
     // attachments. Therefore we perform mailing inside its own render context,
@@ -97,7 +97,7 @@ class Mailer implements MailerInterface {
   /**
    * Sends an email.
    *
-   * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
+   * @param \Drupal\symfony_mailer\InternalEmailInterface $email
    *   The email to send.
    *
    * @return bool
@@ -105,8 +105,9 @@ class Mailer implements MailerInterface {
    *
    * @internal
    */
-  public function doSend(UnrenderedEmailInterface $email) {
-    // Call hooks.
+  public function doSend(InternalEmailInterface $email) {
+    // Call hooks/processors.
+    $email->process('preBuild');
     $this->invokeAll('pre_build', $email);
 
     $langcode = $email->getLangcode();
@@ -118,25 +119,19 @@ class Mailer implements MailerInterface {
     }
 
     // Call hooks/processors.
-    foreach ($email->getProcessors() as $processor) {
-      $processor->preRender($email);
-    }
+    $email->process('preRender');
     $this->invokeAll('pre_render', $email);
 
     // Render.
-    /** @var \Drupal\symfony_mailer\RenderedEmailInterface $rendered_email */
-    $rendered_email = $email->render();
+    $email->render();
 
     // Call hooks/processors.
-    foreach ($rendered_email->getProcessors() as $processor) {
-      $processor->postRender($rendered_email);
-    }
-    $this->invokeAll('pre_send', $rendered_email);
-
+    $email->process('postRender');
+    $this->invokeAll('post_render', $email);
 
     try {
       // Send.
-      $transport_dsn = $rendered_email->getTransportDsn();
+      $transport_dsn = $email->getTransportDsn();
       if (empty($transport_dsn)) {
         throw new MissingTransportException('Missing email transport: please configure a default.');
       }
@@ -144,8 +139,8 @@ class Mailer implements MailerInterface {
       $transport = Transport::fromDsn($transport_dsn);
       $mailer = new SymfonyMailer($transport, NULL, $this->dispatcher);
 
-      //ksm($rendered_email, $rendered_email->getInner()->getHeaders());
-      $mailer->send($rendered_email->getInner());
+      //ksm($email, $email->getHeaders());
+      $mailer->send($email->getSymfonyEmail());
       $result = TRUE;
     }
     catch (MissingTransportException $e) {
@@ -209,10 +204,10 @@ class Mailer implements MailerInterface {
    *
    * @param string $hook
    *   The hook to call.
-   * @param \Drupal\symfony_mailer\BaseEmailInterface $email
+   * @param \Drupal\symfony_mailer\EmailInterface $email
    *   The email.
    */
-  protected function invokeAll($hook, $email) {
+  protected function invokeAll(string $hook, EmailInterface $email) {
     foreach ($email->getSuggestions("mailer_$hook", '_') as $hook_variant) {
       $this->moduleHandler->invokeAll($hook_variant, [$email]);
     }

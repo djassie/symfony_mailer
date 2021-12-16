@@ -34,7 +34,7 @@ class EmailFactory {
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
    *
-   * @return \Drupal\symfony_mailer\UnrenderedEmailInterface
+   * @return \Drupal\symfony_mailer\EmailInterface
    *   A new email object.
    */
   public function newModuleEmail(string $module, string $sub_type) {
@@ -49,7 +49,7 @@ class EmailFactory {
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
    *
-   * @return \Drupal\symfony_mailer\UnrenderedEmailInterface
+   * @return \Drupal\symfony_mailer\EmailInterface
    *   A new email object.
    */
   public function newEntityEmail(ConfigEntityInterface $entity, string $sub_type) {
@@ -66,7 +66,7 @@ class EmailFactory {
    * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
    *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    *
-   * @return \Drupal\symfony_mailer\UnrenderedEmailInterface
+   * @return \Drupal\symfony_mailer\EmailInterface
    *   A new email object.
    */
   protected function newEmail(string $type, string $sub_type, ?ConfigEntityInterface $entity = NULL) {

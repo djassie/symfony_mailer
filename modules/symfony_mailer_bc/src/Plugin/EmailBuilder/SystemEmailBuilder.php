@@ -3,7 +3,7 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\Processor\EmailProcessorBase;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines the Email Builder plug-in for system module.
@@ -18,7 +18,7 @@ class SystemEmailBuilder extends EmailProcessorBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(UnrenderedEmailInterface $email) {
+  public function preRender(EmailInterface $email) {
     $body = [
       '#type' => 'processed_text',
       '#text' => $email->getParam('message'),

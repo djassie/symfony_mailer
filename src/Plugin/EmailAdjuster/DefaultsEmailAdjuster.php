@@ -8,7 +8,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
 use Drupal\symfony_mailer\Entity\MailerTransport;
- use Drupal\symfony_mailer\RenderedEmailInterface;
+ use Drupal\symfony_mailer\EmailInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Address;
 
@@ -83,12 +83,12 @@ class DefaultsEmailAdjuster extends EmailAdjusterBase implements ContainerFactor
   /**
    * {@inheritdoc}
    */
-  public function postRender(RenderedEmailInterface $email) {
+  public function postRender(EmailInterface $email) {
     $site_config = $this->configFactory->get('system.site');
     $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
     $from = new Address($site_mail, $site_config->get('name'));
-    $email->getInner()->sender($from)
-      ->getHeaders()->addTextHeader('X-Mailer', 'Drupal');
+    $email->setSender($from)
+      ->addTextHeader('X-Mailer', 'Drupal');
 
     // First try active theme then fallback to default theme.
     $theme = $this->themeManager->getActiveTheme()->getName();

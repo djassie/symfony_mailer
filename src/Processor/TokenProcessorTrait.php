@@ -5,8 +5,7 @@ namespace Drupal\symfony_mailer\Processor;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Utility\Token;
-use Drupal\symfony_mailer\RenderedEmailInterface;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines a trait to enable token replacement in an Email processor.
@@ -19,15 +18,14 @@ trait TokenProcessorTrait {
   /**
    * {@inheritdoc}
    */
-  public function postRender(RenderedEmailInterface $email) {
+  public function postRender(EmailInterface $email) {
     /** @var \Drupal\Core\Utility\Token $token */
     $token = \Drupal::token();
     $data = $this->data ?? $email->getParams();
-    $inner = $email->getInner();
 
-    if ($subject = $inner->getSubject()) {
+    if ($subject = $email->getSubject()) {
       $subject = PlainTextOutput::renderFromHtml($token->replace(Html::escape($subject), $data, $this->options));
-      $inner->subject($subject);
+      $email->setSubject($subject);
     }
     if ($body = $email->getHtmlBody()) {
       $email->setHtmlBody($token->replace($body, $data, $this->options));

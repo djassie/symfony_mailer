@@ -1,6 +1,6 @@
 <?php
 
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Implements hook_theme().
@@ -41,6 +41,6 @@ function template_preprocess_email(&$variables) {
 /**
  * Implements hook_mailer_pre_build().
  */
-function symfony_mailer_mailer_pre_build(UnrenderedEmailInterface $email) {
+function symfony_mailer_mailer_pre_build(EmailInterface $email) {
   \Drupal::service('plugin.manager.email_adjuster')->applyPolicy($email);
 }

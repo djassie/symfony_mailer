@@ -6,7 +6,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Provides the email adjuster plugin manager.
@@ -33,10 +33,10 @@ class EmailAdjusterManager extends DefaultPluginManager {
   /**
    * Applies email policy to an email message.
    *
-   * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
+   * @param \Drupal\symfony_mailer\EmailInterface $email
    *   The email.
    */
-  public function applyPolicy(UnrenderedEmailInterface $email) {
+  public function applyPolicy(EmailInterface $email) {
     // Load policies, including the root policy that applies to all messages.
     $suggestions = array_merge(['_'], $email->getSuggestions('', '.'));
     foreach ($suggestions as $id) {

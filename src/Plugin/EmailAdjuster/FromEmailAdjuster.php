@@ -4,7 +4,7 @@ namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
-use Drupal\symfony_mailer\RenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 use Symfony\Component\Mime\Address;
 
 /**
@@ -24,11 +24,11 @@ class FromEmailAdjuster extends EmailAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function postRender(RenderedEmailInterface $email) {
+  public function postRender(EmailInterface $email) {
     $mail = $this->configuration['value'];
     $display = $this->configuration['display'];
     $from = $display ? new Address($mail, $display) : $mail;
-    $email->getInner()->from($from);
+    $email->setFrom($from);
   }
 
   /**

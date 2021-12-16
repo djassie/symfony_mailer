@@ -4,7 +4,7 @@ namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Component\Utility\Html;
 use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
-use Drupal\symfony_mailer\RenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines the URL to absolute Email Adjuster.
@@ -21,7 +21,7 @@ class AbsoluteUrlEmailAdjuster extends EmailAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function postRender(RenderedEmailInterface $email) {
+  public function postRender(EmailInterface $email) {
     $email->setHtmlBody(Html::transformRootRelativeUrlsToAbsolute($email->getHtmlBody(), \Drupal::request()->getSchemeAndHttpHost()));
   }
 

@@ -4,7 +4,7 @@ namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines the Subject header Email Adjuster.
@@ -20,7 +20,7 @@ class SubjectEmailAdjuster extends EmailAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(UnrenderedEmailInterface $email) {
+  public function preRender(EmailInterface $email) {
     $subject = $this->configuration['value'];
 
     if ($variables = $email->getVariables()) {
@@ -30,6 +30,8 @@ class SubjectEmailAdjuster extends EmailAdjusterBase {
         '#template' => $subject,
         '#context' => $variables,
       ];
+      $renderer = \Drupal::service('renderer');
+      $subject = $renderer->renderPlain($subject);
     }
 
     $email->setSubject($subject);

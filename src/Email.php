@@ -12,7 +12,8 @@ use Drupal\symfony_mailer\Processor\EmailProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
-class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
+class Email implements InternalEmailInterface {
+  use BaseEmailTrait;
 
   /**
    * The mailer.
@@ -30,25 +31,15 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   protected EntityTypeManagerInterface $entityTypeManager;
 
   protected string $type;
+  protected string $subType;
   protected string $entity_id;
-
-  /**
-   * The email subject.
-   *
-   * @var \Drupal\Component\Render\MarkupInterface|string
-   */
-  protected $subject;
+  protected string $phase = 'preBuild';
 
   protected $body = [];
-  protected array $to = [];
-  protected array $replyTo = [];
   protected array $processors = [];
   protected string $langcode;
   protected array $params = [];
   protected array $variables = [];
-
-  protected SymfonyEmail $inner;
-
   protected array $libraries = [];
 
   /**
@@ -79,6 +70,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
     $this->type = $type;
     $this->subType = $sub_type;
     $this->entity = $entity;
+    $this->inner = new SymfonyEmail();
   }
 
   /**
@@ -112,24 +104,8 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function setSubject($subject) {
-    // We must not force conversion of the subject to a string as this could
-    // cause translation before switching to the correct language.
-    $this->subject = $subject;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getSubject() {
-    return $this->subject;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function setBody($body) {
+    $this->valid('preRender', 'preBuild');
     $this->body = $body;
     return $this;
   }
@@ -138,6 +114,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function appendBody($body) {
+    $this->valid('preRender', 'preBuild');
     $name = 'n' . count($this->body);
     $this->body[$name] = $body;
     return $this;
@@ -151,6 +128,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    *   (optional) The view mode that should be used to render the entity.
    */
   public function appendBodyEntity(EntityInterface $entity, $view_mode = 'full') {
+    $this->valid('preRender', 'preBuild');
     $build = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId())
       ->view($entity, $view_mode);
 
@@ -162,56 +140,17 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function getBody() {
+    $this->valid('preRender', 'preBuild');
     return $this->body;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setTo(...$addresses) {
-    $this->to = $addresses;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTo() {
-    return $this->to;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setReplyTo(...$addresses) {
-    $this->replyTo = $addresses;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getReplyTo() {
-    return $this->replyTo;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function addProcessor(EmailProcessorInterface $processor) {
+    $this->valid('preBuild');
     $this->processors[] = $processor;
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getProcessors() {
-    $function = isset($this->inner) ? 'postRender' : 'preRender';
-    usort($this->processors, function($a, $b) use($function) {
-      return $a->getWeight($function) <=> $b->getWeight($function);
-    });
-    return $this->processors;
   }
 
   /**
@@ -259,6 +198,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function setLangcode(string $langcode) {
+    $this->valid('preBuild');
     $this->langcode = $langcode;
     return $this;
   }
@@ -274,6 +214,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function setParams(array $params = []) {
+    $this->valid('preBuild');
     $this->params = $params;
     return $this;
   }
@@ -282,6 +223,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function setParam(string $key, $value) {
+    $this->valid('preBuild');
     $this->params[$key] = $value;
     return $this;
   }
@@ -304,6 +246,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function setVariables(array $variables) {
+    $this->valid('preRender', 'preBuild');
     $this->variables = $variables;
     return $this;
   }
@@ -312,6 +255,7 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function setVariable(string $key, $value) {
+    $this->valid('preRender', 'preBuild');
     $this->variables[$key] = $value;
     return $this;
   }
@@ -342,35 +286,50 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    * {@inheritdoc}
    */
   public function send() {
-    $this->mailer->send($this);
+    $this->valid('preBuild');
+    return $this->mailer->send($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function process(string $function) {
+    if ($function == 'preRender') {
+      $this->valid('preBuild');
+      $this->phase = 'preRender';
+    }
+    else {
+      $this->valid($function);
+    }
+
+    usort($this->processors, function($a, $b) use($function) {
+      return $a->getWeight($function) <=> $b->getWeight($function);
+    });
+
+    foreach ($this->processors as $processor) {
+      call_user_func([$processor, $function], $this);
+    }
+
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
   public function render() {
+    $this->valid('preRender');
+
     // Render subject.
-    $subject = $this->subject;
-    if (is_array($subject)) {
-      $subject = $this->renderer->renderPlain($subject);
-    }
-    if ($subject instanceof MarkupInterface) {
-      $subject = PlainTextOutput::renderFromHtml($subject);
+    if ($this->subject instanceof MarkupInterface) {
+      $this->subject = PlainTextOutput::renderFromHtml($this->subject);
     }
 
     // Render body.
     $body = ['#theme' => 'email', '#email' => $this];
-    $body = $this->renderer->renderPlain($body);
-
-    $this->inner = (new SymfonyEmail())
-      ->html($body)
-      ->subject($subject)
-      ->to(...$this->to)
-      ->replyTo(...$this->replyTo);
-    $this->subject = NULL;
+    $html = $this->renderer->renderPlain($body);
+    $this->phase = 'postRender';
+    $this->setHtmlBody($html);
     $this->body = [];
-    $this->to = [];
-    $this->replyTo = [];
 
     return $this;
   }
@@ -378,23 +337,11 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function getInner() {
+  public function getSymfonyEmail() {
+    $this->inner->subject($this->subject);
+    // No further alterations allowed.
+    $this->phase = 'postSend';
     return $this->inner;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setHtmlBody($body) {
-    $this->inner->html($body);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getHtmlBody() {
-    return $this->inner->getHtmlBody();
   }
 
   /**
@@ -410,6 +357,25 @@ class Email implements UnrenderedEmailInterface, RenderedEmailInterface {
    */
   public function getTransportDsn() {
     return $this->transportDsn;
+  }
+
+  /**
+   * Checks that a function was called in the correct phase.
+   *
+   * @param string $phase
+   *   The correct phase.
+   * @param string $alt_phase
+   *   An alternative allowed phase.
+   *
+   * @return $this
+   */
+  protected function valid(string $phase, string $alt_phase = '') {
+    $valid = ($this->phase == $phase) || ($this->phase == $alt_phase);
+    if (!$valid) {
+      $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
+      throw new \Exception("$caller function is only valid in the $phase phase");
+    }
+    return $this;
   }
 
 }

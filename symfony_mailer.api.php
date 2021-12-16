@@ -5,8 +5,7 @@
  * Documentation of Symfony Mailer hooks.
  */
 
-use Drupal\symfony_mailer\RenderedEmailInterface;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Acts on an email message prior to building.
@@ -14,10 +13,10 @@ use Drupal\symfony_mailer\UnrenderedEmailInterface;
  * The email is not yet built. Can alter the language or the configured email
  * builders.
  *
- * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
+ * @param \Drupal\symfony_mailer\EmailInterface $email
  *   The email.
  */
-function hook_mailer_pre_build(UnrenderedEmailInterface $email) {
+function hook_mailer_pre_build(EmailInterface $email) {
 }
 
 /**
@@ -25,21 +24,21 @@ function hook_mailer_pre_build(UnrenderedEmailInterface $email) {
  *
  * The email is now fully built, and the body/subject can be altered.
  *
- * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
+ * @param \Drupal\symfony_mailer\EmailInterface $email
  *   The email.
  */
-function hook_mailer_pre_render(UnrenderedEmailInterface $email) {
+function hook_mailer_pre_render(EmailInterface $email) {
 }
 
 /**
- * Acts on an email message prior to sending.
+ * Acts on an email message after rendering.
  *
  * The email is now ready to send and any headers can be altered.
  *
- * @param \Drupal\symfony_mailer\RenderedEmailInterface $email
+ * @param \Drupal\symfony_mailer\EmailInterface $email
  *   The email.
  */
-function hook_mailer_pre_send(RenderedEmailInterface $email) {
+function hook_mailer_post_render(EmailInterface $email) {
 }
 
 // @todo Versions with __TYPE, __SUBTYPE

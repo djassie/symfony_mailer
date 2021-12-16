@@ -76,6 +76,6 @@ function symfony_mailer_bc_mailer_bc_system_alter(string &$key, array &$params, 
  */
 function symfony_mailer_bc_mailer_bc_user_alter(string &$key, array &$params, array &$context) {
   // Use the entity type as the parameter key.
-  // @see \Drupal\symfony_mailer\UnrenderedEmailInterface::setParam()
+  // @see \Drupal\symfony_mailer\EmailInterface::setParam()
   $params = ['user' => $params['account']];
 }

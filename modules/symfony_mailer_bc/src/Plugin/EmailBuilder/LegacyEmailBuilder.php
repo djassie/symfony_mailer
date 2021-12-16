@@ -4,7 +4,7 @@ namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\symfony_mailer\Processor\EmailProcessorBase;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines the Legacy Email Builder plug-in that calls hook_mail().
@@ -14,7 +14,7 @@ class LegacyEmailBuilder extends EmailProcessorBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(UnrenderedEmailInterface $email) {
+  public function preRender(EmailInterface $email) {
     $message = $this->getMessage($email);
     $email->setSubject($message['subject']);
 
@@ -36,13 +36,13 @@ class LegacyEmailBuilder extends EmailProcessorBase {
   /**
    * Gets a message array by calling hook_mail().
    *
-   * @param \Drupal\symfony_mailer\UnrenderedEmailInterface $email
+   * @param \Drupal\symfony_mailer\EmailInterface $email
    *   The email to build.
    *
    * @return array
    *   Message array.
    */
-  protected function getMessage(UnrenderedEmailInterface $email) {
+  protected function getMessage(EmailInterface $email) {
     $module = $email->getType();
     $key = $email->getSubType();
     $message = [

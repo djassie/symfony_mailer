@@ -3,7 +3,7 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Core\Url;
-use Drupal\symfony_mailer\UnrenderedEmailInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines the Email Builder plug-in for contact module page forms.
@@ -26,7 +26,7 @@ class ContactPageEmailBuilder extends ContactEmailBuilderBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(UnrenderedEmailInterface $email) {
+  public function preRender(EmailInterface $email) {
     parent::preRender($email);
     $email->setVariable('form', $email->getEntity()->label())
       ->setVariable('form_url', Url::fromRoute('<current>')->toString());
