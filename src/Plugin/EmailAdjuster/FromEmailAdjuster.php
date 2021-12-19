@@ -2,10 +2,7 @@
 
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
 use Drupal\symfony_mailer\EmailInterface;
-use Symfony\Component\Mime\Address;
 
 /**
  * Defines the From Email Adjuster.
@@ -16,41 +13,13 @@ use Symfony\Component\Mime\Address;
  *   description = @Translation("Sets the email from header."),
  * )
  */
-class FromEmailAdjuster extends EmailAdjusterBase {
-  // @todo Extend from AddressBuilderBase, adding others for cc, Bcc, To, etc.
-  // @todo Allow multiple values
-  // @todo Setting whether to replace existing addresses or add to them.
+class FromEmailAdjuster extends AddressAdjusterBase {
 
   /**
    * {@inheritdoc}
    */
-  public function postRender(EmailInterface $email) {
-    $mail = $this->configuration['value'];
-    $display = $this->configuration['display'];
-    $from = $display ? new Address($mail, $display) : $mail;
-    $email->setFrom($from);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
-    $form['value'] = [
-      '#type' => 'textfield',
-      '#title' => t('Address'),
-      '#default_value' => $this->configuration['value'] ?? NULL,
-      '#required' => TRUE,
-      '#description' => t('Email address.'),
-    ];
-
-    $form['display'] = [
-      '#type' => 'textfield',
-      '#title' => t('Display name'),
-      '#default_value' => $this->configuration['display'] ?? NULL,
-      '#description' => t('Human-readable display name.'),
-    ];
-
-    return $form;
+  protected function setAddress(EmailInterface $email, $address) {
+    $email->setFrom($address);
   }
 
 }
