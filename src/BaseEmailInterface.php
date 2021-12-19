@@ -28,57 +28,91 @@ interface BaseEmailInterface {
   /**
    * Gets the email subject.
    *
-   * @return \Drupal\Component\Render\MarkupInterface|string $subject
-   *   The email subject.
+   * @return ?\Drupal\Component\Render\MarkupInterface|string $subject
+   *   The email subject, or NULL if not set.
    */
   public function getSubject();
 
   /**
+   * Sets the email date and time.
+   *
+   * @param \DateTimeInterface $dateTime
+   *   The date and time.
+   *
    * @return $this
    */
   public function setDate(\DateTimeInterface $dateTime);
 
+  /**
+   * Gets the email date and time.
+   *
+   * @return ?\DateTimeImmutable
+   *   The date and time, or NULL if not set.
+   */
   public function getDate(): ?\DateTimeImmutable;
 
   /**
-   * @return $this
-   */
-  public function setReturnPath($address);
-
-  public function getReturnPath(): ?Address;
-
-  /**
+   * Sets the sender address.
+   *
+   * @param \Symfony\Component\Mime\Address|string $address
+   *   The address to set.
+   *
    * @return $this
    */
   public function setSender($address);
 
+  /**
+   * Gets the sender address.
+   *
+   * @return ?\Symfony\Component\Mime\Address
+   *   The sender address, or NULL if not set.
+   */
   public function getSender(): ?Address;
 
   /**
+   * Adds one or more from addresses.
+   *
+   * @param \Symfony\Component\Mime\Address|string ...$addresses
+   *   The addresses to set.
+   *
    * @return $this
    */
   public function addFrom(...$addresses);
 
   /**
+   * Sets one or more from addresses.
+   *
+   * @param \Symfony\Component\Mime\Address|string ...$addresses
+   *   The addresses to set.
+   *
    * @return $this
    */
   public function setFrom(...$addresses);
 
   /**
-   * @return Address[]
+   * Gets the from addresses.
+   *
+   * @return \Symfony\Component\Mime\Address[]
+   *   The from addresses.
    */
   public function getFrom(): array;
 
   /**
-   * Sets one or more reply-to addresses.
+   * Adds one or more reply-to addresses.
    *
-   * @param ...$addresses
+   * @param \Symfony\Component\Mime\Address|string ...$addresses
+   *   The addresses to set.
    *
    * @return $this
    */
   public function addReplyTo(...$addresses);
 
   /**
+   * Sets one or more reply-to addresses.
+   *
+   * @param \Symfony\Component\Mime\Address|string ...$addresses
+   *   The addresses to set.
+   *
    * @return $this
    */
   public function setReplyTo(...$addresses);
@@ -86,12 +120,17 @@ interface BaseEmailInterface {
   /**
    * Gets the reply-to addresses.
    *
-   * @return Address[]
+   * @return \Symfony\Component\Mime\Address[]
    *   The reply-to addresses.
    */
   public function getReplyTo(): array;
 
   /**
+   * Adds one or more to addresses.
+   *
+   * @param \Symfony\Component\Mime\Address|string ...$addresses
+   *   The addresses to set.
+   *
    * @return $this
    */
   public function addTo(...$addresses);
@@ -99,7 +138,8 @@ interface BaseEmailInterface {
   /**
    * Sets one or more to addresses.
    *
-   * @param ...$addresses
+   * @param \Symfony\Component\Mime\Address|string ...$addresses
+   *   The addresses to set.
    *
    * @return $this
    */
@@ -108,45 +148,72 @@ interface BaseEmailInterface {
   /**
    * Gets the to addresses.
    *
-   * @return Address[]
+   * @return \Symfony\Component\Mime\Address[]
    *   The to addresses.
    */
   public function getTo(): array;
 
   /**
+   * Adds one or more cc addresses.
+   *
+   * @param \Symfony\Component\Mime\Address|string ...$addresses
+   *   The addresses to set.
+   *
    * @return $this
    */
   public function addCc(...$addresses);
 
   /**
+   * Sets one or more cc addresses.
+   *
+   * @param \Symfony\Component\Mime\Address|string ...$addresses
+   *   The addresses to set.
+   *
    * @return $this
    */
   public function setCc(...$addresses);
 
   /**
-   * @return Address[]
+   * Gets the cc addresses.
+   *
+   * @return \Symfony\Component\Mime\Address[]
+   *   The cc addresses.
    */
   public function getCc(): array;
 
   /**
+   * Adds one or more bcc addresses.
+   *
+   * @param \Symfony\Component\Mime\Address|string ...$addresses
+   *   The addresses to set.
+   *
    * @return $this
    */
   public function addBcc(...$addresses);
 
   /**
+   * Sets one or more bcc addresses.
+   *
+   * @param \Symfony\Component\Mime\Address|string ...$addresses
+   *   The addresses to set.
+   *
    * @return $this
    */
   public function setBcc(...$addresses);
 
   /**
-   * @return Address[]
+   * Gets the bcc addresses.
+   *
+   * @return \Symfony\Component\Mime\Address[]
+   *   The bcc addresses.
    */
   public function getBcc(): array;
 
   /**
    * Sets the priority of this message.
    *
-   * The value is an integer where 1 is the highest priority and 5 is the lowest.
+   * @param int $priority
+   *   The priority, where 1 is the highest priority and 5 is the lowest.
    *
    * @return $this
    */
@@ -155,30 +222,41 @@ interface BaseEmailInterface {
   /**
    * Get the priority of this message.
    *
-   * The returned value is an integer where 1 is the highest priority and 5
-   * is the lowest.
+   * @return int
+   *   The priority, where 1 is the highest priority and 5 is the lowest.
    */
   public function getPriority(): int;
 
   /**
+   * Sets the text body.
+   *
+   * By default, the text body will be generated from the unrendered body using
+   * EmailInterface::getBody(). This function can be used to set a custom
+   * plain-text alternative,
+   *
    * @param string $body
+   *   The text body.
    *
    * @return $this
    */
   public function setTextBody(string $body);
 
   /**
+   * Gets the text body.
+   *
    * @return ?string
+   *   The text body, or NULL if not set.
    */
-  public function getTextBody();
+  public function getTextBody(): ?string;
 
   /**
    * Sets the HTML body.
    *
-   * Valid: after rendering.
+   * Valid: after rendering. Email builders should instead call
+   * EmailInterface::setBody() or related functions before rendering.
    *
    * @param ?string $body
-   *   HTML body.
+   *   The HTML body, or NULL to remove the HTML body.
    *
    * @return $this
    */
@@ -190,9 +268,9 @@ interface BaseEmailInterface {
    * Valid: after rendering.
    *
    * @return ?string
-   *   HTML body.
+   *   The HTML body, or NULL if not set.
    */
-  public function getHtmlBody();
+  public function getHtmlBody(): ?string;
 
   /**
    * @param string $body
@@ -228,9 +306,22 @@ interface BaseEmailInterface {
    */
   // public function getAttachments(): array;
 
+  /**
+   * Gets the headers object for getting or setting headers.
+   *
+   * @return \Symfony\Component\Mime\Header\Headers
+   *   The headers object.
+   */
   public function getHeaders(): Headers;
 
   /**
+   * Adds a text header.
+   *
+   * @param string $name
+   *   The name of the header.
+   * @param string $value
+   *   The header value.
+   *
    * @return $this
    */
   public function addTextHeader(string $name, string $value);

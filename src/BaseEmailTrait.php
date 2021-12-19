@@ -145,7 +145,7 @@ trait BaseEmailTrait {
     return $this;
   }
 
-  public function getTextBody() {
+  public function getTextBody(): ?string {
     return $this->inner->getTextBody();
   }
 
@@ -155,7 +155,7 @@ trait BaseEmailTrait {
     return $this;
   }
 
-  public function getHtmlBody() {
+  public function getHtmlBody(): ?string {
     $this->valid('postRender');
     return $this->inner->getHtmlBody();
   }
