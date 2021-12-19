@@ -1,7 +1,7 @@
 services:
   symfony_mailer:
     class: Drupal\symfony_mailer\Mailer
-    arguments: ['@event_dispatcher', '@renderer', '@module_handler', '@language.default', '@language_manager']
+    arguments: ['@event_dispatcher', '@renderer', '@module_handler', '@language.default', '@language_manager', '@logger.factory', '@current_user']
   email_factory:
     class: Drupal\symfony_mailer\EmailFactory
     arguments: ['@plugin.manager.email_builder']

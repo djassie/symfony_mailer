@@ -5,13 +5,14 @@ namespace Drupal\symfony_mailer;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\Exception\MissingTransportException;
-use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -59,6 +60,20 @@ class Mailer implements MailerInterface {
   protected $languageManager;
 
   /**
+   * The logger factory.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   */
+  protected $loggerFactory;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $account;
+
+  /**
    * Constructs the Mailer object.
    *
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
@@ -71,13 +86,19 @@ class Mailer implements MailerInterface {
    *   The default language.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   *   The logger channel factory.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The current user.
    */
-  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, LanguageDefault $language_default, LanguageManagerInterface $language_manager) {
+  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account) {
     $this->dispatcher = $dispatcher;
     $this->renderer = $renderer;
     $this->moduleHandler = $module_handler;
     $this->languageDefault = $language_default;
     $this->languageManager = $language_manager;
+    $this->loggerFactory = $logger_factory;
+    $this->account = $account;
   }
 
   /**
@@ -133,7 +154,7 @@ class Mailer implements MailerInterface {
       // Send.
       $transport_dsn = $email->getTransportDsn();
       if (empty($transport_dsn)) {
-        throw new MissingTransportException('Missing email transport: please configure a default.');
+        throw new MissingTransportException();
       }
 
       $transport = Transport::fromDsn($transport_dsn);
@@ -143,15 +164,27 @@ class Mailer implements MailerInterface {
       $mailer->send($email->getSymfonyEmail());
       $result = TRUE;
     }
-    catch (MissingTransportException $e) {
-      \Drupal::messenger()->addWarning($this->t('Missing email transport: please configure a <a href=":url">default</a>.', [
-        ':url' => Url::fromRoute('entity.mailer_transport.collection')->toString(),
-      ]));
-      $result = FALSE;
-    }
-    catch (RuntimeException $e) {
-      // @todo Log exception, print user-focused message.
-      \Drupal::messenger()->addWarning($e->getMessage());
+    catch (\Exception $e) {
+      if ($e instanceof MissingTransportException) {
+        $message = $this->t('Missing email transport: please <a href=":url">configure a default</a>.', [
+          ':url' => Url::fromRoute('entity.mailer_transport.collection')->toString(),
+        ]);
+      }
+      else {
+        $message = $e->getMessage();
+      }
+
+      // Log.
+      $params = ['%message' => $message];
+      $this->loggerFactory->get('mailer')->error('Error sending email: %message', $params);
+
+      // Messenger.
+      if (!$this->account->hasPermission('administer mailer')) {
+        // Hide the detailed message and show a generic one instead.
+        $message = $this->t('Unable to send email. Contact the site administrator if the problem persists.');
+      }
+
+      \Drupal::messenger()->addError($message);
       $result = FALSE;
     }
 
