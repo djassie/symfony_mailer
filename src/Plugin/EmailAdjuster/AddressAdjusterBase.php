@@ -43,14 +43,14 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
       '#title' => t('Address'),
       '#default_value' => $this->configuration['value'] ?? NULL,
       '#required' => TRUE,
-      '#description' => t('Email address.'),
+      '#description' => $this->t('Email address.'),
     ];
 
     $form['display'] = [
       '#type' => 'textfield',
       '#title' => t('Display name'),
       '#default_value' => $this->configuration['display'] ?? NULL,
-      '#description' => t('Human-readable display name.'),
+      '#description' => $this->t('Human-readable display name.'),
     ];
 
     return $form;
