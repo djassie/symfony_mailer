@@ -115,94 +115,10 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function setBody($body) {
-    $this->valid('preRender', 'preBuild');
-    $this->body = $body;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function appendBody($body) {
-    $this->valid('preRender', 'preBuild');
-    $name = 'n' . count($this->body);
-    $this->body[$name] = $body;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity to render.
-   * @param string $view_mode
-   *   (optional) The view mode that should be used to render the entity.
-   */
-  public function appendBodyEntity(EntityInterface $entity, $view_mode = 'full') {
-    $this->valid('preRender', 'preBuild');
-    $build = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId())
-      ->view($entity, $view_mode);
-
-    $this->appendBody($build);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBody() {
-    $this->valid('preRender', 'preBuild');
-    return $this->body;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function addProcessor(EmailProcessorInterface $processor) {
     $this->valid('preBuild');
     $this->processors[] = $processor;
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getType() {
-    return $this->type;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getSubType() {
-    return $this->subType;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getEntity() {
-    return $this->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getSuggestions(string $initial, string $join) {
-    $part_array = [$this->type, $this->subType];
-    if (isset($this->entity)) {
-      $part_array[] = $this->entity->id();
-    }
-
-    $part = $initial ?: array_shift($part_array);
-    $suggestions[] = $part;
-
-    while ($part_array) {
-      $part .= $join . array_shift($part_array);
-      $suggestions[] = $part;
-    }
-
-    return $suggestions;
   }
 
   /**
@@ -256,6 +172,57 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
+  public function send() {
+    $this->valid('preBuild');
+    return $this->mailer->send($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setBody($body) {
+    $this->valid('preRender', 'preBuild');
+    $this->body = $body;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function appendBody($body) {
+    $this->valid('preRender', 'preBuild');
+    $name = 'n' . count($this->body);
+    $this->body[$name] = $body;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to render.
+   * @param string $view_mode
+   *   (optional) The view mode that should be used to render the entity.
+   */
+  public function appendBodyEntity(EntityInterface $entity, $view_mode = 'full') {
+    $this->valid('preRender', 'preBuild');
+    $build = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId())
+      ->view($entity, $view_mode);
+
+    $this->appendBody($build);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBody() {
+    $this->valid('preRender', 'preBuild');
+    return $this->body;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setVariables(array $variables) {
     $this->valid('preRender', 'preBuild');
     $this->variables = $variables;
@@ -276,6 +243,47 @@ class Email implements InternalEmailInterface {
    */
   public function getVariables() {
     return $this->variables;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getType() {
+    return $this->type;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSubType() {
+    return $this->subType;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntity() {
+    return $this->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSuggestions(string $initial, string $join) {
+    $part_array = [$this->type, $this->subType];
+    if (isset($this->entity)) {
+      $part_array[] = $this->entity->id();
+    }
+
+    $part = $initial ?: array_shift($part_array);
+    $suggestions[] = $part;
+
+    while ($part_array) {
+      $part .= $join . array_shift($part_array);
+      $suggestions[] = $part;
+    }
+
+    return $suggestions;
   }
 
   /**
@@ -315,9 +323,16 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function send() {
-    $this->valid('preBuild');
-    return $this->mailer->send($this);
+  public function setTransportDsn(string $dsn) {
+    $this->transportDsn = $dsn;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTransportDsn() {
+    return $this->transportDsn;
   }
 
   /**
@@ -375,21 +390,6 @@ class Email implements InternalEmailInterface {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function setTransportDsn(string $dsn) {
-    $this->transportDsn = $dsn;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTransportDsn() {
-    return $this->transportDsn;
-  }
-
-  /**
    * Checks that a function was called in the correct phase.
    *
    * @param string $phase
@@ -403,7 +403,7 @@ class Email implements InternalEmailInterface {
     $valid = ($this->phase == $phase) || ($this->phase == $alt_phase);
     if (!$valid) {
       $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
-      throw new \Exception("$caller function is only valid in the $phase phase");
+      throw new \LogicException("$caller function is only valid in the $phase phase");
     }
     return $this;
   }
