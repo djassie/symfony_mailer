@@ -39,8 +39,8 @@ function template_preprocess_email(&$variables) {
 }
 
 /**
- * Implements hook_mailer_pre_build().
+ * Implements hook_mailer_init().
  */
-function symfony_mailer_mailer_pre_build(EmailInterface $email) {
+function symfony_mailer_mailer_init(EmailInterface $email) {
   \Drupal::service('plugin.manager.email_adjuster')->applyPolicy($email);
 }

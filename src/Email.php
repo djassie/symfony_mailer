@@ -7,6 +7,7 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\symfony_mailer\Processor\EmailProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -30,6 +31,11 @@ class Email implements InternalEmailInterface {
    */
   protected EntityTypeManagerInterface $entityTypeManager;
 
+  /**
+   * The theme manager.
+   */
+  protected ThemeManagerInterface $themeManager;
+
   protected string $type;
   protected string $subType;
   protected string $entity_id;
@@ -40,6 +46,7 @@ class Email implements InternalEmailInterface {
   protected string $langcode;
   protected array $params = [];
   protected array $variables = [];
+  protected string $theme = '';
   protected array $libraries = [];
 
   /**
@@ -56,6 +63,8 @@ class Email implements InternalEmailInterface {
    *   The renderer.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   *   The theme manager.
    * @param string $type
    *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
    * @param string $sub_type
@@ -63,10 +72,11 @@ class Email implements InternalEmailInterface {
    * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
    *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    */
-  public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
+  public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, ThemeManagerInterface $theme_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
     $this->mailer = $mailer;
     $this->renderer = $renderer;
     $this->entityTypeManager = $entity_type_manager;
+    $this->themeManager = $theme_manager;
     $this->type = $type;
     $this->subType = $sub_type;
     $this->entity = $entity;
@@ -95,6 +105,7 @@ class Email implements InternalEmailInterface {
       $container->get('symfony_mailer'),
       $container->get('renderer'),
       $container->get('entity_type.manager'),
+      $container->get('theme.manager'),
       $type,
       $sub_type,
       $entity
@@ -265,6 +276,25 @@ class Email implements InternalEmailInterface {
    */
   public function getVariables() {
     return $this->variables;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTheme(string $theme_name) {
+    $this->valid('preBuild');
+    $this->theme = $theme_name;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTheme() {
+    if (!$this->theme) {
+      $this->theme = $this->themeManager->getActiveTheme()->getName();
+    }
+    return $this->theme;
   }
 
   /**

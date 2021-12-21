@@ -9,6 +9,8 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Core\Url;
@@ -74,6 +76,20 @@ class Mailer implements MailerInterface {
   protected $account;
 
   /**
+   * The theme manager.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected $themeManager;
+
+  /**
+   * The theme initialization.
+   *
+   * @var \Drupal\Core\Theme\ThemeInitializationInterface
+   */
+  protected $themeInitialization;
+
+  /**
    * Constructs the Mailer object.
    *
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
@@ -90,8 +106,12 @@ class Mailer implements MailerInterface {
    *   The logger channel factory.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   *   The theme manager.
+   * @param \Drupal\Core\Theme\ThemeInitializationInterface $theme_initialization
+   *   The theme initialization.
    */
-  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account) {
+  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account, ThemeManagerInterface $theme_manager, ThemeInitializationInterface $theme_initialization) {
     $this->dispatcher = $dispatcher;
     $this->renderer = $renderer;
     $this->moduleHandler = $module_handler;
@@ -99,6 +119,8 @@ class Mailer implements MailerInterface {
     $this->languageManager = $language_manager;
     $this->loggerFactory = $logger_factory;
     $this->account = $account;
+    $this->themeManager = $theme_manager;
+    $this->themeInitialization = $theme_initialization;
   }
 
   /**
@@ -127,15 +149,26 @@ class Mailer implements MailerInterface {
    * @internal
    */
   public function doSend(InternalEmailInterface $email) {
+    // Call hooks.
+    $this->invokeAll('init', $email);
+
     // Call hooks/processors.
     $email->process('preBuild');
     $this->invokeAll('pre_build', $email);
 
-    $langcode = $email->getLangcode();
-    $currentLangcode = $this->languageManager->getCurrentLanguage()->getId();
-    $mustSwitch = isset($langcode) && $langcode !== $currentLangcode;
+    $theme_name = $email->getTheme();
+    $active_theme_name = $this->themeManager->getActiveTheme()->getName();
+    $must_switch_theme = $theme_name !== $active_theme_name;
 
-    if ($mustSwitch) {
+    if ($must_switch_theme) {
+      $this->changeTheme($theme_name);
+    }
+
+    $langcode = $email->getLangcode();
+    $current_langcode = $this->languageManager->getCurrentLanguage()->getId();
+    $must_switch_language = isset($langcode) && $langcode !== $current_langcode;
+
+    if ($must_switch_language) {
       $this->changeActiveLanguage($langcode);
     }
 
@@ -188,8 +221,12 @@ class Mailer implements MailerInterface {
       $result = FALSE;
     }
 
-    if ($mustSwitch) {
-      $this->changeActiveLanguage($currentLangcode);
+    if ($must_switch_language) {
+      $this->changeActiveLanguage($current_langcode);
+    }
+
+    if ($must_switch_theme) {
+      $this->changeTheme($active_theme_name);
     }
 
     return $result;
@@ -201,7 +238,7 @@ class Mailer implements MailerInterface {
    * @param string $langcode
    *   The langcode.
    */
-  protected function changeActiveLanguage($langcode) {
+  protected function changeActiveLanguage(string $langcode) {
     // Language switching adapted from commerce module.
     // @see \Drupal\commerce\MailHandler::sendMail
     if (!$this->languageManager->isMultilingual()) {
@@ -230,6 +267,16 @@ class Mailer implements MailerInterface {
       $string_translation->setDefaultLangcode($language->getId());
       $string_translation->reset();
     }
+  }
+
+  /**
+   * Changes the active theme for email.
+   *
+   * @param string $theme_name
+   *   The theme name.
+   */
+  protected function changeTheme(string $theme_name) {
+    $this->themeManager->setActiveTheme($this->themeInitialization->initTheme($theme_name));
   }
 
   /**

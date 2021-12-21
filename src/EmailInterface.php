@@ -238,6 +238,26 @@ interface EmailInterface extends BaseEmailInterface {
   public function getSuggestions(string $initial, string $join);
 
   /**
+   * Sets the email theme.
+   *
+   * Valid: before building.
+   *
+   * @param string $theme_name
+   *   The theme name to use for email.
+   *
+   * @return $this
+   */
+  public function setTheme(string $theme_name);
+
+  /**
+   * Gets the email theme name.
+   *
+   * @return string
+   *   The email theme name.
+   */
+  public function getTheme();
+
+  /**
    * Adds an asset library to use as mail CSS.
    *
    * @param string $library

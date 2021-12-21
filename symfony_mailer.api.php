@@ -8,6 +8,15 @@
 use Drupal\symfony_mailer\EmailInterface;
 
 /**
+ * Acts on an email message initialization.
+ *
+ * @param \Drupal\symfony_mailer\EmailInterface $email
+ *   The email.
+ */
+function hook_mailer_init(EmailInterface $email) {
+}
+
+/**
  * Acts on an email message prior to building.
  *
  * The email is not yet built. Can alter the language or the configured email
