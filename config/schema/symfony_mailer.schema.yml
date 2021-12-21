@@ -66,6 +66,17 @@ symfony_mailer.mailer_policy.*:
       sequence:
         type: symfony_mailer.email_adjuster_plugin.[%key]
 
+symfony_mailer.email_adjuster_plugin.email_bcc:
+  type: mapping
+  label: 'Bcc header'
+  mapping:
+    value:
+      type: email
+      label: 'E-mail address'
+    display:
+      type: label
+      label: 'Display name'
+
 symfony_mailer.email_adjuster_plugin.email_body:
   type: mapping
   label: 'Body'
@@ -74,9 +85,47 @@ symfony_mailer.email_adjuster_plugin.email_body:
       type: text
       label: 'Email body'
 
+symfony_mailer.email_adjuster_plugin.email_cc:
+  type: mapping
+  label: 'Cc header'
+  mapping:
+    value:
+      type: email
+      label: 'E-mail address'
+    display:
+      type: label
+      label: 'Display name'
+
 symfony_mailer.email_adjuster_plugin.email_from:
   type: mapping
   label: 'From header'
+  mapping:
+    value:
+      type: email
+      label: 'E-mail address'
+    display:
+      type: label
+      label: 'Display name'
+
+symfony_mailer.email_adjuster_plugin.email_plain:
+  type: mapping
+  label: 'Plain text alternative'
+  mapping:
+    value:
+      type: text
+      label: 'Email body'
+
+symfony_mailer.email_adjuster_plugin.email_priority:
+  type: mapping
+  label: 'Priority'
+  mapping:
+    value:
+      type: integer
+      label: 'Email subject'
+
+symfony_mailer.email_adjuster_plugin.email_reply_to:
+  type: mapping
+  label: 'Reply-to header'
   mapping:
     value:
       type: email
@@ -100,6 +149,25 @@ symfony_mailer.email_adjuster_plugin.email_theme:
     theme:
       type: label
       label: 'Email theme'
+
+symfony_mailer.email_adjuster_plugin.email_to:
+  type: mapping
+  label: 'To header'
+  mapping:
+    value:
+      type: email
+      label: 'E-mail address'
+    display:
+      type: label
+      label: 'Display name'
+
+symfony_mailer.email_adjuster_plugin.email_transport:
+  type: mapping
+  label: 'Mailer transport'
+  mapping:
+    value:
+      type: label
+      label: 'Email body'
 
 symfony_mailer.email_adjuster_plugin.mailer_default_headers:
   type: mapping
