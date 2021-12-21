@@ -66,7 +66,7 @@ class DefaultsEmailAdjuster extends EmailAdjusterBase implements ContainerFactor
     $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
     $sender = new Address($site_mail, $site_config->get('name'));
     $theme = $email->getTheme();
-    $email->setSender(sender)
+    $email->setSender($sender)
       ->addTextHeader('X-Mailer', 'Drupal')
       ->addLibrary("$theme/email");
 
