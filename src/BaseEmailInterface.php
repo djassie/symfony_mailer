@@ -11,7 +11,15 @@ use Symfony\Component\Mime\Part\DataPart;
  * Defines an interface related to the Symfony Email object.
  *
  * The functions are mostly identical, except that set accessors are explicitly
- * named, e.g. setSubject() instead of subject().
+ * named, e.g. setSubject() instead of subject(). Exceptions:
+ * - No 'returnPath': should only be set by the SMTP server.
+ *   @see https://www.postmastery.com/about-the-return-path-header/
+ * - No 'date': defaults automatically, can still override via getHeaders() if
+ *   needed.
+ * - Accept MarkupInterface for 'subject'.
+ * - Remove all references to charset: always use utf-8.
+ * - Remove all references to Symfony 'resource': these don't really apply in
+ *   the Drupal environment.
  */
 interface BaseEmailInterface {
 
@@ -32,24 +40,6 @@ interface BaseEmailInterface {
    *   The email subject, or NULL if not set.
    */
   public function getSubject();
-
-  /**
-   * Sets the email date and time.
-   *
-   * @param \DateTimeInterface $dateTime
-   *   The date and time.
-   *
-   * @return $this
-   */
-  public function setDate(\DateTimeInterface $dateTime);
-
-  /**
-   * Gets the email date and time.
-   *
-   * @return ?\DateTimeImmutable
-   *   The date and time, or NULL if not set.
-   */
-  public function getDate(): ?\DateTimeImmutable;
 
   /**
    * Sets the sender address.

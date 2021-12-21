@@ -34,24 +34,6 @@ trait BaseEmailTrait {
     return $this->subject;
   }
 
-  public function setDate(\DateTimeInterface $dateTime) {
-    $this->inner->date($dateTime);
-    return $this;
-  }
-
-  public function getDate(): ?\DateTimeImmutable {
-    return $this->inner->getDate();
-  }
-
-  public function setReturnPath($address) {
-    $this->inner->returnPath($address);
-    return $this;
-  }
-
-  public function getReturnPath(): ?Address {
-    return $this->inner->getReturnPath();
-  }
-
   public function setSender($address) {
     $this->inner->sender($address);
     return $this;
