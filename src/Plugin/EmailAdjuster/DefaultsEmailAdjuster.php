@@ -61,12 +61,12 @@ class DefaultsEmailAdjuster extends EmailAdjusterBase implements ContainerFactor
   /**
    * {@inheritdoc}
    */
-  public function postRender(EmailInterface $email) {
+  public function preRender(EmailInterface $email) {
     $site_config = $this->configFactory->get('system.site');
     $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
-    $from = new Address($site_mail, $site_config->get('name'));
+    $sender = new Address($site_mail, $site_config->get('name'));
     $theme = $email->getTheme();
-    $email->setSender($from)
+    $email->setSender(sender)
       ->addTextHeader('X-Mailer', 'Drupal')
       ->addLibrary("$theme/email");
 
