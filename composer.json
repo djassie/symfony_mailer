@@ -1,5 +1,5 @@
 {
-  "name": "drupal/symfony-mailer",
+  "name": "drupal/symfony_mailer",
   "description": "Symfony Mailer",
   "type": "drupal-module",
   "license": "GPL-2.0-or-later",
