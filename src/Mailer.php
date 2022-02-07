@@ -15,6 +15,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\Exception\MissingTransportException;
+use Drupal\symfony_mailer\Exception\SkipMailException;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -133,7 +134,16 @@ class Mailer implements MailerInterface {
     // to ensure it doesn't leak into the render context for the HTTP response
     // to the current request.
     return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($email) {
-      return $this->doSend($email);
+      try {
+        return $this->doSend($email);
+      }
+      catch (SkipMailException $e) {
+        if ($this->account->hasPermission('administer mailer')) {
+          \Drupal::messenger()->addError($this->t('Email sending skipped: %message.', [
+            '%message' => $e->getMessage(),
+          ]));
+        }
+      }
     });
   }
 

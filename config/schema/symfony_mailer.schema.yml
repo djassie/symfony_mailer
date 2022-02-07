@@ -134,6 +134,14 @@ symfony_mailer.email_adjuster_plugin.email_reply_to:
       type: label
       label: 'Display name'
 
+symfony_mailer.email_adjuster_plugin.email_skip_sending:
+  type: mapping
+  label: 'Skip sending'
+  mapping:
+    message:
+      type: label
+      label: 'Skip message'
+
 symfony_mailer.email_adjuster_plugin.email_subject:
   type: mapping
   label: 'Subject'
