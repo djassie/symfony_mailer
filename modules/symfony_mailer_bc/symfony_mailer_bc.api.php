@@ -16,8 +16,10 @@
  * @param array $params
  *   The email parameters.
  * @param array $context
- *   Array with two entries
+ *   Array with entries:
  *   - module: The email type, known as 'module' on the old interface.
+ *   - to: The email 'to' address.
+ *   - reply: The email 'reply-to' address.
  *   - entity: The associated config entity, always null on the old interface.
  *
  * @see \Drupal\Core\Mail\MailManagerInterface::mail()
@@ -34,8 +36,10 @@ function hook_mailer_bc_alter(string &$key, array &$params, array &$context) {
  * @param array $params
  *   The email parameters.
  * @param array $context
- *   Array with two entries
+ *   Array with entries:
  *   - module: The email type, known as 'module' on the old interface.
+ *   - to: The email 'to' address.
+ *   - reply: The email 'reply-to' address.
  *   - entity: The associated config entity, always null on the old interface.
  */
 function hook_mailer_bc_MODULE_alter(string &$key, array &$params, array &$context) {

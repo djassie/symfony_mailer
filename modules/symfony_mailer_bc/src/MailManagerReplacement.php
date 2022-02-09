@@ -54,7 +54,7 @@ class MailManagerReplacement extends MailManager {
    */
   public function mail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
     // Call alter hook.
-    $context = ['module' => $module, 'entity' => NULL];
+    $context = ['module' => $module, 'to' => $to, 'reply' => $reply, 'entity' => NULL];
     $this->moduleHandler->alter(['mailer_bc', "mailer_bc_$module"], $key, $params, $context);
 
     if ($entity = $context['entity']) {
@@ -64,10 +64,10 @@ class MailManagerReplacement extends MailManager {
       $email = $this->emailFactory->newModuleEmail($module, $key);
     }
 
-    $email->setTo($to)
+    $email->setTo($context['to'])
       ->setLangcode($langcode)
       ->setParams($params);
-    if ($reply) {
+    if ($context['reply']) {
       $email->setReplyTo($reply);
     }
 
