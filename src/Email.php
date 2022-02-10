@@ -14,45 +14,99 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
 class Email implements InternalEmailInterface {
+
   use BaseEmailTrait;
 
   /**
    * The mailer.
+   *
+   * @var \Drupal\symfony_mailer\MailerInterface
    */
-  protected MailerInterface $mailer;
+  protected $mailer;
 
   /**
    * The renderer.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected RendererInterface $renderer;
+  protected $renderer;
 
   /**
    * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected EntityTypeManagerInterface $entityTypeManager;
+  protected $entityTypeManager;
 
   /**
    * The theme manager.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
    */
-  protected ThemeManagerInterface $themeManager;
+  protected $themeManager;
 
-  protected string $type;
-  protected string $subType;
-  protected string $entity_id;
-  protected string $phase = 'preBuild';
 
+  /**
+   * @var string
+   */
+  protected $type;
+
+  /**
+   * @var string
+   */
+  protected $subType;
+
+  /**
+   * @var string
+   */
+  protected $entity_id;
+
+  /**
+   * @var string
+   */
+  protected $phase = 'preBuild';
+
+  /**
+   * @var \Drupal\symfony_mailer\Processor\EmailProcessorInterface[]
+   */
   protected $body = [];
-  protected array $processors = [];
-  protected string $langcode;
-  protected array $params = [];
-  protected array $variables = [];
-  protected string $theme = '';
-  protected array $libraries = [];
+
+  /**
+   * @var array
+   */
+  protected $processors = [];
+
+  /**
+   * @var string
+   */
+  protected $langcode;
+
+  /**
+   * @var string[]
+   */
+  protected $params = [];
+
+  /**
+   * @var string[]
+   */
+  protected $variables = [];
+
+  /**
+   * @var string
+   */
+  protected $theme = '';
+
+  /**
+   * @var array
+   */
+  protected $libraries = [];
 
   /**
    * The mail transport DSN.
+   *
+   * @var string
    */
-  protected string $transportDsn = '';
+  protected $transportDsn = '';
 
   /**
    * Constructs the Email object.
@@ -347,7 +401,7 @@ class Email implements InternalEmailInterface {
       $this->valid($function);
     }
 
-    usort($this->processors, function($a, $b) use($function) {
+    usort($this->processors, function ($a, $b) use ($function) {
       return $a->getWeight($function) <=> $b->getWeight($function);
     });
 

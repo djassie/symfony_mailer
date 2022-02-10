@@ -13,14 +13,18 @@ class EmailAdjuster extends Plugin {
 
   /**
    * The plugin ID.
+   *
+   * @var string
    */
-  public string $id;
+  public $id;
 
   /**
    * The label of the plugin.
    *
+   * @var string
+   *
    * @ingroup plugin_translatable
    */
-  public string $label;
+  public $label;
 
 }

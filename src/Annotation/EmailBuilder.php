@@ -13,8 +13,10 @@ class EmailBuilder extends Plugin {
 
   /**
    * The plugin ID.
+   *
+   * @var string
    */
-  public string $id;
+  public $id;
 
   /**
    * Array of sub-types.
@@ -24,11 +26,13 @@ class EmailBuilder extends Plugin {
    *
    * @var string[]
    */
-  public array $sub_types = [];
+  public $sub_types = [];
 
   /**
    * Whether the plugin is associated with a config entity.
+   *
+   * @var bool
    */
-  public bool $has_entity = FALSE;
+  public $has_entity = FALSE;
 
 }

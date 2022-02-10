@@ -12,8 +12,15 @@ use Drupal\symfony_mailer\EmailInterface;
  */
 trait TokenProcessorTrait {
 
-  protected array $data;
-  protected array $options = [];
+  /**
+   * @var array
+   */
+  protected $data;
+
+  /**
+   * @var array
+   */
+  protected $options = [];
 
   /**
    * {@inheritdoc}

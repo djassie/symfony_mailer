@@ -13,8 +13,10 @@ trait BaseEmailTrait {
 
   /**
    * The inner Symfony Email object.
+   *
+   * @var \Symfony\Component\Mime\Email
    */
-  protected SymfonyEmail $inner;
+  protected $inner;
 
   /**
    * The email subject.
