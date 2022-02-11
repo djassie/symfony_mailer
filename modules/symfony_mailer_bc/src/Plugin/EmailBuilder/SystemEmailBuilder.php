@@ -4,6 +4,7 @@ namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\Processor\EmailProcessorBase;
 use Drupal\symfony_mailer\EmailInterface;
+use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
 
 /**
  * Defines the Email Builder plug-in for system module.
@@ -15,6 +16,8 @@ use Drupal\symfony_mailer\EmailInterface;
  */
 class SystemEmailBuilder extends EmailProcessorBase {
 
+  use TokenProcessorTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -25,8 +28,7 @@ class SystemEmailBuilder extends EmailProcessorBase {
     ];
 
     $email->setSubject($email->getParam('subject'))
-      ->setBody($body)
-      ->addProcessor('mailer_token_replace');
+      ->setBody($body);
   }
 
 }
