@@ -61,10 +61,12 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    */
   protected $emailAdjusterManager;
 
+  protected $labelUnknown;
+  protected $labelAll;
   protected $type;
   protected $subType;
+  protected $entityId;
   protected $entity;
-  protected $entityLabel;
   protected $builderDefinition;
 
   /**
@@ -91,7 +93,6 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
     $this->emailAdjusterManager = \Drupal::service('plugin.manager.email_adjuster');
     $this->labelUnknown = $this->t('Unknown');
     $this->labelAll = $this->t('<b>*All*</b>');
-    $this->labelInvalid = $this->t('<b>*Invalid*</b>');
 
     // The root policy with ID '_' applies to all types.
     if (!$this->id || ($this->id == '_')) {
@@ -99,13 +100,13 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
       return;
     }
 
-    list($this->type, $this->subType, $entityId) = array_pad(explode('.', $this->id), 3, NULL);
+    list($this->type, $this->subType, $this->entityId) = array_pad(explode('.', $this->id), 3, NULL);
     $this->builderDefinition = $this->emailBuilderManager->getDefinition($this->type, FALSE);
     if (!$this->builderDefinition) {
       $this->builderDefinition = ['label' => $this->labelUnknown];
     }
-    if ($entityId && !empty($this->builderDefinition['has_entity'])) {
-      $this->entity = $this->entityTypeManager()->getStorage($this->type)->load($entityId);
+    if ($this->entityId && !empty($this->builderDefinition['has_entity'])) {
+      $this->entity = $this->entityTypeManager()->getStorage($this->type)->load($this->entityId);
     }
   }
 
@@ -169,11 +170,17 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    * Gets a human-readable label for the config entity this policy applies to.
    *
    * @return string
-   *   Email config entity label, or NULL if the policy applies to all
+   *   Email config entity label, or NULL if the builder doesn't support
    *   entities.
    */
   public function getEntityLabel() {
-    return $this->entity ? $this->entity->label() : NULL;
+    if (empty($this->builderDefinition['has_entity'])) {
+      return NULL;
+    }
+    if ($this->entity) {
+      return $this->entity->label();
+    }
+    return $this->entityId ? $this->labelUnknown : $this->labelAll;
   }
 
   /**
