@@ -242,7 +242,9 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    */
   public function getSummary() {
     $summary = [];
-    foreach (array_keys($this->getConfiguration()) as $plugin_id) {
+    $plugin_ids = array_keys($this->getConfiguration());
+    asort($plugin_ids);
+    foreach ($plugin_ids as $plugin_id) {
       if ($definition = $this->emailAdjusterManager->getDefinition($plugin_id, FALSE)) {
         $summary[] = $definition['label'];
       }
