@@ -35,7 +35,7 @@ class BodyEmailAdjuster extends EmailAdjusterBase {
     // filtering, even Xss:filterAdmin(), will corrupt any tokens inside links
     // from the removal of 'unsafe protocols'.
     if ($variables) {
-      // Apply TWIG template
+      // Apply Twig template
       $body = [
         '#type' => 'inline_template',
         '#template' => $body,
@@ -60,6 +60,7 @@ class BodyEmailAdjuster extends EmailAdjusterBase {
       '#required' => TRUE,
       '#description' => $this->t('Email body. This field may support tokens or Twig template syntax – please check the supplied default policy for possible values.'),
     ];
+    // @todo Show the available Twig variables / token browser.
 
     return $form;
   }

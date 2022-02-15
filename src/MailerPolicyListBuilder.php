@@ -7,6 +7,8 @@ use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Defines a class to build a listing of mailer policy entities.
+ *
+ * @todo Add filters by type and by adjuster.
  */
 class MailerPolicyListBuilder extends ConfigEntityListBuilder {
 
