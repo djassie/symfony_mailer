@@ -13,6 +13,13 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 class EmailBuilderManager extends DefaultPluginManager {
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * Constructs the EmailBuilderManager object.
    *
    * @param \Traversable $namespaces
