@@ -53,6 +53,13 @@ entity.mailer_policy.add_form:
   requirements:
     _permission: 'administer mailer'
 
+entity.mailer_policy.add_id_form:
+  path: '/admin/config/system/mailer/policy/add/{policy_id}'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::createPolicy'
+  requirements:
+    _permission: 'administer mailer'
+
 entity.mailer_policy.edit_form:
   path: '/admin/config/system/mailer/policy/{mailer_policy}'
   defaults:
@@ -68,3 +75,4 @@ entity.mailer_policy.delete_form:
     _title: 'Delete policy'
   requirements:
     _entity_access: 'mailer_policy.delete'
+

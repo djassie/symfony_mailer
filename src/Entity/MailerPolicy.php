@@ -282,4 +282,17 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
       strnatcasecmp($a->getEntityLabel(), $b->getEntityLabel());
   }
 
+  /**
+   * Loads a Mailer Policy, or creates a new one.
+   *
+   * @param string $id
+   *   The id of the policy to load or create.
+   *
+   * @return static
+   *   The policy object.
+   */
+  public static function loadOrCreate($id) {
+    return static::load($id) ?? static::create(['id' => $id]);
+  }
+
 }
