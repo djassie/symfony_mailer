@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Implements hook_theme().
  */
@@ -37,6 +39,56 @@ function symfony_mailer_bc_mailer_builder_info_alter(array &$email_builders) {
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ */
+function symfony_mailer_bc_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'form_alter') {
+    // Move our implementation to the end of the list.
+    $value = $implementations['symfony_mailer_bc'];
+    unset($implementations['symfony_mailer_bc']);
+    $implementations['symfony_mailer_bc'] = $value;
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $config_all = [
+    'simplenews_admin_settings_newsletter' => [
+      'remove' => ['simplenews_default_options', 'simplenews_sender_info'],
+    ],
+    'simplenews_admin_settings_subscription' => [
+      'remove' => ['subscription_mail'],
+      'type' => ['simplenews'],
+    ],
+    'simplenews_newsletter_edit_form' => [
+      'remove' => ['email', 'simplenews_sender_information', 'simplenews_subject'],
+      'entity' => ['node'],
+    ],
+  ];
+
+  if ($config = $config_all[$form_id] ?? NULL) {
+    $helper = Drupal::service('symfony_mailer.helper');
+
+    // Hide fields that are replaced by Mailer Policy.
+    foreach ($config['remove'] ?? [] as $key) {
+      $form[$key]['#access'] = FALSE;
+    }
+
+    // Add policy elements on entity forms.
+    if (!empty($config['entity'])) {
+      $form['mailer_policy'] = $helper->renderEntityPolicy($form_state->getFormObject()->getEntity(), ...$config['entity']);
+    }
+
+    // Add policy elements on settings forms.
+    if (!empty($config['type'])) {
+      $form['mailer_policy'] = $helper->renderTypePolicy(...$config['type']);
+    }
+  }
+}
+
+/**
  * Implements hook_mailer_bc_MODULE_alter() for contact.
  */
 function symfony_mailer_bc_mailer_bc_contact_alter(string &$key, array &$params, array &$context) {
@@ -57,6 +109,16 @@ function symfony_mailer_bc_mailer_bc_simplenews_alter(string &$key, array &$para
   if ($key == 'node' || $key == 'test') {
     // Set the associated config entity.
     $context['entity'] = $params['simplenews_mail']->getNewsletter();
+
+    // Remove the reply-to address because we use policy from this module
+    // instead.
+    $context['reply'] = '';
+
+    // Use a parameter for 'test' rather than the key. We don't want test
+    // email to use a different policy, template, and so on.
+    $params['test'] = ($key == 'test');
+    $key = 'node';
+
   }
   elseif ($key == 'subscribe_combined') {
     $key = 'subscribe';

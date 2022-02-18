@@ -3,6 +3,7 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\Processor\EmailProcessorBase;
+use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
 use Drupal\symfony_mailer\EmailInterface;
 
 /**
@@ -12,7 +13,6 @@ use Drupal\symfony_mailer\EmailInterface;
  *   id = "simplenews_newsletter",
  *   sub_types = {
  *     "node" = @Translation("Issue"),
- *     "test" = @Translation("Test"),
  *   },
  *   has_entity = TRUE,
  * )
@@ -21,6 +21,8 @@ use Drupal\symfony_mailer\EmailInterface;
  * MailBuilder class, and many methods of MailEntity.
  */
 class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase {
+  use TokenProcessorTrait;
+  // @todo Maybe only replace in the subject as body already done?
 
   /**
    * {@inheritdoc}
@@ -28,8 +30,8 @@ class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase {
   public function preRender(EmailInterface $email) {
     /** @var \Drupal\simplenews\Mail\MailEntity $mail */
     $mail = $email->getParam('simplenews_mail');
-    $email->setSubject($mail->getSubject())
-      ->setBody($mail->getBody())
+    $this->tokenData($mail->getTokenContext());
+    $email->setBody($mail->getBody())
       ->addTextHeader('Precedence', 'bulk');
 
     if ($unsubscribe_url = \Drupal::token()->replace('[simplenews-subscriber:unsubscribe-url]', $email->getParams(), ['clear' => TRUE])) {
