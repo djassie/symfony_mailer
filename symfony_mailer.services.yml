@@ -17,4 +17,4 @@ services:
     parent: default_plugin_manager
   symfony_mailer.helper:
     class: Drupal\symfony_mailer\MailerHelper
-    arguments: ['@entity_type.manager', '@plugin.manager.email_adjuster', '@plugin.manager.email_builder']
+    arguments: ['@entity_type.manager', '@plugin.manager.email_adjuster', '@plugin.manager.email_builder', '@config.factory']

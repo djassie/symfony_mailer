@@ -3,8 +3,10 @@
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
 use Drupal\symfony_mailer\EmailInterface;
+use Drupal\symfony_mailer\MailerHelperTrait;
+use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
+use Drupal\user\Entity\User;
 use Symfony\Component\Mime\Address;
 
 /**
@@ -13,6 +15,8 @@ use Symfony\Component\Mime\Address;
 abstract class AddressAdjusterBase extends EmailAdjusterBase {
   // @todo Allow multiple values
   // @todo Setting whether to replace existing addresses or add to them.
+
+  use MailerHelperTrait;
 
   /**
    * Sets the address in the appropriate header.
@@ -28,9 +32,19 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
    * {@inheritdoc}
    */
   public function postRender(EmailInterface $email) {
-    $mail = $this->configuration['value'];
+    $value = $this->configuration['value'];
     $display = $this->configuration['display'];
-    $address = $display ? new Address($mail, $display) : $mail;
+
+    if ($value === '<site>') {
+      $address = $this->helper()->getSiteAddress();
+    }
+    elseif ((strpos($value, '@') === FALSE) && ($user = User::load($value))) {
+      $address = new Address($user->getEmail(), $user->getDisplayName());
+    }
+    else {
+      $address = $display ? new Address($value, $display) : $value;
+    }
+
     $this->setAddress($email, $address);
   }
 
@@ -43,14 +57,14 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
       '#title' => t('Address'),
       '#default_value' => $this->configuration['value'] ?? NULL,
       '#required' => TRUE,
-      '#description' => $this->t('Email address.'),
+      '#description' => $this->t('Enter an email address, a user ID, or %site to use the site email address.', ['%site' => '<site>']),
     ];
 
     $form['display'] = [
       '#type' => 'textfield',
       '#title' => t('Display name'),
       '#default_value' => $this->configuration['display'] ?? NULL,
-      '#description' => $this->t('Human-readable display name.'),
+      '#description' => $this->t('Human-readable display name (ignored for user or site address).'),
     ];
 
     return $form;

@@ -4,6 +4,7 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -11,6 +12,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\symfony_mailer\Processor\EmailAdjusterManager;
 use Drupal\symfony_mailer\Processor\EmailBuilderManager;
+use Symfony\Component\Mime\Address;
 
 /**
  * Provides the mailer helper service.
@@ -39,6 +41,13 @@ class MailerHelper implements MailerHelperInterface {
   protected $builderManager;
 
   /**
+   * The configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * Constructs the MailerHelper object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -47,11 +56,23 @@ class MailerHelper implements MailerHelperInterface {
    *   The email adjuster manager.
    * @param \Drupal\symfony_mailer\Processor\EmailBuilderManager $email_builder_manager
    *   The email builder manager.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EmailAdjusterManager $email_adjuster_manager, EmailBuilderManager $email_builder_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EmailAdjusterManager $email_adjuster_manager, EmailBuilderManager $email_builder_manager, ConfigFactoryInterface $config_factory) {
     $this->entityTypeManager = $entity_type_manager;
     $this->adjusterManager = $email_adjuster_manager;
     $this->builderManager = $email_builder_manager;
+    $this->configFactory = $config_factory;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSiteAddress() {
+    $site_config = $this->configFactory->get('system.site');
+    $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
+    return new Address($site_mail, $site_config->get('name'));
   }
 
   /**

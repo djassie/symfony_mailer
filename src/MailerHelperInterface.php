@@ -10,6 +10,14 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface MailerHelperInterface {
 
   /**
+   * Get an address using the site mail and name.
+   *
+   * @return \Symfony\Component\Mime\Address
+   *   The address.
+   */
+  public function getSiteAddress();
+
+  /**
    * Renders an element that lists policy related to a config entity.
    *
    * The element is designed for insertion into a config edit page for an
