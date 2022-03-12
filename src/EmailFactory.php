@@ -32,7 +32,7 @@ class EmailFactory {
    * @param string $module
    *   The module name.
    * @param string $sub_type
-   *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
+   *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
    *
    * @return \Drupal\symfony_mailer\EmailInterface
    *   A new email object.
@@ -45,9 +45,9 @@ class EmailFactory {
    * Creates an email object from a config entity.
    *
    * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
-   *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
+   *   Entity. @see \Drupal\symfony_mailer\EmailInterface::getEntity()
    * @param string $sub_type
-   *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
+   *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
    *
    * @return \Drupal\symfony_mailer\EmailInterface
    *   A new email object.
@@ -60,11 +60,11 @@ class EmailFactory {
    * Creates an email.
    *
    * @param string $type
-   *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
+   *   Type. @see \Drupal\symfony_mailer\EmailInterface::getType()
    * @param string $sub_type
-   *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
+   *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
    * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
-   *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
+   *   Entity. @see \Drupal\symfony_mailer\EmailInterface::getEntity()
    *
    * @return \Drupal\symfony_mailer\EmailInterface
    *   A new email object.
