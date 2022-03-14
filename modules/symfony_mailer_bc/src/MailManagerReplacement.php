@@ -71,9 +71,11 @@ class MailManagerReplacement extends MailManager {
       $email->setReplyTo($reply);
     }
 
-    $result = $email->send();
+    if ($send) {
+      $result = $email->send();
+    }
     // Set the 'send' element for Webform module.
-    return ['result' => $result, 'send' => TRUE];
+    return ['result' => $result, 'send' => $send];
   }
 
 }
