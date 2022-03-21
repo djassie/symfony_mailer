@@ -141,12 +141,3 @@ function symfony_mailer_bc_mailer_bc_user_alter(string &$key, array &$params, ar
   // @see \Drupal\symfony_mailer\EmailInterface::setParam()
   $params = ['user' => $params['account']];
 }
-
-/**
- * Implements hook_mailer_bc_MODULE_alter() for user_registrationpassword.
- */
-function symfony_mailer_bc_mailer_bc_user_registrationpassword_alter(string &$key, array &$params, array &$context) {
-  // Use the entity type as the parameter key.
-  // @see \Drupal\symfony_mailer\EmailInterface::setParam()
-  $params = ['user' => $params['account']];
-}
