@@ -10,7 +10,28 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface MailerHelperInterface {
 
   /**
-   * Get an address using the site mail and name.
+   * Parses an address string into Address structures.
+   *
+   * This function should only be used for back-compatibility and migration,
+   * when old code has already encoded the addresses to a string. This function
+   * converts back to human-readable format, ready for the symfony mailer
+   * library to encode once more during sending! New code should store
+   * configuration in human-readable format with a list of addresses with
+   * display names.
+   *
+   * @todo This function is limited. It cannot handle display names, or emails
+   * with characters that require special encoding.
+   *
+   * @param string $encoded
+   *   Encoded address string.
+   *
+   * @return \Symfony\Component\Mime\Address[]
+   *   The parsed address structures.
+   */
+  public function parseAddress(string $encoded);
+
+  /**
+   * Gets an address using the site mail and name.
    *
    * @return \Symfony\Component\Mime\Address
    *   The address.

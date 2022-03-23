@@ -69,6 +69,16 @@ class MailerHelper implements MailerHelperInterface {
   /**
    * {@inheritdoc}
    */
+  public function parseAddress(string $encoded) {
+    foreach (explode(',', $encoded) as $part) {
+      $addresses[] = new Address($part);
+    }
+    return $addresses ?: [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getSiteAddress() {
     $site_config = $this->configFactory->get('system.site');
     $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');

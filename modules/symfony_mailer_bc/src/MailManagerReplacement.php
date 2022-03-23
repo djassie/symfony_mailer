@@ -10,6 +10,7 @@ use Drupal\Core\Mail\MailManager;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\symfony_mailer\EmailFactory;
+use Drupal\symfony_mailer\MailerHelperInterface;
 
 /**
  * Provides a Symfony Mailer replacement for MailManager.
@@ -22,6 +23,13 @@ class MailManagerReplacement extends MailManager {
    * @var \Drupal\symfony_mailer\EmailFactory
    */
   protected $emailFactory;
+
+  /**
+   * The mailer helper.
+   *
+   * @var \Drupal\symfony_mailer\MailerHelperInterface
+   */
+  protected $mailerHelper;
 
   /**
    * Constructs the MailManagerReplacement object.
@@ -43,10 +51,13 @@ class MailManagerReplacement extends MailManager {
    *   The renderer.
    * @param \Drupal\symfony_mailer\EmailFactory $email_factory;
    *   The email factory.
+   * @param \Drupal\symfony_mailer\MailerHelperInterface $mailer_helper
+   *   The mailer helper.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, EmailFactory $email_factory) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, EmailFactory $email_factory, MailerHelperInterface $mailer_helper) {
     parent::__construct($namespaces, $cache_backend, $module_handler, $config_factory, $logger_factory, $string_translation, $renderer);
     $this->emailFactory = $email_factory;
+    $this->mailerHelper = $mailer_helper;
   }
 
   /**
@@ -64,11 +75,11 @@ class MailManagerReplacement extends MailManager {
       $email = $this->emailFactory->newModuleEmail($module, $key);
     }
 
-    $email->setTo($context['to'])
+    $email->setTo(...$this->mailerHelper->parseAddress($context['to']))
       ->setLangcode($langcode)
       ->setParams($params);
     if ($context['reply']) {
-      $email->setReplyTo($reply);
+      $email->setReplyTo(...$this->mailerHelper->parseAddress($context['reply']));
     }
 
     if ($send) {
