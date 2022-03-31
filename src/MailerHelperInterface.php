@@ -31,6 +31,26 @@ interface MailerHelperInterface {
   public function parseAddress(string $encoded);
 
   /**
+   * Converts an address array into Policy configuration.
+   *
+   * This function should only be used for migration.
+   *
+   * @param \Symfony\Component\Mime\Address[] $addresses
+   *   Array of address structures.
+   *
+   * @return array
+   *   The equivalent policy configuration.
+   */
+  public function policyFromAddresses(array $addresses);
+
+  /**
+   * Returns the configuration factory.
+   *
+   * @return \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  public function config();
+
+  /**
    * Gets an address using the site mail and name.
    *
    * @return \Symfony\Component\Mime\Address

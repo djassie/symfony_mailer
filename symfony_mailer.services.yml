@@ -7,7 +7,7 @@ services:
     arguments: ['@plugin.manager.email_builder']
   plugin.manager.email_builder:
     class: Drupal\symfony_mailer\Processor\EmailBuilderManager
-    arguments: ['@entity_type.manager']
+    arguments: ['@entity_type.manager', '@keyvalue']
     parent: default_plugin_manager
   plugin.manager.email_adjuster:
     class: Drupal\symfony_mailer\Processor\EmailAdjusterManager

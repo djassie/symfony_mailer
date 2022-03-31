@@ -3,26 +3,27 @@
 namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\symfony_mailer\Processor\EmailBuilderManager;
+use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
 
 /**
  * Provides a factory for creating email objects.
  */
 class EmailFactory {
+
   /**
    * The email builder manager.
    *
-   * @var \Drupal\symfony_mailer\Processor\EmailBuilderManager
+   * @var \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface
    */
   protected $emailBuilderManager;
 
   /**
    * Constructs the EmailFactory object.
    *
-   * @param \Drupal\symfony_mailer\Processor\EmailBuilderManager $email_builder_manager
+   * @param \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface $email_builder_manager
    *   The email builder manager.
    */
-  public function __construct(EmailBuilderManager $email_builder_manager) {
+  public function __construct(EmailBuilderManagerInterface $email_builder_manager) {
     $this->emailBuilderManager = $email_builder_manager;
   }
 

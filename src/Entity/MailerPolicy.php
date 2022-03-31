@@ -38,6 +38,7 @@ use Drupal\symfony_mailer\Processor\AdjusterPluginCollection;
  * )
  */
 class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectionInterface {
+
   use StringTranslationTrait;
 
   /**
@@ -50,7 +51,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   /**
    * The email builder manager.
    *
-   * @var \Drupal\symfony_mailer\Processor\EmailBuilderManager
+   * @var \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface
    */
   protected $emailBuilderManager;
 
@@ -291,8 +292,105 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    * @return static
    *   The policy object.
    */
-  public static function loadOrCreate($id) {
+  public static function loadOrCreate(string $id) {
     return static::load($id) ?? static::create(['id' => $id]);
+  }
+
+  /**
+   * Loads config for a Mailer Policy including inherited policy.
+   *
+   * @param string $id
+   *   The id of the policy.
+   *
+   * @return array
+   *   The configuration array.
+   */
+  public static function loadInheritedConfig(string $id) {
+    $config = [];
+    for ($loop_id = $id; $loop_id; $loop_id = static::parentId($loop_id)) {
+      if ($policy = MailerPolicy::load($loop_id)) {
+        $config += $policy->getConfiguration();
+      }
+
+    }
+    return $config;
+  }
+
+  /**
+   * Imports a Mailer Policy from configuration.
+   *
+   * @param string $id
+   *   The id of the policy to import.
+   * @param array $configuration
+   *   An associative array of adjuster configuration, keyed by the plug-in ID
+   *   with value as an array of configured settings.
+   */
+  public static function import($id, array $configuration) {
+    $inherited = static::loadInheritedConfig(static::parentId($id));
+    foreach (array_keys($configuration) as $key) {
+      if (isset($inherited[$key]) && static::identicalArray($configuration[$key], $inherited[$key])) {
+        unset($configuration[$key]);
+      }
+    }
+
+    $policy = static::loadOrCreate($id);
+    if ($configuration) {
+      $policy->setConfiguration($configuration)->save();
+    }
+    else {
+      $policy->delete();
+    }
+  }
+
+  /**
+   * Returns the parent ID.
+   *
+   * @param string $id
+   *   The initial id.
+   *
+   * @return string
+   *   The parent id.
+   */
+  protected static function parentId(string $id) {
+    if ($id == '_') {
+      return NULL;
+    }
+    $pos = strrpos($id, '.');
+    return $pos ? substr($id, 0, $pos) : '_';
+  }
+
+  /**
+   * Compares two arrays recursively.
+   *
+   * @param array $a
+   *   The first array.
+   * @param array $b
+   *   The second array.
+   *
+   * @return boolean
+   *   TRUE if the arrays are identical.
+   */
+  protected static function identicalArray(array $a, array $b) {
+    if (count($a) != count($b)) {
+      return FALSE;
+    }
+
+    foreach ($a as $key => $value_a) {
+      if (!isset($b[$key])) {
+        return FALSE;
+      }
+      $value_b = $b[$key];
+      if (is_array($value_a) && is_array($value_b)) {
+        if (!static::identicalArray($value_a, $value_b)) {
+          return FALSE;
+        }
+      }
+      elseif ($value_a != $value_b) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
   }
 
 }
