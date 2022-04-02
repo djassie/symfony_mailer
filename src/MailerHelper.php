@@ -2,7 +2,6 @@
 
 namespace Drupal\symfony_mailer;
 
-use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -10,6 +9,8 @@ use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\symfony_mailer\Processor\EmailAdjusterManager;
 use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
 use Symfony\Component\Mime\Address;
@@ -18,6 +19,8 @@ use Symfony\Component\Mime\Address;
  * Provides the mailer helper service.
  */
 class MailerHelper implements MailerHelperInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The entity type manager.
@@ -123,9 +126,9 @@ class MailerHelper implements MailerHelperInterface {
   /**
    * {@inheritdoc}
    */
-  public function renderEntityPolicy(ConfigEntityInterface $entity, string $subtype, array $common_adjusters = ['email_subject', 'email_from']) {
+  public function renderEntityPolicy(ConfigEntityInterface $entity, string $subtype) {
     $type = $entity->getEntityTypeId();
-    $element = $this->renderCommon($type, $common_adjusters);
+    $element = $this->renderCommon($type);
     $policy_id = "$type.$subtype";
     $entities = [$policy_id, $policy_id . '.' . $entity->id()];
     $element['listing'] = $this->entityTypeManager->getListBuilder('mailer_policy')
@@ -139,8 +142,8 @@ class MailerHelper implements MailerHelperInterface {
   /**
    * {@inheritdoc}
    */
-  public function renderTypePolicy(string $type, array $common_adjusters = ['email_subject', 'email_from']) {
-    $element = $this->renderCommon($type, $common_adjusters);
+  public function renderTypePolicy(string $type) {
+    $element = $this->renderCommon($type);
     $entities = [$type];
     foreach (array_keys($this->builderManager->getDefinition($type)['sub_types']) as $subtype) {
       $entities[] = "$type.$subtype";
@@ -159,30 +162,32 @@ class MailerHelper implements MailerHelperInterface {
    *
    * @param string $type
    *   Type of the policies to show.
-   * @param string[] $common_adjusters
-   *   ID of EmailAdjusters to use as an example in the description.
    *
    * @return array
    *   The render array.
    */
-  protected function renderCommon(string $type, array $common_adjusters) {
+  protected function renderCommon(string $type) {
     $element = [
       '#type' => 'fieldset',
-      '#title' => t('Mailer policy'),
+      '#title' => $this->t('Mailer policy'),
       '#collapsible' => FALSE,
-      '#description' => t('If you have made changes on this page, please save them before editing policy.'),
+      '#description' => $this->t('If you have made changes on this page, please save them before editing policy.'),
     ];
 
-    foreach ($common_adjusters as $adjuster_id) {
-      $adjuster_names[] = $this->adjusterManager->getDefinition($adjuster_id)['label'];
-    }
-    $label = $this->builderManager->getDefinition($type)['label'];
-
+    $definition = $this->builderManager->getDefinition($type);
     $element['explanation'] = [
       '#prefix' => '<p>',
-      '#markup' => t('Configure Mailer policy records to customise the emails sent for @label. You can set the @adjusters and more.', ['@label' => $label, '@adjusters' => implode(', ', $adjuster_names)]),
+      '#markup' => $this->t('Configure Mailer policy records to customise the emails sent for @label.', ['@label' => $definition['label']]),
       '#suffix' => '</p>',
     ];
+
+    foreach ($definition['common_adjusters'] as $adjuster_id) {
+      $adjuster_names[] = $this->adjusterManager->getDefinition($adjuster_id)['label'];
+    }
+
+    if (!empty($adjuster_names)) {
+      $element['explanation']['#markup'] .= ' ' . $this->t('You can set the @adjusters and more.', ['@adjusters' => implode(', ', $adjuster_names)]);
+    }
 
     return $element;
   }

@@ -35,4 +35,11 @@ class EmailBuilder extends Plugin {
    */
   public $has_entity = FALSE;
 
+  /**
+   * Array of common adjuster IDs.
+   *
+   * @var string[]
+   */
+  public $common_adjusters = [];
+
 }

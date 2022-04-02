@@ -20,6 +20,7 @@ use Symfony\Component\Mime\Address;
  *     "node" = @Translation("Issue"),
  *   },
  *   has_entity = TRUE,
+ *   common_adjusters = {"email_subject", "email_from"},
  *   migrate = @Translation("Simplenews newsletter settings"),
  * )
  *
