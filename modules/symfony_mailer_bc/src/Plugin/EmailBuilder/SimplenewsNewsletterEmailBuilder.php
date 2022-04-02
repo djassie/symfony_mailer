@@ -21,7 +21,7 @@ use Symfony\Component\Mime\Address;
  *   },
  *   has_entity = TRUE,
  *   common_adjusters = {"email_subject", "email_from"},
- *   migrate = @Translation("Simplenews newsletter settings"),
+ *   import = @Translation("Simplenews newsletter settings"),
  * )
  *
  * @todo Notes for adopting Symfony Mailer into simplenews. Can remove the

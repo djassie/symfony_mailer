@@ -100,14 +100,14 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
     $state_all = $this->keyValue->get('import', []);
 
     foreach ($this->getDefinitions() as $id => $definition) {
-      if ($definition['migrate']) {
+      if ($definition['import']) {
         $state = $state_all[$id] ?? self::IMPORT_READY;
 
         $info[$id] = [
-          'name' => "$definition[migrate] ($id)",
+          'name' => "$definition[import] ($id)",
           'state' => $state,
           'state_name' => $this->stateName[$state],
-          'warning' => $definition['migrate_warning'] ?? NULL,
+          'warning' => $definition['import_warning'] ?? NULL,
         ];
       }
     }

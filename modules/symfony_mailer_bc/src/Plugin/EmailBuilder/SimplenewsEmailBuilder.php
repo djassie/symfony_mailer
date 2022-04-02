@@ -19,8 +19,8 @@ use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
  *     "validate" = @Translation("Validate"),
  *   },
  *   common_adjusters = {"email_subject", "email_body"},
- *   migrate = @Translation("Simplenews subscriber settings"),
- *   migrate_warning = @Translation("This overrides the default HTML messages with imported plain text versions."),
+ *   import = @Translation("Simplenews subscriber settings"),
+ *   import_warning = @Translation("This overrides the default HTML messages with imported plain text versions."),
  * )
  */
 class SimplenewsEmailBuilder extends EmailProcessorBase implements MailerPolicyImportInterface {
