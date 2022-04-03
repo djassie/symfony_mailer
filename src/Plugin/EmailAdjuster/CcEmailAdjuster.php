@@ -18,8 +18,8 @@ class CcEmailAdjuster extends AddressAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  protected function setAddress(EmailInterface $email, $address) {
-    $email->setCc($address);
+  protected function setAddresses(EmailInterface $email, array $addresses) {
+    $email->setCc(...$addresses);
   }
 
 }

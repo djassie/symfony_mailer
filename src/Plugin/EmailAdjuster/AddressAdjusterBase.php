@@ -23,51 +23,112 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
    *
    * @param \Drupal\symfony_mailer\EmailInterface $email
    *   The email to process.
-   * @param \Symfony\Component\Mime\Address|string $address
-   *   The address to set.
+   * @param \Symfony\Component\Mime\Address[] $addresses
+   *   The addresses to set.
    */
-  abstract protected function setAddress(EmailInterface $email, $address);
+  abstract protected function setAddresses(EmailInterface $email, array $addresses);
 
   /**
    * {@inheritdoc}
    */
   public function postRender(EmailInterface $email) {
-    $value = $this->configuration['value'];
-    $display = $this->configuration['display'];
+    foreach ($this->configuration['addresses'] as $item) {
+      $value = $item['value'];
+      $display = $item['display'];
 
-    if ($value === '<site>') {
-      $address = $this->helper()->getSiteAddress();
-    }
-    elseif ((strpos($value, '@') === FALSE) && ($user = User::load($value))) {
-      $address = new Address($user->getEmail(), $user->getDisplayName());
-    }
-    else {
-      $address = $display ? new Address($value, $display) : $value;
+      if ($value === '<site>') {
+        $addresses[] = $this->helper()->getSiteAddress();
+      }
+      elseif ((strpos($value, '@') === FALSE) && ($user = User::load($value))) {
+        $addresses[] = new Address($user->getEmail(), $user->getDisplayName());
+      }
+      else {
+        $addresses[] = new Address($value, $display);
+      }
     }
 
-    $this->setAddress($email, $address);
+    $this->setAddresses($email, $addresses);
   }
 
   /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $form['value'] = [
-      '#type' => 'textfield',
-      '#title' => t('Address'),
-      '#default_value' => $this->configuration['value'] ?? NULL,
-      '#required' => TRUE,
-      '#description' => $this->t('Enter an email address, a user ID, or %site to use the site email address.', ['%site' => '<site>']),
+    // Set an id to allow updating the addresses when the type is changed.
+    $id = $this->getPluginId();
+    $wrapper = "mailer-policy-edit-$id";
+    $form['addresses'] = [
+      '#type' => 'container',
+      '#attributes' => ['id' => $wrapper],
+      '#element_validate' => [[static::class, 'addressesValidate']],
     ];
 
-    $form['display'] = [
-      '#type' => 'textfield',
-      '#title' => t('Display name'),
-      '#default_value' => $this->configuration['display'] ?? NULL,
-      '#description' => $this->t('Human-readable display name (ignored for user or site address).'),
+    // Synchronise with any existing form state.
+    $addresses = $form_state->getValue(['config', $id, 'addresses']);
+    if (!is_array($addresses)) {
+      $addresses = $this->configuration['addresses'];
+    }
+
+    foreach ($addresses as $item) {
+      $form_item['value'] = [
+        '#type' => 'textfield',
+        '#title' => t('Address'),
+        '#default_value' => $item['value'] ?? NULL,
+        '#description' => $this->t('Enter an email address, a user ID, or %site to use the site email address.', ['%site' => '<site>']),
+      ];
+
+      $form_item['display'] = [
+        '#type' => 'textfield',
+        '#title' => t('Display name'),
+        '#default_value' => $item['display'] ?? NULL,
+        '#description' => $this->t('Human-readable display name (ignored for user or site address).'),
+      ];
+      $form['addresses'][] = $form_item;
+    }
+
+    // Add address button.
+    $form['add'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Add address'),
+      '#submit' => [[static::class, 'submitAdd']],
+      '#ajax' => [
+        'callback' => [static::class, 'ajaxUpdate'],
+        'wrapper' => $wrapper,
+      ],
     ];
 
     return $form;
+  }
+
+  /**
+   * Ajax callback to update the form.
+   */
+  public static function ajaxUpdate($form, FormStateInterface $form_state) {
+    $button = $form_state->getTriggeringElement();
+    $id = $button['#parents'][1];
+    return $form['config'][$id]['addresses'];
+  }
+
+  /**
+   * Submit callback for add button.
+   */
+  public static function submitAdd(array &$form, FormStateInterface $form_state) {
+    $button = $form_state->getTriggeringElement();
+    $id = $button['#parents'][1];
+    $addresses = $form_state->getValue(['config', $id, 'addresses']);
+    $addresses[] = [];
+    $form_state->setValue(['config', $id, 'addresses'], $addresses)
+      ->setRebuild();
+  }
+
+  /**
+   * Validate callback for the addresses.
+   */
+  public static function addressesValidate($element, FormStateInterface $form_state, $form) {
+    $id = $element['#parents'][1];
+    $addresses = $form_state->getValue(['config', $id, 'addresses']);
+    $addresses = array_filter($addresses, function($a) { return !empty($a['value']); });
+    $form_state->setValueForElement($element, $addresses);
   }
 
 }

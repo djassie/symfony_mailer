@@ -18,8 +18,8 @@ class ReplyToEmailAdjuster extends AddressAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  protected function setAddress(EmailInterface $email, $address) {
-    $email->setReplyTo($address);
+  protected function setAddresses(EmailInterface $email, array $addresses) {
+    $email->setReplyTo(...$addresses);
   }
 
 }

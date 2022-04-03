@@ -18,8 +18,8 @@ class FromEmailAdjuster extends AddressAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  protected function setAddress(EmailInterface $email, $address) {
-    $email->setFrom($address);
+  protected function setAddresses(EmailInterface $email, array $addresses) {
+    $email->setFrom(...$addresses);
   }
 
 }

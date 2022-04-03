@@ -18,8 +18,8 @@ class BccEmailAdjuster extends AddressAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  protected function setAddress(EmailInterface $email, $address) {
-    $email->setBcc($address);
+  protected function setAddresses(EmailInterface $email, array $addresses) {
+    $email->setBcc(...$addresses);
   }
 
 }

@@ -68,13 +68,20 @@ symfony_mailer.mailer_policy.*:
 
 symfony_mailer.address_adjuster_base:
   type: mapping
+  label: 'SMTP transport'
   mapping:
-    value:
-      type: email
-      label: 'E-mail address'
-    display:
-      type: label
-      label: 'Display name'
+    addresses:
+      type: sequence
+      label: 'Addresses'
+      sequence:
+        type: mapping
+        mapping:
+          value:
+            type: email
+            label: 'E-mail address'
+          display:
+            type: label
+            label: 'Display name'
 
 symfony_mailer.email_adjuster_plugin.email_bcc:
   label: 'Bcc header'
