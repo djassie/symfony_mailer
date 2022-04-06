@@ -59,6 +59,8 @@ interface MailerTransportInterface extends ConfigEntityInterface {
    *
    * @param string $plugin_id
    *   The transport plugin ID.
+   *
+   * @return $this
    */
   public function setPluginId($plugin_id);
 
@@ -72,6 +74,8 @@ interface MailerTransportInterface extends ConfigEntityInterface {
 
   /**
    * Sets this as the default transport.
+   *
+   * @return $this
    */
   public function setAsDefault();
 
