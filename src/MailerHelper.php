@@ -74,7 +74,7 @@ class MailerHelper implements MailerHelperInterface {
    */
   public function parseAddress(string $encoded) {
     foreach (explode(',', $encoded) as $part) {
-      $addresses[] = new Address($part);
+      $addresses[] = Address::create($part);
     }
     return $addresses ?: [];
   }
