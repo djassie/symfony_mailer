@@ -437,7 +437,10 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function getSymfonyEmail() {
-    $this->inner->subject($this->subject);
+    if ($this->subject) {
+      $this->inner->subject($this->subject);
+    }
+
     // No further alterations allowed.
     $this->phase = 'postSend';
     return $this->inner;
