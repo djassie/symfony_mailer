@@ -4,6 +4,36 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
 
 /**
+ * Implements hook_requirements().
+ */
+function symfony_mailer_requirements($phase) {
+  $requirements = [];
+
+  $packages = [
+    'html2text/html2text' => 'Html2Text\Html2Text',
+    'symfony/mailer' => 'Symfony\Component\Mailer\Mailer',
+    'tijsverkoyen/css-to-inline-styles' => 'TijsVerkoyen\CssToInlineStyles\CssToInlineStyles',
+  ];
+
+  foreach ($packages as $name => $class) {
+    if (!class_exists($class)) {
+      $missing[] = $name;
+    }
+  }
+
+  if ($missing) {
+    $requirements['symfony_mailer_packages'] = [
+      'title' => t('Symfony Mailer dependencies'),
+      'value' => t('Required packages missing.'),
+      'description' => ['#theme' => 'item_list', '#items' => $missing],
+      'severity' => REQUIREMENT_ERROR,
+    ];
+  }
+
+  return $requirements;
+}
+
+/**
  * Update policy for multiple addresses.
  */
 function symfony_mailer_update_10001() {
