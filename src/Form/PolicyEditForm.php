@@ -33,6 +33,13 @@ class PolicyEditForm extends EntityForm {
     $form['#prefix'] = '<div id="mailer-policy-edit-form">';
     $form['#suffix'] = '</div>';
 
+    $form['label'] = [
+      '#markup' => $this->entity->label(),
+      '#prefix' => '<h2>',
+      '#suffix' => '</h2>',
+      '#weight' => -2,
+    ];
+
     // Add adjuster button.
     $ajax = [
       'callback' => '::ajaxUpdate',
