@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
 
 /**
@@ -21,6 +22,35 @@ function symfony_mailer_update_10001() {
       if (in_array($id, $adjusters) && !isset($values['addresses'])) {
         $values = ['addresses' => [$values]];
       }
+    }
+    $policy->setConfiguration($config)->save();
+  }
+}
+
+/**
+ * Create email_html text format.
+ */
+function symfony_mailer_update_10002() {
+  $values = [
+    'format' => 'email_html',
+    'name' => 'Email HTML',
+  ];
+
+  FilterFormat::create($values)->save();
+}
+
+/**
+ * Update body policy to add text format.
+ */
+function symfony_mailer_update_10003() {
+  foreach (MailerPolicy::loadMultiple() as $policy) {
+    $config = $policy->getConfiguration();
+    if (isset($config['email_body']['value'])) {
+      $config['email_body']['content'] = [
+        'value' => $config['email_body']['value'],
+        'format' => 'email_html',
+      ];
+      unset($config['email_body']['value']);
     }
     $policy->setConfiguration($config)->save();
   }
