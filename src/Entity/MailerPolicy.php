@@ -185,6 +185,14 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function label() {
+    $labels = [$this->getTypeLabel(), $this->getSubTypeLabel(), $this->getEntityLabel()];
+    return implode(' » ', array_filter($labels));
+  }
+
+  /**
    * Sets the email adjuster configuration for this policy record.
    *
    * @param array $configuration
