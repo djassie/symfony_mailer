@@ -97,8 +97,7 @@ class MailerHelper implements MailerHelperInterface {
         $display = $address->getName();
       }
 
-      // @todo Support multiple addresses.
-      $config = [
+      $config['addresses'][] = [
         'value' => $value,
         'display' => $display ?? '',
       ];

@@ -55,6 +55,11 @@ function symfony_mailer_bc_module_implements_alter(&$implementations, $hook) {
  */
 function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $config_all = [
+    'contact_form_edit_form' => [
+      'remove' => ['recipients'],
+      'entity' => ['mail'],
+    ],
+
     'simplenews_admin_settings_newsletter' => [
       'remove' => ['simplenews_default_options', 'simplenews_sender_info'],
     ],
@@ -65,6 +70,23 @@ function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $f
     'simplenews_newsletter_edit_form' => [
       'remove' => ['email', 'simplenews_sender_information', 'simplenews_subject'],
       'entity' => ['node'],
+    ],
+    'user_admin_settings' => [
+      'remove' => [
+        'mail_notification_address',
+        'email_admin_created',
+        'email_pending_approval',
+        'email_pending_approval_admin',
+        'email_no_approval_required',
+        'email_password_reset',
+        'email_activated',
+        'email_blocked',
+        'email_cancel_confirm',
+        'email_canceled',
+        // For user_registrationpassword.
+        'email_user_registrationpassword',
+      ],
+      'type' => ['user', ['email_body', 'email_subject']],
     ],
   ];
 
@@ -95,6 +117,11 @@ function symfony_mailer_bc_mailer_bc_contact_alter(array &$message, ?ConfigEntit
   if (isset($message['params']['contact_form'])) {
     // Set the associated config entity.
     $entity = $message['params']['contact_form'];
+
+    if ($message['key'] == 'page_copy') {
+      // Remove the 'to' address as it will be set by Mailer Policy.
+      $message['to'] = '';
+    }
   }
 
   // This creates two separate email types, so no longer need the key to
@@ -110,8 +137,7 @@ function symfony_mailer_bc_mailer_bc_simplenews_alter(array &$message, ?ConfigEn
     // Set the associated config entity.
     $entity = $message['params']['simplenews_mail']->getNewsletter();
 
-    // Remove the reply-to address because we use policy from this module
-    // instead.
+    // Remove the reply-to address as it will be set by Mailer Policy.
     $message['reply'] = '';
 
     // Use a parameter for 'test' rather than the key. We don't want test
@@ -139,6 +165,12 @@ function symfony_mailer_bc_mailer_bc_user_alter(array &$message, ?ConfigEntityIn
   // Use the entity type as the parameter key.
   // @see \Drupal\symfony_mailer\EmailInterface::setParam()
   $message['params'] = ['user' => $message['params']['account']];
+
+  // Remove the 'to' address as we calculate it.
+  $message['to'] = '';
+
+  // Remove the 'reply-to' address as it will be set by Mailer Policy.
+  $message['reply'] = '';
 }
 
 /**
