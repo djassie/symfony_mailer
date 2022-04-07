@@ -33,6 +33,16 @@ interface InternalEmailInterface extends EmailInterface {
   public function render();
 
   /**
+   * Checks if the email has been rendered.
+   *
+   * @internal
+   *
+   * @return bool
+   *   TRUE if the email has been rendered.
+   */
+  public function isRendered();
+
+  /**
    * Gets the inner Symfony email to send.
    *
    * Valid: after rendering.

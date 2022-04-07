@@ -2,6 +2,7 @@
 
 namespace Drupal\symfony_mailer_bc;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -10,12 +11,26 @@ use Drupal\Core\Mail\MailManager;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\symfony_mailer\EmailFactory;
+use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\MailerHelperInterface;
 
 /**
  * Provides a Symfony Mailer replacement for MailManager.
  */
 class MailManagerReplacement extends MailManager {
+
+  /**
+   * List of headers for conversion to/from array.
+   *
+   * @var array
+   */
+  protected const HEADERS = [
+    'From' => 'from',
+    'Reply-To' => 'reply-to',
+    'To' => 'to',
+    'Cc' => 'cc',
+    'Bcc' => 'bcc',
+  ];
 
   /**
    * The email factory.
@@ -64,29 +79,125 @@ class MailManagerReplacement extends MailManager {
    * {@inheritdoc}
    */
   public function mail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
-    // Call alter hook.
-    $context = ['module' => $module, 'to' => $to, 'reply' => $reply, 'entity' => NULL];
-    $this->moduleHandler->alter(['mailer_bc', "mailer_bc_$module"], $key, $params, $context);
+    $message = [
+      'module' => $module,
+      'key' => $key,
+      'to' => $to,
+      'langcode' => $langcode,
+      'params' => $params,
+      'reply-to' => $reply,
+      'send' => $send,
+      'subject' => '',
+      'body' => [],
+    ];
+    $entity = NULL;
 
-    if ($entity = $context['entity']) {
-      $email = $this->emailFactory->newEntityEmail($entity, $key);
+    // Call alter hooks.
+    $this->moduleHandler->alter(['mailer_bc', "mailer_bc_$module"], $message, $entity);
+
+    if ($entity) {
+      $email = $this->emailFactory->newEntityEmail($entity, $message['key']);
     }
     else {
-      $email = $this->emailFactory->newModuleEmail($module, $key);
+      $email = $this->emailFactory->newModuleEmail($message['module'], $message['key']);
     }
 
-    $email->setTo(...$this->mailerHelper->parseAddress($context['to']))
-      ->setLangcode($langcode)
-      ->setParams($params);
-    if ($context['reply']) {
-      $email->setReplyTo(...$this->mailerHelper->parseAddress($context['reply']));
-    }
-
-    if ($send) {
+    $this->emailFromArray($email, $message);
+    if ($message['send']) {
       $result = $email->send();
     }
-    // Set the 'send' element for Webform module.
-    return ['result' => $result, 'send' => $send];
+
+    $message = $this->emailToArray($email);
+    return $message + ['result' => $result ?? NULL, 'send' => $message['send']];
+  }
+
+  /**
+   * Fills an Email from a message array.
+   *
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email to fill.
+   * @param array $message
+   *   The array to fill from.
+   * @param array $original
+   *   (Optional) The original message array.
+   */
+  public function emailFromArray(EmailInterface $email, array $message, array $original = []) {
+    $email->setLangcode($message['langcode'])
+      ->setParams($message['params'])
+      ->setSubject($message['subject']);
+
+    // Address headers.
+    $headers = $email->getHeaders();
+    foreach (self::HEADERS as $name => $key) {
+      // If the header hasn't change then no need to parse it.
+      $encoded = $message['headers'][$name] ?? $message[$key] ?? NULL;
+      $encoded_original = $original['headers'][$name] ?? $original[$key] ?? NULL;
+      if (isset($encoded) && ($encoded != $encoded_original)) {
+        $addresses = $this->mailerHelper->parseAddress($encoded);
+        if ($header = $headers->get($name)) {
+          $header->setAddresses($addresses);
+        }
+        else {
+          $headers->addMailboxListHeader($name, $addresses);
+        }
+      }
+    }
+
+    // Body.
+    if (is_array($message['body'])) {
+      foreach ($message['body'] as $part) {
+        if ($part instanceof MarkupInterface) {
+          $content = ['#markup' => $part];
+        }
+        else {
+          $content = [
+            '#type' => 'processed_text',
+            '#text' => $part,
+          ];
+        }
+        $email->appendBody($content);
+      }
+    }
+    else {
+      $email->setHtmlBody($message['body']);
+    }
+  }
+
+  /**
+   * Gets a message array for an Email.
+   *
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email to convert.
+   *
+   * @return array
+   *   Message array.
+   */
+  public function emailToArray(EmailInterface $email) {
+    $module = $email->getType();
+    $key = $email->getSubType();
+    $message = [
+      'id' => $module . '_' . $key,
+      'module' => $module,
+      'key' => $key,
+      'langcode' => $email->getLangcode(),
+      'params' => $email->getParams(),
+      'send' => TRUE,
+      'subject' => $email->getSubject(),
+      'body' => $email->isRendered() ? $email->getHtmlBody() : $email->getBody(),
+    ];
+
+    // Address headers.
+    $headers = $email->getHeaders();
+    foreach (self::HEADERS as $name => $key) {
+      if ($headers->has($name)) {
+        $message['headers'][$name] = $headers->get($name)->getBodyAsString();
+      }
+      if ($key) {
+        $message[$key] = $message['headers'][$name] ?? NULL;
+      }
+    }
+
+    return $message;
   }
 
 }

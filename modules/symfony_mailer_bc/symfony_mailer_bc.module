@@ -91,60 +91,59 @@ function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $f
 /**
  * Implements hook_mailer_bc_MODULE_alter() for contact.
  */
-function symfony_mailer_bc_mailer_bc_contact_alter(string &$key, array &$params, array &$context) {
-  if (isset($params['contact_form'])) {
+function symfony_mailer_bc_mailer_bc_contact_alter(array &$message, ?ConfigEntityInterface &$entity) {
+  if (isset($message['params']['contact_form'])) {
     // Set the associated config entity.
-    $context['entity'] = $params['contact_form'];
+    $entity = $message['params']['contact_form'];
   }
 
   // This creates two separate email types, so no longer need the key to
   // contain page_ or user_.
-  $key = substr($key, 5);
+  $message['key'] = substr($message['key'], 5);
 }
 
 /**
  * Implements hook_mailer_bc_MODULE_alter() for simplenews.
  */
-function symfony_mailer_bc_mailer_bc_simplenews_alter(string &$key, array &$params, array &$context) {
-  if ($key == 'node' || $key == 'test') {
+function symfony_mailer_bc_mailer_bc_simplenews_alter(array &$message, ?ConfigEntityInterface &$entity) {
+  if ($message['key'] == 'node' || $message['key'] == 'test') {
     // Set the associated config entity.
-    $context['entity'] = $params['simplenews_mail']->getNewsletter();
+    $entity = $message['params']['simplenews_mail']->getNewsletter();
 
     // Remove the reply-to address because we use policy from this module
     // instead.
-    $context['reply'] = '';
+    $message['reply'] = '';
 
     // Use a parameter for 'test' rather than the key. We don't want test
     // email to use a different policy, template, and so on.
-    $params['test'] = ($key == 'test');
-    $key = 'node';
-
+    $message['params']['test'] = ($message['key'] == 'test');
+    $message['key'] = 'node';
   }
-  elseif ($key == 'subscribe_combined') {
-    $key = 'subscribe';
+  elseif ($message['key'] == 'subscribe_combined') {
+    $message['key'] = 'subscribe';
   }
 }
 
 /**
  * Implements hook_mailer_bc_MODULE_alter() for system.
  */
-function symfony_mailer_bc_mailer_bc_system_alter(string &$key, array &$params, array &$context) {
+function symfony_mailer_bc_mailer_bc_system_alter(array &$message, ?ConfigEntityInterface &$entity) {
   // Simplify the params.
-  $params = $params['context'];
+  $message['params'] = $message['params']['context'];
 }
 
 /**
  * Implements hook_mailer_bc_MODULE_alter() for user.
  */
-function symfony_mailer_bc_mailer_bc_user_alter(string &$key, array &$params, array &$context) {
+function symfony_mailer_bc_mailer_bc_user_alter(array &$message, ?ConfigEntityInterface &$entity) {
   // Use the entity type as the parameter key.
   // @see \Drupal\symfony_mailer\EmailInterface::setParam()
-  $params = ['user' => $params['account']];
+  $message['params'] = ['user' => $message['params']['account']];
 }
 
 /**
  * Implements hook_mailer_bc_MODULE_alter() for user_registrationpassword.
  */
-function symfony_mailer_bc_mailer_bc_user_registrationpassword_alter(string &$key, array &$params, array &$context) {
-  symfony_mailer_bc_mailer_bc_user_alter($key, $params, $context);
+function symfony_mailer_bc_mailer_bc_user_registrationpassword_alter(array &$message, ?ConfigEntityInterface &$entity) {
+  symfony_mailer_bc_mailer_bc_user_alter($message, $entity);
 }

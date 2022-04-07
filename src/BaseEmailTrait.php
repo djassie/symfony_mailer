@@ -140,7 +140,7 @@ trait BaseEmailTrait {
   }
 
   public function getHtmlBody(): ?string {
-    $this->valid('postRender');
+    $this->valid('postRender', 'postSend');
     return $this->inner->getHtmlBody();
   }
 
