@@ -9,7 +9,7 @@ use Drupal\symfony_mailer\EmailInterface;
  *
  * @EmailAdjuster(
  *   id = "email_reply_to",
- *   label = @Translation("Reply-to header"),
+ *   label = @Translation("Reply-to"),
  *   description = @Translation("Sets the email reply-to header."),
  * )
  */

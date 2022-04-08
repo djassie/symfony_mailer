@@ -27,4 +27,11 @@ interface EmailAdjusterInterface extends EmailProcessorInterface {
    */
   public function getLabel();
 
+  /**
+   * Returns a summary for this plugin.
+   *
+   * @return string
+   */
+  public function getSummary();
+
 }

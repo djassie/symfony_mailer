@@ -151,4 +151,11 @@ class ThemeEmailAdjuster extends EmailAdjusterBase implements ContainerFactoryPl
     return $theme;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getSummary() {
+    return $this->getThemes()[$this->configuration['theme']];
+  }
+
 }

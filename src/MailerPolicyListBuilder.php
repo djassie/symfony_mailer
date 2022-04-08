@@ -42,11 +42,12 @@ class MailerPolicyListBuilder extends ConfigEntityListBuilder implements MailerP
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    $summary['data']['#markup'] = $entity->getSummary(!empty($this->overrideEntities));
     $row = [
       'type' => $entity->getTypeLabel(),
       'sub_type' => $entity->getSubTypeLabel(),
       'entity' => $entity->getEntityLabel(),
-      'summary' => $entity->getSummary(),
+      'summary' => $summary,
     ];
     return array_diff_key($row, $this->hideColumns) + parent::buildRow($entity);
   }

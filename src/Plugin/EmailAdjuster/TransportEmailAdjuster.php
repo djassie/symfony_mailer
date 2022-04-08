@@ -47,4 +47,13 @@ class TransportEmailAdjuster extends EmailAdjusterBase {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getSummary() {
+    if ($transport = MailerTransport::load($this->configuration['value'])) {
+      return $transport->label();
+    }
+  }
+
 }

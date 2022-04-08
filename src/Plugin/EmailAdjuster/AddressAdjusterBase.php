@@ -101,6 +101,28 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getSummary() {
+    foreach ($this->configuration['addresses'] as $item) {
+      $value = $item['value'];
+      $display = $item['display'];
+
+      if ($value === '<site>') {
+        $summary[] = $this->t('Site email address');
+      }
+      elseif ((strpos($value, '@') === FALSE) && ($user = User::load($value))) {
+        $summary[] = $user->getDisplayName();
+      }
+      else {
+        $summary[] = $value;
+      }
+    }
+
+    return implode(', ', $summary);
+  }
+
+  /**
    * Ajax callback to update the form.
    */
   public static function ajaxUpdate($form, FormStateInterface $form_state) {

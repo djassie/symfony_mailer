@@ -20,4 +20,11 @@ class EmailAdjusterBase extends EmailProcessorBase implements EmailAdjusterInter
     return $this->pluginDefinition['label'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getSummary() {
+    return NULL;
+  }
+
 }

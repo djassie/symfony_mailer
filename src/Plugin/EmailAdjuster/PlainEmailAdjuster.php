@@ -40,4 +40,11 @@ class PlainEmailAdjuster extends EmailAdjusterBase {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getSummary() {
+    return $this->configuration['value'];
+  }
+
 }

@@ -42,6 +42,13 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   use StringTranslationTrait;
 
   /**
+   * Maximum length of a summary for a adjuster.
+   *
+   * @var int
+   */
+  protected const MAX_SUMMARY = 50;
+
+  /**
    * The unique ID of the policy record.
    *
    * @var string
@@ -246,19 +253,41 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   /**
    * Gets a short human-readable summary of the configured policy.
    *
+   * @param bool $expanded
+   *   (Optional) If FALSE return just the labels. If TRUE include a short
+   *   summary of each element.
+   *
    * @return string
    *   Summary text.
    */
-  public function getSummary() {
+  public function getSummary($expanded = FALSE) {
     $summary = [];
-    $plugin_ids = array_keys($this->getConfiguration());
-    asort($plugin_ids);
-    foreach ($plugin_ids as $plugin_id) {
-      if ($definition = $this->emailAdjusterManager->getDefinition($plugin_id, FALSE)) {
-        $summary[] = $definition['label'];
+    $separator = ', ';
+
+    foreach ($this->adjusters()->sort() as $adjuster) {
+      $element = $adjuster->getLabel();
+      if ($expanded && ($element_summary = $adjuster->getSummary())) {
+        if (strlen($element_summary) > static::MAX_SUMMARY) {
+          $element_summary = substr($element_summary, 0, static::MAX_SUMMARY) . '…';
+        }
+        $element .= ": $element_summary";
+        $separator = '<br>';
       }
+      $summary[] = $element;
+
     }
-    return implode(', ', $summary);
+
+    return implode($separator, $summary);
+  }
+
+  /**
+   * Returns the common adjusters for this policy.
+   *
+   * @return array
+   *   An array of common adjuster IDs.
+   */
+  public function getCommonAdjusters() {
+    return $this->builderDefinition ? $this->builderDefinition['common_adjusters'] : [];
   }
 
   /**

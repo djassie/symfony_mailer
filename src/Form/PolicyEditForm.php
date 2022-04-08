@@ -52,12 +52,22 @@ class PolicyEditForm extends EntityForm {
       '#attributes' => ['class' => ['container-inline']],
     ];
 
+    // Put the common adjusters first.
+    $common_adjusters = array_flip($this->entity->getCommonAdjusters());
+    $options = $options2 = [];
     foreach ($this->entity->adjusterDefinitions() as $name => $definition) {
       if (!$adjusters->has($name)) {
-        $options[$name] = $definition['label'];
+        if (isset($common_adjusters[$name])) {
+          $options[$name] = $definition['label'];
+        }
+        else {
+          $options2[$name] = $definition['label'];
+        }
       }
     }
     asort($options);
+    asort($options2);
+    $options += $options2;
 
     $form['add_actions']['add_select'] = [
       '#type' => 'select',

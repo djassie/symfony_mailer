@@ -9,7 +9,7 @@ use Drupal\symfony_mailer\EmailInterface;
  *
  * @EmailAdjuster(
  *   id = "email_cc",
- *   label = @Translation("Cc header"),
+ *   label = @Translation("Cc"),
  *   description = @Translation("Sets the email cc header."),
  * )
  */

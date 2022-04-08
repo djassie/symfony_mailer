@@ -9,7 +9,7 @@ use Drupal\symfony_mailer\EmailInterface;
  *
  * @EmailAdjuster(
  *   id = "email_bcc",
- *   label = @Translation("Bcc header"),
+ *   label = @Translation("Bcc"),
  *   description = @Translation("Sets the email bcc header."),
  * )
  */
