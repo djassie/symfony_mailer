@@ -5,36 +5,7 @@ namespace Drupal\symfony_mailer;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
- * Defines a Mailer Transport configuration entity class.
- *
- * @ConfigEntityType(
- *   id = "mailer_transport",
- *   label = @Translation("Mailer Transport"),
- *   handlers = {
- *     "list_builder" = "Drupal\symfony_mailer\MailerTransportListBuilder",
- *     "form" = {
- *       "edit" = "Drupal\symfony_mailer\Form\TransportForm",
- *       "add" = "Drupal\symfony_mailer\Form\TransportAddForm",
- *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
- *     }
- *   },
- *   admin_permission = "administer mailer",
- *   entity_keys = {
- *     "id" = "id",
- *     "label" = "label"
- *   },
- *   links = {
- *     "edit-form" = "/admin/config/system/mailer/transport/{mailer_transport}",
- *     "delete-form" = "/admin/config/system/mailer/transport/{mailer_transport}/delete",
- *     "set-default" = "/admin/config/system/mailer/transport/{mailer_transport}/set-default",
- *   },
- *   config_export = {
- *     "id",
- *     "label",
- *     "plugin",
- *     "configuration",
- *   }
- * )
+ * Defines the Mailer Transport interface.
  */
 interface MailerTransportInterface extends ConfigEntityInterface {
 
