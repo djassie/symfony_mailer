@@ -1,5 +1,5 @@
 entity.mailer_transport.collection:
-  path: '/admin/config/system/mailer'
+  path: '/admin/config/system/mailer/transport'
   defaults:
     _entity_list: 'mailer_transport'
     _title: 'Mailer'
@@ -38,7 +38,7 @@ entity.mailer_transport.set_default:
     _permission: 'administer mailer'
 
 entity.mailer_policy.collection:
-  path: '/admin/config/system/mailer/policy'
+  path: '/admin/config/system/mailer'
   defaults:
     _entity_list: 'mailer_policy'
     _title: 'Mailer policy'
