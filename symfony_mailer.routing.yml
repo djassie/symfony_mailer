@@ -76,3 +76,34 @@ entity.mailer_policy.delete_form:
   requirements:
     _entity_access: 'mailer_policy.delete'
 
+symfony_mailer.import.status:
+  path: '/admin/config/system/mailer/import'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::importStatus'
+    _title: 'Import configuration'
+  requirements:
+    _permission: 'administer mailer'
+
+symfony_mailer.import.all:
+  path: '/admin/config/system/mailer/import-all'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::importAll'
+    _title: 'Import all'
+  requirements:
+    _permission: 'administer mailer'
+
+symfony_mailer.import.import:
+  path: '/admin/config/system/mailer/import/{id}'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::import'
+    _title: 'Import'
+  requirements:
+    _permission: 'administer mailer'
+
+symfony_mailer.import.skip:
+  path: '/admin/config/system/mailer/import/{id}/skip'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::skip'
+    _title: 'Skip'
+  requirements:
+    _permission: 'administer mailer'

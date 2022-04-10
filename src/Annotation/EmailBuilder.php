@@ -42,4 +42,18 @@ class EmailBuilder extends Plugin {
    */
   public $common_adjusters = [];
 
+  /**
+   * Human-readable name of config to import.
+   *
+   * @var string
+   */
+  public $import = '';
+
+  /**
+   * Human-readable warning for importing.
+   *
+   * @var string
+   */
+  public $import_warning = '';
+
 }

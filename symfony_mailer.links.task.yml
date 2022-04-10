@@ -1,14 +1,20 @@
+entity.mailer_policy.collection:
+  title: Policy
+  description: 'Listing of Mailer policy.'
+  base_route: entity.mailer_policy.collection
+  route_name: entity.mailer_policy.collection
+
 symfony_mailer.mailer_transport.collection:
   title: Transports
   description: 'Listing of Mailer transports.'
   base_route: entity.mailer_policy.collection
   route_name: entity.mailer_transport.collection
 
-entity.mailer_policy.collection:
-  title: Policy
-  description: 'Listing of Mailer policy.'
+symfony_mailer.import.status:
+  title: Import
+  description: 'Import configuration.'
   base_route: entity.mailer_policy.collection
-  route_name: entity.mailer_policy.collection
+  route_name: symfony_mailer.import.status
 
 entity.mailer_policy.edit_form:
   title: Edit
