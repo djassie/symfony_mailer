@@ -6,16 +6,15 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\symfony_mailer\TransportPluginInterface;
 
 /**
- * Defines the native Mail Transport plug-in.
+ * Defines the null Mail Transport plug-in.
  *
  * @MailerTransport(
- *   id = "native",
- *   label = @Translation("Native"),
- *   description = @Translation("Use the sendmail binary and options configured in the sendmail_path setting of php.ini."),
- *   warning = @Translation("<b>NOT RECOMMENDED, prefer Sendmail). If php.ini uses the sendmail -t command, you won't have error reporting and Bcc headers won't be removed."),
+ *   id = "null",
+ *   label = @Translation("Null"),
+ *   description = @Translation("Disable delivery of messages."),
  * )
  */
-class NativeTransport extends TransportBase {
+class NullTransport extends TransportBase {
 
   /**
    * {@inheritdoc}

@@ -2,6 +2,7 @@
 
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
+use Drupal\symfony_mailer\Entity\MailerTransport;
 
 /**
  * Implements hook_requirements().
@@ -83,5 +84,24 @@ function symfony_mailer_update_10003() {
       unset($config['email_body']['value']);
     }
     $policy->setConfiguration($config)->save();
+  }
+}
+
+/**
+ * Replace Native transport with Sendmail.
+ */
+function symfony_mailer_update_10004() {
+  if ($native = MailerTransport::load('native')) {
+    $native->delete();
+
+    $values = [
+      'id' => 'sendmail',
+      'label' => 'Sendmail',
+      'plugin' => 'sendmail',
+      'configuration' => [
+        'query' => ['command' > ''],
+      ],
+    ];
+    MailerTransport::create($values)->save();
   }
 }

@@ -47,6 +47,10 @@ class TransportForm extends EntityForm {
       '#description' => $definition['description'] ?? '',
     ];
 
+    $form['warning'] = [
+      '#markup' => $definition['warning'] ?? '',
+    ];
+
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
