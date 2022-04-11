@@ -3,7 +3,6 @@
 namespace Drupal\symfony_mailer\Plugin\MailerTransport;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\TransportPluginInterface;
 
 /**
  * Defines the null Mail Transport plug-in.
@@ -20,8 +19,7 @@ class NullTransport extends TransportBase {
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return [
-    ];
+    return [];
   }
 
   /**

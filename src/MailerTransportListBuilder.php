@@ -98,7 +98,7 @@ class MailerTransportListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function render() {
-    $build['transport_add_form'] =  [
+    $build['transport_add_form'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['container-inline']],
     ];

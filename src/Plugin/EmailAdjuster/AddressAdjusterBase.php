@@ -15,7 +15,6 @@ use Symfony\Component\Mime\Address;
 abstract class AddressAdjusterBase extends EmailAdjusterBase {
   // @todo Allow multiple values
   // @todo Setting whether to replace existing addresses or add to them.
-
   use MailerHelperTrait;
 
   /**
@@ -149,7 +148,9 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
   public static function addressesValidate($element, FormStateInterface $form_state, $form) {
     $id = $element['#parents'][1];
     $addresses = $form_state->getValue(['config', $id, 'addresses']);
-    $addresses = array_filter($addresses, function($a) { return !empty($a['value']); });
+    $addresses = array_filter($addresses, function ($a) {
+      return !empty($a['value']);
+    });
     $form_state->setValueForElement($element, $addresses);
   }
 

@@ -88,7 +88,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   /**
    * The collection of email adjuster plug-ins configured in this policy.
    *
-   * @var \Drupal\Core\Plugin\DefaultLazyPluginCollection;
+   * @var \Drupal\Core\Plugin\DefaultLazyPluginCollection
    */
   protected $pluginCollection;
 
@@ -108,7 +108,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
       return;
     }
 
-    list($this->type, $this->subType, $this->entityId) = array_pad(explode('.', $this->id), 3, NULL);
+    [$this->type, $this->subType, $this->entityId] = array_pad(explode('.', $this->id), 3, NULL);
     $this->builderDefinition = $this->emailBuilderManager->getDefinition($this->type, FALSE);
     if (!$this->builderDefinition) {
       $this->builderDefinition = ['label' => $this->labelUnknown];
@@ -121,7 +121,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   /**
    * Gets the email type this policy applies to.
    *
-   * @return ?string
+   * @return string
    *   Email type, or NULL if the policy applies to all types.
    */
   public function getType() {
@@ -131,7 +131,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   /**
    * Gets the email sub-type this policy applies to.
    *
-   * @return ?string
+   * @return string
    *   Email sub-type, or NULL if the policy applies to all sub-types.
    */
   public function getSubType() {
@@ -141,7 +141,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   /**
    * Gets the config entity this policy applies to.
    *
-   * @return ?\Drupal\Core\Config\Entity\ConfigEntityInterface.
+   * @return \Drupal\Core\Config\Entity\ConfigEntityInterface
    *   Entity, or NULL if the policy applies to all entities.
    */
   public function getEntity() {
@@ -404,7 +404,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    * @param array $b
    *   The second array.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the arrays are identical.
    */
   protected static function identicalArray(array $a, array $b) {

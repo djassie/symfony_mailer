@@ -24,7 +24,7 @@ class SubjectEmailAdjuster extends EmailAdjusterBase {
     $subject = $this->configuration['value'];
 
     if ($variables = $email->getVariables()) {
-      // Apply TWIG template
+      // Apply TWIG template.
       $subject = [
         '#type' => 'inline_template',
         '#template' => $subject,

@@ -4,6 +4,9 @@ namespace Drupal\symfony_mailer\Processor;
 
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * Defines the interface for EmailAdjuster plug-ins.
+ */
 interface EmailAdjusterInterface extends EmailProcessorInterface {
 
   /**

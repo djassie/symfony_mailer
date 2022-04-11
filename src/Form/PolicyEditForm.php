@@ -2,8 +2,6 @@
 
 namespace Drupal\symfony_mailer\Form;
 
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\RemoveCommand;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -21,7 +19,6 @@ class PolicyEditForm extends EntityForm {
     // @todo Display the inherited adjusters and provide a way to block them.
     // @todo If an adjuster is inherited and not configurable, don't offer to add it.
     // @todo Show an adjuster description.
-
     // Get the adjusters and synchronise with any existing form state.
     $adjusters = $this->entity->adjusters();
     $config = $form_state->getValue('config');

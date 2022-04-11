@@ -29,7 +29,7 @@ class LegacyEmailBuilder extends EmailProcessorBase implements ContainerFactoryP
    *   The plugin implementation definition.
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    *   Mail manager service.
- */
+   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MailManagerInterface $mail_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->mailManager = $mail_manager;

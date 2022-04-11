@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Install, update and uninstall functions for the symfony mailer module.
+ */
+
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
 use Drupal\symfony_mailer\Entity\MailerTransport;

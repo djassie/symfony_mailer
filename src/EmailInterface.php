@@ -215,7 +215,7 @@ interface EmailInterface extends BaseEmailInterface {
    * The ID of this entity can be used to select a specific template or apply
    * specific policy configuration.
    *
-   * @return ?\Drupal\Core\Config\Entity\ConfigEntityInterface.
+   * @return \Drupal\Core\Config\Entity\ConfigEntityInterface
    *   Entity, or NULL if there is no associated entity.
    */
   public function getEntity();

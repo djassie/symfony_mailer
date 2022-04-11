@@ -3,7 +3,6 @@
 namespace Drupal\symfony_mailer;
 
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email as SymfonyEmail;
 use Symfony\Component\Mime\Header\Headers;
 
 /**

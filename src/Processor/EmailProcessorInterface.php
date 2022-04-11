@@ -4,6 +4,9 @@ namespace Drupal\symfony_mailer\Processor;
 
 use Drupal\symfony_mailer\EmailInterface;
 
+/**
+ * Defines the interface for Email Processors.
+ */
 interface EmailProcessorInterface {
 
   /**

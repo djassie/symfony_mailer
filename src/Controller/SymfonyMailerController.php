@@ -56,7 +56,6 @@ class SymfonyMailerController extends ControllerBase {
         'warning' => $this->t('Warning'),
         'operations' => $this->t('Operations'),
       ],
-      //'#title' => $this->getTitle(),
       '#rows' => $this->builderManager->getImportInfo(),
       '#empty' => $this->t('There is no config to import.'),
     ];

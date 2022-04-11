@@ -3,7 +3,6 @@
 namespace Drupal\symfony_mailer\Plugin\MailerTransport;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\TransportPluginInterface;
 
 /**
  * Defines the native Mail Transport plug-in.
@@ -21,8 +20,7 @@ class NativeTransport extends TransportBase {
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return [
-    ];
+    return [];
   }
 
   /**

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Provides back-compatibility when sending emails with Symfony Mailer.
+ */
+
 use Drupal\Core\Form\FormStateInterface;
 
 /**

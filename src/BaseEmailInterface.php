@@ -2,10 +2,8 @@
 
 namespace Drupal\symfony_mailer;
 
-use Drupal\Component\Render\MarkupInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\Headers;
-use Symfony\Component\Mime\Part\DataPart;
 
 /**
  * Defines an interface related to the Symfony Email object.
@@ -13,6 +11,7 @@ use Symfony\Component\Mime\Part\DataPart;
  * The functions are mostly identical, except that set accessors are explicitly
  * named, e.g. setSubject() instead of subject(). Exceptions:
  * - No 'returnPath': should only be set by the SMTP server.
+ *
  *   @see https://www.postmastery.com/about-the-return-path-header/
  * - No 'date': defaults automatically, can still override via getHeaders() if
  *   needed.
@@ -36,7 +35,7 @@ interface BaseEmailInterface {
   /**
    * Gets the email subject.
    *
-   * @return ?\Drupal\Component\Render\MarkupInterface|string $subject
+   * @return \Drupal\Component\Render\MarkupInterface|string
    *   The email subject, or NULL if not set.
    */
   public function getSubject();
@@ -54,8 +53,8 @@ interface BaseEmailInterface {
   /**
    * Gets the sender address.
    *
-   * @return ?\Symfony\Component\Mime\Address
-   *   The sender address, or NULL if not set.
+   * @return \Symfony\Component\Mime\Address
+   *  The sender address, or NULL if not set.
    */
   public function getSender(): ?Address;
 
@@ -234,7 +233,7 @@ interface BaseEmailInterface {
   /**
    * Gets the text body.
    *
-   * @return ?string
+   * @return string
    *   The text body, or NULL if not set.
    */
   public function getTextBody(): ?string;
@@ -245,8 +244,8 @@ interface BaseEmailInterface {
    * Valid: after rendering. Email builders should instead call
    * EmailInterface::setBody() or related functions before rendering.
    *
-   * @param ?string $body
-   *   The HTML body, or NULL to remove the HTML body.
+   * @param string $body
+   *   (optional) The HTML body, or NULL to remove the HTML body.
    *
    * @return $this
    */
@@ -257,7 +256,7 @@ interface BaseEmailInterface {
    *
    * Valid: after rendering.
    *
-   * @return ?string
+   * @return string
    *   The HTML body, or NULL if not set.
    */
   public function getHtmlBody(): ?string;

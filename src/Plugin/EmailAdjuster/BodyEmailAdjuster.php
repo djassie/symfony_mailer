@@ -2,9 +2,7 @@
 
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Markup;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
 use Drupal\symfony_mailer\EmailInterface;
@@ -68,7 +66,6 @@ class BodyEmailAdjuster extends EmailAdjusterBase implements TrustedCallbackInte
     ];
 
     // @todo Show the available Twig variables / token browser.
-
     return $form;
   }
 

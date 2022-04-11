@@ -13,6 +13,9 @@ use Drupal\symfony_mailer\Processor\EmailProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
+/**
+ * Defines the email class.
+ */
 class Email implements InternalEmailInterface {
 
   use BaseEmailTrait;
@@ -123,8 +126,8 @@ class Email implements InternalEmailInterface {
    *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
-   * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
-   *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
+   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   *   (optional) Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    */
   public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, ThemeManagerInterface $theme_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
     $this->mailer = $mailer;
@@ -148,8 +151,8 @@ class Email implements InternalEmailInterface {
    *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
-   * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
-   *   Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
+   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   *   (optional) Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    *
    * @return static
    *   A new email object.
@@ -252,6 +255,7 @@ class Email implements InternalEmailInterface {
 
   /**
    * {@inheritdoc}
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to render.
    * @param string $view_mode

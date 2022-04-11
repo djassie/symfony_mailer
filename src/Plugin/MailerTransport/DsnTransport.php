@@ -3,7 +3,6 @@
 namespace Drupal\symfony_mailer\Plugin\MailerTransport;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\TransportPluginInterface;
 use Symfony\Component\Mailer\Transport;
 
 /**

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Allows sending emails with Symfony Mailer.
+ */
+
 use Drupal\symfony_mailer\EmailInterface;
 
 /**

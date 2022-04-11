@@ -5,6 +5,9 @@ namespace Drupal\symfony_mailer\Processor;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\symfony_mailer\EmailInterface;
 
+/**
+ * Defines the base class for EmailProcessorInterface implementations.
+ */
 class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
 
   const DEFAULT_WEIGHT = 500;

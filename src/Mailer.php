@@ -203,7 +203,7 @@ class Mailer implements MailerInterface {
       $transport = Transport::fromDsn($transport_dsn);
       $mailer = new SymfonyMailer($transport, NULL, $this->dispatcher);
 
-      //ksm($email, $email->getHeaders());
+      // ksm($email, $email->getHeaders());
       $mailer->send($email->getSymfonyEmail());
       $result = TRUE;
     }

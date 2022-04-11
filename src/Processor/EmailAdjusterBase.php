@@ -4,6 +4,9 @@ namespace Drupal\symfony_mailer\Processor;
 
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * Defines the base class for EmailAdjuster plug-ins.
+ */
 class EmailAdjusterBase extends EmailProcessorBase implements EmailAdjusterInterface {
 
   /**

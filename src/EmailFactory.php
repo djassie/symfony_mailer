@@ -64,8 +64,8 @@ class EmailFactory {
    *   Type. @see \Drupal\symfony_mailer\EmailInterface::getType()
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
-   * @param ?\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
-   *   Entity. @see \Drupal\symfony_mailer\EmailInterface::getEntity()
+   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   *   (optional) Entity. @see \Drupal\symfony_mailer\EmailInterface::getEntity()
    *
    * @return \Drupal\symfony_mailer\EmailInterface
    *   A new email object.

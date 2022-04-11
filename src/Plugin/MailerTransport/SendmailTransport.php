@@ -4,7 +4,6 @@ namespace Drupal\symfony_mailer\Plugin\MailerTransport;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Site\Settings;
-use Drupal\symfony_mailer\TransportPluginInterface;
 
 /**
  * Defines the native Mail Transport plug-in.
