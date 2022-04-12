@@ -8,7 +8,7 @@ use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
 /**
  * Provides a factory for creating email objects.
  */
-class EmailFactory {
+class EmailFactory implements EmailFactoryInterface {
 
   /**
    * The email builder manager.

@@ -10,7 +10,7 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Mail\MailManager;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\symfony_mailer\EmailFactory;
+use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\MailerHelperInterface;
 
@@ -35,7 +35,7 @@ class MailManagerReplacement extends MailManager {
   /**
    * The email factory.
    *
-   * @var \Drupal\symfony_mailer\EmailFactory
+   * @var \Drupal\symfony_mailer\EmailFactoryInterface
    */
   protected $emailFactory;
 
@@ -64,12 +64,12 @@ class MailManagerReplacement extends MailManager {
    *   The string translation service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\symfony_mailer\EmailFactory $email_factory;
+   * @param \Drupal\symfony_mailer\EmailFactoryInterface $email_factory;
    *   The email factory.
    * @param \Drupal\symfony_mailer\MailerHelperInterface $mailer_helper
    *   The mailer helper.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, EmailFactory $email_factory, MailerHelperInterface $mailer_helper) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, EmailFactoryInterface $email_factory, MailerHelperInterface $mailer_helper) {
     parent::__construct($namespaces, $cache_backend, $module_handler, $config_factory, $logger_factory, $string_translation, $renderer);
     $this->emailFactory = $email_factory;
     $this->mailerHelper = $mailer_helper;
