@@ -9,7 +9,10 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\symfony_mailer\Processor\EmailProcessorInterface;
+use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
@@ -48,6 +51,19 @@ class Email implements InternalEmailInterface {
    */
   protected $themeManager;
 
+  /**
+   * Account switcher.
+   *
+   * @var \Drupal\Core\Session\AccountSwitcherInterface
+   */
+  protected $accountSwitcher;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $account;
 
   /**
    * @var string
@@ -112,6 +128,13 @@ class Email implements InternalEmailInterface {
   protected $transportDsn = '';
 
   /**
+   * True if must switch account for rendering.
+   *
+   * @var bool
+   */
+  protected $mustSwitchAccount = FALSE;
+
+  /**
    * Constructs the Email object.
    *
    * @param \Drupal\symfony_mailer\MailerInterface $mailer
@@ -122,6 +145,10 @@ class Email implements InternalEmailInterface {
    *   The entity type manager.
    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
    *   The theme manager.
+   * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
+   *   The account switcher service.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The current user.
    * @param string $type
    *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
    * @param string $sub_type
@@ -129,11 +156,13 @@ class Email implements InternalEmailInterface {
    * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
    *   (optional) Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    */
-  public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, ThemeManagerInterface $theme_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
+  public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, ThemeManagerInterface $theme_manager, AccountSwitcherInterface $account_switcher, AccountInterface $account, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
     $this->mailer = $mailer;
     $this->renderer = $renderer;
     $this->entityTypeManager = $entity_type_manager;
     $this->themeManager = $theme_manager;
+    $this->accountSwitcher = $account_switcher;
+    $this->account = $account;
     $this->type = $type;
     $this->subType = $sub_type;
     $this->entity = $entity;
@@ -163,6 +192,8 @@ class Email implements InternalEmailInterface {
       $container->get('renderer'),
       $container->get('entity_type.manager'),
       $container->get('theme.manager'),
+      $container->get('account_switcher'),
+      $container->get('current_user'),
       $type,
       $sub_type,
       $entity
@@ -267,6 +298,7 @@ class Email implements InternalEmailInterface {
       ->view($entity, $view_mode);
 
     $this->appendBody($build);
+    $this->mustSwitchAccount = TRUE;
     return $this;
   }
 
@@ -422,6 +454,13 @@ class Email implements InternalEmailInterface {
   public function render() {
     $this->valid('preRender');
 
+    $user = $this->mustSwitchAccount ? $this->getUser() : NULL;
+    $must_switch = $user && $user->id() != $this->account->id();
+
+    if ($must_switch) {
+      $this->accountSwitcher->switchTo($user);
+    }
+
     // Render subject.
     if ($this->subject instanceof MarkupInterface) {
       $this->subject = PlainTextOutput::renderFromHtml($this->subject);
@@ -433,6 +472,11 @@ class Email implements InternalEmailInterface {
     $this->phase = 'postRender';
     $this->setHtmlBody($html);
     $this->body = [];
+
+    if ($must_switch) {
+      $this->accountSwitcher->switchBack();
+    }
+
 
     return $this;
   }
@@ -474,6 +518,24 @@ class Email implements InternalEmailInterface {
       throw new \LogicException("$caller function is only valid in the $phase phase");
     }
     return $this;
+  }
+
+  /**
+   * Gets a user account for the recipient of this email.
+   *
+   * If there is a single to address, searcch for a matching user account.
+   *
+   * @return
+   */
+  protected function getUser() {
+    $to = $this->getTo();
+    if (count($to) == 1) {
+      $user = user_load_by_mail($to[0]);
+    }
+    if (empty($user)) {
+      $user = User::getAnonymousUser();
+    }
+    return $user;
   }
 
 }
