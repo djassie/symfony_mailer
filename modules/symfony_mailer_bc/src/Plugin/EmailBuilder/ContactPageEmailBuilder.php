@@ -20,7 +20,7 @@ use Drupal\symfony_mailer\Processor\MailerPolicyImportInterface;
  *     "autoreply" = @Translation("Auto-reply"),
  *   },
  *   has_entity = TRUE,
- *   common_adjusters = {"email_subject", "email_from"},
+ *   common_adjusters = {"email_subject", "email_body", "email_to"},
  *   import = @Translation("Contact form recipients"),
  * )
  *

@@ -13,7 +13,6 @@ use Symfony\Component\Mime\Address;
  * Defines a base class for Email Adjusters that set an address field.
  */
 abstract class AddressAdjusterBase extends EmailAdjusterBase {
-  // @todo Allow multiple values
   // @todo Setting whether to replace existing addresses or add to them.
   use MailerHelperTrait;
 
