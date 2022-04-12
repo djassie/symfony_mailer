@@ -27,7 +27,7 @@ function symfony_mailer_requirements($phase) {
     }
   }
 
-  if ($missing) {
+  if (!empty($missing)) {
     $requirements['symfony_mailer_packages'] = [
       'title' => t('Symfony Mailer dependencies'),
       'value' => t('Required packages missing.'),
