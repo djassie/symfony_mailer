@@ -31,17 +31,15 @@ class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase implements Mai
 
   use MailerHelperTrait;
   use TokenProcessorTrait;
-  // @todo Maybe only replace in the subject as body already done?
 
   /**
    * {@inheritdoc}
    */
   public function preRender(EmailInterface $email) {
-    /** @var \Drupal\simplenews\Mail\MailEntity $mail */
-    $mail = $email->getParam('simplenews_mail');
-    $this->tokenData($mail->getTokenContext());
-    $email->setBody($mail->getBody())
-      ->addTextHeader('Precedence', 'bulk');
+    $email->appendBodyEntity($email->getParam('node'), 'email_html')
+      ->addTextHeader('Precedence', 'bulk')
+      ->setVariable('opt_out_hidden', !$email->getEntity()->isAccessible())
+      ->setVariable('test', $email->getParam('test'));
 
     if ($unsubscribe_url = \Drupal::token()->replace('[simplenews-subscriber:unsubscribe-url]', $email->getParams(), ['clear' => TRUE])) {
       $email->addTextHeader('List-Unsubscribe', "<$unsubscribe_url>");

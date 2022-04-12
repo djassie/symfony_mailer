@@ -139,11 +139,14 @@ function symfony_mailer_bc_mailer_bc_contact_alter(array &$message, ?ConfigEntit
  */
 function symfony_mailer_bc_mailer_bc_simplenews_alter(array &$message, ?ConfigEntityInterface &$entity) {
   if ($message['key'] == 'node' || $message['key'] == 'test') {
-    // Set the associated config entity.
-    $entity = $message['params']['simplenews_mail']->getNewsletter();
+    $mail = $message['params']['simplenews_mail'];
 
-    // Remove the reply-to address as it will be set by Mailer Policy.
-    $message['reply'] = '';
+    // Set the associated config entity.
+    $entity = $mail->getNewsletter();
+    $message['params'] = $mail->getTokenContext();
+
+    // Remove the 'reply-to' address as it will be set by Mailer Policy.
+    $message['reply-to'] = '';
 
     // Use a parameter for 'test' rather than the key. We don't want test
     // email to use a different policy, template, and so on.
@@ -152,6 +155,11 @@ function symfony_mailer_bc_mailer_bc_simplenews_alter(array &$message, ?ConfigEn
   }
   elseif ($message['key'] == 'subscribe_combined') {
     $message['key'] = 'subscribe';
+    $message['params'] = $message['params']['context'];
+
+    // Remove the 'to' address and langcode as we calculate them.
+    $message['to'] = '';
+    $message['langcode'] = '';
   }
 }
 
