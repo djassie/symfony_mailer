@@ -11,7 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   id = "native",
  *   label = @Translation("Native"),
  *   description = @Translation("Use the sendmail binary and options configured in the sendmail_path setting of php.ini."),
- *   warning = @Translation("<b>NOT RECOMMENDED, prefer Sendmail). If php.ini uses the sendmail -t command, you won't have error reporting and Bcc headers won't be removed."),
+ *   warning = @Translation("<b>Not recommended</b>, prefer Sendmail. If php.ini uses the sendmail -t command, you won't have error reporting and Bcc headers won't be removed."),
  * )
  */
 class NativeTransport extends TransportBase {

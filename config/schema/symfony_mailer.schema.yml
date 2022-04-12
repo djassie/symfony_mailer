@@ -24,10 +24,6 @@ symfony_mailer.mailer_transport.*:
     configuration:
       type: symfony_mailer.transport_plugin.[%parent.plugin]
 
-symfony_mailer.transport_plugin.native:
-  type: mapping
-  label: 'Native transport'
-
 symfony_mailer.transport_plugin.dsn:
   type: mapping
   label: 'DSN transport'
@@ -35,6 +31,14 @@ symfony_mailer.transport_plugin.dsn:
     dsn:
       type: string
       label: 'DSN'
+
+symfony_mailer.transport_plugin.native:
+  type: mapping
+  label: 'Native transport'
+
+symfony_mailer.transport_plugin.null:
+  type: mapping
+  label: 'Null transport'
 
 symfony_mailer.transport_plugin.smtp:
   type: mapping
