@@ -35,8 +35,20 @@ class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase implements Mai
   /**
    * {@inheritdoc}
    */
+  public function preBuild(EmailInterface $email) {
+    $subscriber = $email->getParam('simplenews_subscriber');
+    $issue = $email->getParam('issue');
+    $email->setTo($subscriber->getMail())
+      ->setLangcode($subscriber->getLangcode())
+      ->setParam('newsletter', $issue->simplenews_issue->entity)
+      ->setParam($issue->getEntityTypeId(), $issue);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preRender(EmailInterface $email) {
-    $email->appendBodyEntity($email->getParam('node'), 'email_html')
+    $email->appendBodyEntity($email->getParam('issue'), 'email_html')
       ->addTextHeader('Precedence', 'bulk')
       ->setVariable('opt_out_hidden', !$email->getEntity()->isAccessible())
       ->setVariable('test', $email->getParam('test'));

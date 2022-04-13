@@ -143,14 +143,23 @@ function symfony_mailer_bc_mailer_bc_simplenews_alter(array &$message, ?ConfigEn
 
     // Set the associated config entity.
     $entity = $mail->getNewsletter();
-    $message['params'] = $mail->getTokenContext();
+
+    // Fix params to match the expected format.
+    $message['params'] = [
+      'simplenews_subscriber' => $mail->getSubscriber(),
+      'issue' => $mail->getIssue(),
+      'test' => ($mail->getKey() == 'test'),
+    ];
 
     // Remove the 'reply-to' address as it will be set by Mailer Policy.
     $message['reply-to'] = '';
 
-    // Use a parameter for 'test' rather than the key. We don't want test
-    // email to use a different policy, template, and so on.
-    $message['params']['test'] = ($message['key'] == 'test');
+    // Remove the 'to' address and langcode as we calculate them.
+    $message['to'] = '';
+    $message['langcode'] = '';
+
+    // Use the same 'key' for test emails as we don't want to use a different
+    // policy, template, and so on.
     $message['key'] = 'node';
   }
   elseif ($message['key'] == 'subscribe_combined') {
