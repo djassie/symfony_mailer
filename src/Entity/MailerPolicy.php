@@ -6,6 +6,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\symfony_mailer\Annotation\EmailBuilder;
 use Drupal\symfony_mailer\Processor\AdjusterPluginCollection;
 
 /**
@@ -104,7 +105,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
 
     // The root policy with ID '_' applies to all types.
     if (!$this->id || ($this->id == '_')) {
-      $this->builderDefinition = ['label' => $this->labelAll];
+      $this->builderDefinition = (new EmailBuilder(['label' => $this->labelAll]))->get();
       return;
     }
 
