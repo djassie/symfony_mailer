@@ -9,6 +9,7 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -91,6 +92,13 @@ class Mailer implements MailerInterface {
   protected $themeInitialization;
 
   /**
+   * Account switcher.
+   *
+   * @var \Drupal\Core\Session\AccountSwitcherInterface
+   */
+  protected $accountSwitcher;
+
+  /**
    * Constructs the Mailer object.
    *
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
@@ -111,8 +119,10 @@ class Mailer implements MailerInterface {
    *   The theme manager.
    * @param \Drupal\Core\Theme\ThemeInitializationInterface $theme_initialization
    *   The theme initialization.
+   * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
+   *   The account switcher service.
    */
-  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account, ThemeManagerInterface $theme_manager, ThemeInitializationInterface $theme_initialization) {
+  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account, ThemeManagerInterface $theme_manager, ThemeInitializationInterface $theme_initialization, AccountSwitcherInterface $account_switcher) {
     $this->dispatcher = $dispatcher;
     $this->renderer = $renderer;
     $this->moduleHandler = $module_handler;
@@ -122,6 +132,7 @@ class Mailer implements MailerInterface {
     $this->account = $account;
     $this->themeManager = $theme_manager;
     $this->themeInitialization = $theme_initialization;
+    $this->accountSwitcher = $account_switcher;
   }
 
   /**
@@ -159,19 +170,25 @@ class Mailer implements MailerInterface {
    * @internal
    */
   public function doSend(InternalEmailInterface $email) {
-    // Call hooks.
-    $this->invokeAll('init', $email);
-
     // Call hooks/processors.
-    $email->process('preBuild');
-    $this->invokeAll('pre_build', $email);
+    $this->invokeAll('init', $email);
+    $email->process(EmailInterface::PHASE_INIT);
+    $email->process(EmailInterface::PHASE_BUILD);
 
+    // Do switching.
     $theme_name = $email->getTheme();
     $active_theme_name = $this->themeManager->getActiveTheme()->getName();
     $must_switch_theme = $theme_name !== $active_theme_name;
 
     if ($must_switch_theme) {
       $this->changeTheme($theme_name);
+    }
+
+    $account = $email->getAccount();
+    $must_switch_account = $account && $account->id() != $this->account->id();
+
+    if ($must_switch_account) {
+      $this->accountSwitcher->switchTo($user);
     }
 
     $langcode = $email->getLangcode();
@@ -182,16 +199,14 @@ class Mailer implements MailerInterface {
       $this->changeActiveLanguage($langcode);
     }
 
-    // Call hooks/processors.
-    $email->process('preRender');
-    $this->invokeAll('pre_render', $email);
+    // Call processors.
+    $email->process(EmailInterface::PHASE_PRE_RENDER);
 
     // Render.
     $email->render();
 
-    // Call hooks/processors.
-    $email->process('postRender');
-    $this->invokeAll('post_render', $email);
+    // Call processors.
+    $email->process(EmailInterface::PHASE_POST_RENDER);
 
     try {
       // Send.
@@ -229,6 +244,11 @@ class Mailer implements MailerInterface {
 
       \Drupal::messenger()->addError($message);
       $result = FALSE;
+    }
+
+    // Switch back.
+    if ($must_switch_account) {
+      $this->accountSwitcher->switchBack();
     }
 
     if ($must_switch_language) {

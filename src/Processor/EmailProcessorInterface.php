@@ -10,39 +10,22 @@ use Drupal\symfony_mailer\EmailInterface;
 interface EmailProcessorInterface {
 
   /**
-   * Runs the pre-build function on an email message.
+   * Runs processing on an email message for a phase.
    *
    * @param \Drupal\symfony_mailer\EmailInterface $email
    *   The email to process.
    */
-  public function preBuild(EmailInterface $email);
-
-  /**
-   * Runs the pre-render function on an email message.
-   *
-   * @param \Drupal\symfony_mailer\EmailInterface $email
-   *   The email to process.
-   */
-  public function preRender(EmailInterface $email);
-
-  /**
-   * Runs the post-render function on an email message.
-   *
-   * @param \Drupal\symfony_mailer\EmailInterface $email
-   *   The email to process.
-   */
-  public function postRender(EmailInterface $email);
+  public function initialize(EmailInterface $email);
 
   /**
    * Gets the weight of the email processor.
    *
-   * @param string $function
-   *   The function that will be called: 'preBuild', 'preRender' or
-   *   'postRender'.
+   * @param int $phase
+   *   The phase that will run, one of the EmailInterface::PHASE_ constants.
    *
    * @return int
    *   The weight.
    */
-  public function getWeight(string $function);
+  public function getWeight(int $phase);
 
 }

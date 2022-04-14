@@ -123,8 +123,11 @@ class MailManagerReplacement extends MailManager {
    */
   public function emailFromArray(EmailInterface $email, array $message, array $original = []) {
     $email->setLangcode($message['langcode'])
-      ->setParams($message['params'])
       ->setSubject($message['subject']);
+
+    if ($email->getPhase() == EmailInterface::PHASE_INIT) {
+      $email->setParams($message['params']);
+    }
 
     // Address headers.
     $headers = $email->getHeaders();
@@ -183,7 +186,7 @@ class MailManagerReplacement extends MailManager {
       'params' => $email->getParams(),
       'send' => TRUE,
       'subject' => $email->getSubject(),
-      'body' => $email->isRendered() ? $email->getHtmlBody() : $email->getBody(),
+      'body' => ($email->getPhase() >= EmailInterface::PHASE_POST_RENDER) ? $email->getHtmlBody() : $email->getBody(),
     ];
 
     // Address headers.

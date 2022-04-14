@@ -50,7 +50,7 @@ class LegacyEmailBuilder extends EmailProcessorBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public function preBuild(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     $message = $this->mailManager->emailToArray($email);
     $original = $message;
 

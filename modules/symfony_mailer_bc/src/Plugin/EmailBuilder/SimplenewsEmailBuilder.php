@@ -31,7 +31,7 @@ class SimplenewsEmailBuilder extends EmailProcessorBase implements MailerPolicyI
   /**
    * {@inheritdoc}
    */
-  public function preBuild(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     $subscriber = $email->getParam('simplenews_subscriber');
     $email->setTo($subscriber->getMail())
       ->setLangcode($subscriber->getLangcode());

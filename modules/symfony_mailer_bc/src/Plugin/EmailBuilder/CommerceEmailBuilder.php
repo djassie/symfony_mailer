@@ -24,7 +24,7 @@ class CommerceEmailBuilder extends EmailProcessorBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     $email->setSubject($email->getParam('subject'))
       ->setBody($email->getParam('body'));
 

@@ -20,7 +20,7 @@ class SubjectEmailAdjuster extends EmailAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     $subject = $this->configuration['value'];
 
     if ($variables = $email->getVariables()) {

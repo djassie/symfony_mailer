@@ -21,7 +21,7 @@ class SystemEmailBuilder extends EmailProcessorBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     $body = [
       '#type' => 'processed_text',
       '#text' => $email->getParam('message'),

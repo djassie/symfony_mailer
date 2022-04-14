@@ -34,8 +34,8 @@ class ContactPageEmailBuilder extends ContactEmailBuilderBase implements MailerP
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
-    parent::preRender($email);
+  public function build(EmailInterface $email) {
+    parent::build($email);
     $email->setVariable('form', $email->getEntity()->label())
       ->setVariable('form_url', Url::fromRoute('<current>')->toString());
 

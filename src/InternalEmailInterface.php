@@ -8,18 +8,16 @@ namespace Drupal\symfony_mailer;
 interface InternalEmailInterface extends EmailInterface {
 
   /**
-   * Call a function for all email processors.
-   *
-   * Valid: postRender after rendering else before building.
+   * Runs processing of a phase for all email processors.
    *
    * @internal
    *
-   * @param string $function
-   *   The function to call: preBuild, preRender or postRender.
+   * @param int $phase
+   *   The phase, one of the PHASE_ constants.
    *
    * @return $this
    */
-  public function process(string $function);
+  public function process(int $phase);
 
   /**
    * Renders the email.
@@ -33,14 +31,14 @@ interface InternalEmailInterface extends EmailInterface {
   public function render();
 
   /**
-   * Checks if the email has been rendered.
+   * Get the phase of processing.
    *
    * @internal
    *
-   * @return bool
-   *   TRUE if the email has been rendered.
+   * @return int
+   *   The phase, one of the PHASE_ constants.
    */
-  public function isRendered();
+  public function getPhase();
 
   /**
    * Gets the inner Symfony email to send.

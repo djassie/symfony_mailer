@@ -19,8 +19,8 @@ class UserRegistrationPasswordEmailBuilder extends UserEmailBuilder {
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
-    parent::preRender($email);
+  public function build(EmailInterface $email) {
+    parent::build($email);
     $this->tokenOptions(['callback' => 'user_registrationpassword_mail_tokens', 'clear' => TRUE]);
   }
 

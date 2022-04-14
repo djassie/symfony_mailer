@@ -23,8 +23,8 @@ class ContactEmailBuilder extends ContactEmailBuilderBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
-    parent::preRender($email);
+  public function build(EmailInterface $email) {
+    parent::build($email);
     $recipient = $email->getParams()['recipient'];
 
     $email->setVariable('recipient_name', $recipient->getDisplayName())

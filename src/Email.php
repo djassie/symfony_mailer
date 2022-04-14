@@ -10,8 +10,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Session\AccountSwitcherInterface;
-use Drupal\symfony_mailer\Processor\EmailProcessorInterface;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
@@ -52,20 +50,6 @@ class Email implements InternalEmailInterface {
   protected $themeManager;
 
   /**
-   * Account switcher.
-   *
-   * @var \Drupal\Core\Session\AccountSwitcherInterface
-   */
-  protected $accountSwitcher;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
    * @var string
    */
   protected $type;
@@ -81,12 +65,14 @@ class Email implements InternalEmailInterface {
   protected $entity_id;
 
   /**
-   * @var string
+   * Current phase, one of the PHASE_ constants.
+   *
+   * @var int
    */
-  protected $phase = 'preBuild';
+  protected $phase = self::PHASE_INIT;
 
   /**
-   * @var \Drupal\symfony_mailer\Processor\EmailProcessorInterface[]
+   * @var array
    */
   protected $body = [];
 
@@ -111,6 +97,13 @@ class Email implements InternalEmailInterface {
   protected $variables = [];
 
   /**
+   * The account to switch to for rendering.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $account;
+
+  /**
    * @var string
    */
   protected $theme = '';
@@ -128,13 +121,6 @@ class Email implements InternalEmailInterface {
   protected $transportDsn = '';
 
   /**
-   * True if must switch account for rendering.
-   *
-   * @var bool
-   */
-  protected $mustSwitchAccount = FALSE;
-
-  /**
    * Constructs the Email object.
    *
    * @param \Drupal\symfony_mailer\MailerInterface $mailer
@@ -145,10 +131,6 @@ class Email implements InternalEmailInterface {
    *   The entity type manager.
    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
    *   The theme manager.
-   * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
-   *   The account switcher service.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
    * @param string $type
    *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
    * @param string $sub_type
@@ -156,13 +138,11 @@ class Email implements InternalEmailInterface {
    * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
    *   (optional) Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
    */
-  public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, ThemeManagerInterface $theme_manager, AccountSwitcherInterface $account_switcher, AccountInterface $account, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
+  public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, ThemeManagerInterface $theme_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
     $this->mailer = $mailer;
     $this->renderer = $renderer;
     $this->entityTypeManager = $entity_type_manager;
     $this->themeManager = $theme_manager;
-    $this->accountSwitcher = $account_switcher;
-    $this->account = $account;
     $this->type = $type;
     $this->subType = $sub_type;
     $this->entity = $entity;
@@ -192,8 +172,6 @@ class Email implements InternalEmailInterface {
       $container->get('renderer'),
       $container->get('entity_type.manager'),
       $container->get('theme.manager'),
-      $container->get('account_switcher'),
-      $container->get('current_user'),
       $type,
       $sub_type,
       $entity
@@ -203,9 +181,12 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function addProcessor(EmailProcessorInterface $processor) {
-    $this->valid('preBuild');
-    $this->processors[] = $processor;
+  public function addProcessor(string $id, int $phase, callable $function, int $weight = self::DEFAULT_WEIGHT) {
+    $this->valid(self::PHASE_INIT);
+    $this->processors[$phase][$id] = [
+      'function' => $function,
+      'weight' => $weight,
+    ];
     return $this;
   }
 
@@ -213,7 +194,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function setLangcode(string $langcode) {
-    $this->valid('preBuild');
+    $this->valid(self::PHASE_BUILD);
     $this->langcode = $langcode;
     return $this;
   }
@@ -229,7 +210,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function setParams(array $params = []) {
-    $this->valid('preBuild');
+    $this->valid(self::PHASE_INIT);
     $this->params = $params;
     return $this;
   }
@@ -238,7 +219,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function setParam(string $key, $value) {
-    $this->valid('preBuild');
+    $this->valid(self::PHASE_INIT);
     $this->params[$key] = $value;
     return $this;
   }
@@ -261,15 +242,31 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function send() {
-    $this->valid('preBuild');
+    $this->valid(self::PHASE_INIT);
     return $this->mailer->send($this);
   }
 
   /**
    * {@inheritdoc}
    */
+  public function setAccount(AccountInterface $account) {
+    $this->valid(self::PHASE_BUILD);
+    $this->account = $account;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAccount() {
+    return $this->account;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setBody($body) {
-    $this->valid('preRender', 'preBuild');
+    $this->valid(self::PHASE_PRE_RENDER);
     $this->body = $body;
     return $this;
   }
@@ -278,7 +275,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function appendBody($body) {
-    $this->valid('preRender', 'preBuild');
+    $this->valid(self::PHASE_PRE_RENDER);
     $name = 'n' . count($this->body);
     $this->body[$name] = $body;
     return $this;
@@ -286,19 +283,17 @@ class Email implements InternalEmailInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity to render.
-   * @param string $view_mode
-   *   (optional) The view mode that should be used to render the entity.
    */
   public function appendBodyEntity(EntityInterface $entity, $view_mode = 'full') {
-    $this->valid('preRender', 'preBuild');
+    $this->valid(self::PHASE_PRE_RENDER);
     $build = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId())
       ->view($entity, $view_mode);
-
     $this->appendBody($build);
-    $this->mustSwitchAccount = TRUE;
+
+    if (!$this->getAccount()) {
+      $this->setAccount($this->getUser());
+    }
+
     return $this;
   }
 
@@ -306,7 +301,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function getBody() {
-    $this->valid('preRender', 'preBuild');
+    $this->valid(self::PHASE_PRE_RENDER);
     return $this->body;
   }
 
@@ -314,7 +309,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function setVariables(array $variables) {
-    $this->valid('preRender', 'preBuild');
+    $this->valid(self::PHASE_BUILD);
     $this->variables = $variables;
     return $this;
   }
@@ -323,7 +318,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function setVariable(string $key, $value) {
-    $this->valid('preRender', 'preBuild');
+    $this->valid(self::PHASE_BUILD);
     $this->variables[$key] = $value;
     return $this;
   }
@@ -380,7 +375,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function setTheme(string $theme_name) {
-    $this->valid('preBuild');
+    $this->valid(self::PHASE_BUILD);
     $this->theme = $theme_name;
     return $this;
   }
@@ -428,21 +423,23 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function process(string $function) {
-    if ($function == 'preRender') {
-      $this->valid('preBuild');
-      $this->phase = 'preRender';
-    }
-    else {
-      $this->valid($function);
-    }
+  public function process(int $phase) {
+    $phase_valid = [
+      self::PHASE_INIT => self::PHASE_INIT,
+      self::PHASE_BUILD => self::PHASE_INIT,
+      self::PHASE_PRE_RENDER => self::PHASE_BUILD,
+      self::PHASE_POST_RENDER => self::PHASE_POST_RENDER,
+    ];
+    $this->valid($phase_valid[$phase], TRUE);
+    $this->phase = $phase;
 
-    usort($this->processors, function ($a, $b) use ($function) {
-      return $a->getWeight($function) <=> $b->getWeight($function);
+    $processors = $this->processors[$phase] ?? [];
+    uasort($processors, function ($a, $b) {
+      return $a['weight'] <=> $b['weight'];
     });
 
-    foreach ($this->processors as $processor) {
-      call_user_func([$processor, $function], $this);
+    foreach ($processors as $processor) {
+      call_user_func($processor['function'], $this);
     }
 
     return $this;
@@ -452,14 +449,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function render() {
-    $this->valid('preRender');
-
-    $user = $this->mustSwitchAccount ? $this->getUser() : NULL;
-    $must_switch = $user && $user->id() != $this->account->id();
-
-    if ($must_switch) {
-      $this->accountSwitcher->switchTo($user);
-    }
+    $this->valid(self::PHASE_PRE_RENDER, TRUE);
 
     // Render subject.
     if ($this->subject instanceof MarkupInterface) {
@@ -469,14 +459,9 @@ class Email implements InternalEmailInterface {
     // Render body.
     $body = ['#theme' => 'email', '#email' => $this];
     $html = $this->renderer->renderPlain($body);
-    $this->phase = 'postRender';
+    $this->phase = self::PHASE_POST_RENDER;
     $this->setHtmlBody($html);
     $this->body = [];
-
-    if ($must_switch) {
-      $this->accountSwitcher->switchBack();
-    }
-
 
     return $this;
   }
@@ -484,19 +469,20 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function isRendered() {
-    return in_array($this->phase, ['postRender', 'postSend']);
+  public function getPhase() {
+    return $this->phase;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getSymfonyEmail() {
+    $this->valid(self::PHASE_POST_RENDER, TRUE);
+
     if ($this->subject) {
       $this->inner->subject($this->subject);
     }
 
-    // No further alterations allowed.
     $this->phase = 'postSend';
     return $this->inner;
   }
@@ -504,18 +490,31 @@ class Email implements InternalEmailInterface {
   /**
    * Checks that a function was called in the correct phase.
    *
-   * @param string $phase
-   *   The correct phase.
-   * @param string $alt_phase
-   *   An alternative allowed phase.
+   * @param int $phase
+   *   The correct phase, one of the PHASE_ constants.
+   * @param bool $exact
+   *   If TRUE, require the exact phase, if FALSE allow earlier phases (later
+   *   phases for post-render).
    *
    * @return $this
    */
-  protected function valid(string $phase, string $alt_phase = '') {
-    $valid = ($this->phase == $phase) || ($this->phase == $alt_phase);
+  protected function valid(int $phase, bool $exact = FALSE) {
+    if ($exact) {
+      // Exact match specified.
+      $valid = ($this->phase == $phase);
+    }
+    elseif ($phase != self::PHASE_POST_RENDER) {
+      // By default can call functions in the exact phase or earlier.
+      $valid = ($this->phase <= $phase);
+    }
+    else {
+      // Functions valid post-render are by default valid then or after.
+      $valid = ($this->phase >= $phase);
+    }
+
     if (!$valid) {
       $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
-      throw new \LogicException("$caller function is only valid in the $phase phase");
+      throw new \LogicException("$caller function is only valid in phase $phase");
     }
     return $this;
   }

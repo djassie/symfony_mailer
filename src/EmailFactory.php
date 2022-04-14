@@ -76,7 +76,7 @@ class EmailFactory implements EmailFactoryInterface {
     // Load builders with matching ID.
     foreach ($email->getSuggestions('', '.') as $plugin_id) {
       if ($this->emailBuilderManager->hasDefinition($plugin_id)) {
-        $email->addProcessor($this->emailBuilderManager->createInstance($plugin_id));
+        $this->emailBuilderManager->createInstance($plugin_id)->initialize($email);
       }
     }
 

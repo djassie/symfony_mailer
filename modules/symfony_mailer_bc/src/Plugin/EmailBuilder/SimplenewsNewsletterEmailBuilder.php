@@ -35,24 +35,25 @@ class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase implements Mai
   /**
    * {@inheritdoc}
    */
-  public function preBuild(EmailInterface $email) {
-    $subscriber = $email->getParam('simplenews_subscriber');
+  public function init(EmailInterface $email) {
     $issue = $email->getParam('issue');
-    $email->setTo($subscriber->getMail())
-      ->setLangcode($subscriber->getLangcode())
-      ->setParam('newsletter', $issue->simplenews_issue->entity)
+    $email->setParam('newsletter', $issue->simplenews_issue->entity)
       ->setParam($issue->getEntityTypeId(), $issue);
-  }
+    }
 
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
-    $email->appendBodyEntity($email->getParam('issue'), 'email_html')
+  public function build(EmailInterface $email) {
+    $subscriber = $email->getParam('simplenews_subscriber');
+    $email->setTo($subscriber->getMail())
+      ->setLangcode($subscriber->getLangcode())
+      ->appendBodyEntity($email->getParam('issue'), 'email_html')
       ->addTextHeader('Precedence', 'bulk')
       ->setVariable('opt_out_hidden', !$email->getEntity()->isAccessible())
       ->setVariable('test', $email->getParam('test'));
 
+    // @todo Find a better way rather than using the token.
     if ($unsubscribe_url = \Drupal::token()->replace('[simplenews-subscriber:unsubscribe-url]', $email->getParams(), ['clear' => TRUE])) {
       $email->addTextHeader('List-Unsubscribe', "<$unsubscribe_url>");
     }

@@ -86,7 +86,7 @@ class ThemeEmailAdjuster extends EmailAdjusterBase implements ContainerFactoryPl
   /**
    * {@inheritdoc}
    */
-  public function preBuild(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     $theme_name = $this->getEmailTheme();
     $email->setTheme($theme_name);
   }

@@ -10,32 +10,35 @@ use Drupal\symfony_mailer\EmailInterface;
  */
 class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
 
-  const DEFAULT_WEIGHT = 500;
+  /**
+   * Mapping from phase to default function name.
+   *
+   * @var string[]
+   */
+  protected const FUNCTION_NAMES = [
+    EmailInterface::PHASE_INIT => 'init',
+    EmailInterface::PHASE_BUILD => 'build',
+    EmailInterface::PHASE_PRE_RENDER => 'preRender',
+    EmailInterface::PHASE_POST_RENDER => 'postRender',
+  ];
 
   /**
    * {@inheritdoc}
    */
-  public function preBuild(EmailInterface $email) {
+  public function initialize(EmailInterface $email) {
+    foreach (self::FUNCTION_NAMES as $phase => $function) {
+      if (method_exists($this, $function)) {
+        $email->addProcessor($this->getPluginId(), $phase, [$this, $function], $this->getWeight($phase));
+      }
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function postRender(EmailInterface $email) {
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getWeight(string $function) {
-    $weight = $this->getPluginDefinition()['weight'] ?? static::DEFAULT_WEIGHT;
-    return is_array($weight) ? $weight[$function] : $weight;
+  public function getWeight(int $phase) {
+    $weight = $this->getPluginDefinition()['weight'] ?? EmailInterface::DEFAULT_WEIGHT;
+    return is_array($weight) ? $weight[$phase] : $weight;
   }
 
 }

@@ -21,7 +21,7 @@ class BodyEmailAdjuster extends EmailAdjusterBase implements TrustedCallbackInte
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     $content = $this->configuration['content'];
 
     $body = [

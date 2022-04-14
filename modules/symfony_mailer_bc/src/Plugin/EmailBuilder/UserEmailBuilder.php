@@ -41,7 +41,7 @@ class UserEmailBuilder extends EmailProcessorBase implements MailerPolicyImportI
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     if ($email->getSubType() != 'register_pending_approval_admin') {
       $email->setTo($email->getParam('user')->getEmail());
     }

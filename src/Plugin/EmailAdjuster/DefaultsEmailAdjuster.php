@@ -24,7 +24,7 @@ class DefaultsEmailAdjuster extends EmailAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     $sender = $this->helper()->getSiteAddress();
     $theme = $email->getTheme();
     $email->setSender($sender)

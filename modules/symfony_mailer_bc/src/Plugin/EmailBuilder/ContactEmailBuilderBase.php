@@ -14,7 +14,7 @@ class ContactEmailBuilderBase extends EmailProcessorBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     /** @var \Drupal\user\UserInterface $sender */
     $sender = $email->getParam('sender');
     $contact_message = $email->getParam('contact_message');

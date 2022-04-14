@@ -3,7 +3,7 @@
 namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\symfony_mailer\Processor\EmailProcessorInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the interface for an Email.
@@ -11,21 +11,70 @@ use Drupal\symfony_mailer\Processor\EmailProcessorInterface;
 interface EmailInterface extends BaseEmailInterface {
 
   /**
+   * The default weight for an email processor.
+   *
+   * Set processors and parameters.
+   */
+  const DEFAULT_WEIGHT = 500;
+
+  /**
+   * Initialisation phase: set the processing that will occur.
+   *
+   * Set processors and parameters.
+   */
+  const PHASE_INIT = 0;
+
+  /**
+   * Build phase: construct the email.
+   *
+   * Must not trigger any rendering because cannot yet rely on the correct
+   * language, theme, and account. For example, must not cast a translatable
+   * string into a plain string, or replace tokens.
+   */
+  const PHASE_BUILD = 1;
+
+  /**
+   * Pre-render phase: preparation for rendering.
+   *
+   * Not normally needed. Only if there is a rendering step that needs to be
+   * done before the main rendering call.
+   */
+  const PHASE_PRE_RENDER = 2;
+
+  /**
+   * Post-render phase: adjusting of rendered output.
+   *
+   * Act on the rendered HTML, or any header.
+   */
+  const PHASE_POST_RENDER = 3;
+
+  /**
+   * Post-send phase: no further alterations allowed.
+   */
+  const PHASE_POST_SEND = 4;
+
+  /**
    * Add an email processor.
    *
-   * Valid: before building.
+   * Valid: initialisation.
    *
-   * @param \Drupal\symfony_mailer\Processor\EmailProcessorInterface $processor
-   *   The email processor.
+   * @param string $id
+   *   A ID that can be used to alter or debug. Use a class or module name.
+   * @param int $phase
+   *   The phase to run in, one of the EmailInterface::PHASE_ constants.
+   * @param callable
+   *   The function to call.
+   * @param int
+   *   The weight, lower values run earlier.
    *
    * @return $this
    */
-  public function addProcessor(EmailProcessorInterface $processor);
+  public function addProcessor(string $id, int $phase, callable $function, int $weight = self::DEFAULT_WEIGHT);
 
   /**
    * Sets the langcode.
    *
-   * Valid: before building.
+   * Valid: build.
    *
    * @param string $langcode
    *   Language code to use to compose the email.
@@ -45,7 +94,7 @@ interface EmailInterface extends BaseEmailInterface {
   /**
    * Sets parameters used for building the email.
    *
-   * Valid: before building.
+   * Valid: initialisation.
    *
    * @param array $params
    *   (optional) An array of keyed objects or configuration.
@@ -60,7 +109,7 @@ interface EmailInterface extends BaseEmailInterface {
    * If the value is an entity, then the key should be the entity type ID.
    * Otherwise the value is typically a setting that alters the email build.
    *
-   * Valid: before building.
+   * Valid: initialisation.
    *
    * @param string $key
    *   Parameter key to set.
@@ -93,13 +142,32 @@ interface EmailInterface extends BaseEmailInterface {
   /**
    * Sends the email.
    *
-   * Valid: before building.
+   * Valid: initialisation.
    *
    * @return bool
    *   Whether successful.
    */
   public function send();
 
+  /**
+   * Sets the account to switch to for rendering.
+   *
+   * Valid: build.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The account.
+   *
+   * @return $this
+   */
+  public function setAccount(AccountInterface $account);
+
+  /**
+   * Gets the account to switch to for rendering.
+   *
+   * @return \Drupal\Core\Session\AccountInterface
+   *   The account.
+   */
+  public function getAccount();
   /**
    * Sets the unrendered email body.
    *
@@ -155,7 +223,7 @@ interface EmailInterface extends BaseEmailInterface {
   /**
    * Sets variables available in the email template.
    *
-   * Valid: before rendering.
+   * Valid: build.
    *
    * @param array $variables
    *   An array of keyed variables.
@@ -167,7 +235,7 @@ interface EmailInterface extends BaseEmailInterface {
   /**
    * Sets a variable available in the email template.
    *
-   * Valid: before rendering.
+   * Valid: build.
    *
    * @param string $key
    *   Variable key to set.
@@ -240,7 +308,7 @@ interface EmailInterface extends BaseEmailInterface {
   /**
    * Sets the email theme.
    *
-   * Valid: before building.
+   * Valid: build.
    *
    * @param string $theme_name
    *   The theme name to use for email.
@@ -259,6 +327,8 @@ interface EmailInterface extends BaseEmailInterface {
 
   /**
    * Adds an asset library to use as mail CSS.
+   *
+   * Valid: before rendering.
    *
    * @param string $library
    *   Library name, in the form "THEME/LIBRARY".

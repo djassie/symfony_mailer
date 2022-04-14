@@ -20,7 +20,7 @@ class UpdateEmailBuilder extends EmailProcessorBase {
   /**
    * {@inheritdoc}
    */
-  public function preRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     foreach ($email->getParams() as $msg_type => $msg_reason) {
       $messages[] = _update_message_text($msg_type, $msg_reason);
     }
