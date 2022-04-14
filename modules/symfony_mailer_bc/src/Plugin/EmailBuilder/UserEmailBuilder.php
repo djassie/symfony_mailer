@@ -25,7 +25,7 @@ use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
  *     "status_blocked" = @Translation("Account blocked"),
  *     "status_canceled" = @Translation("Account cancelled"),
  *   },
- *   common_adjusters = {"email_subject", "email_body"},
+ *   common_adjusters = {"email_subject", "email_body", "email_skip_sending"},
  *   import = @Translation("User email settings"),
  *   import_warning = @Translation("This overrides the default HTML messages with imported plain text versions."),
  * )
@@ -43,7 +43,11 @@ class UserEmailBuilder extends EmailProcessorBase implements MailerPolicyImportI
    */
   public function build(EmailInterface $email) {
     if ($email->getSubType() != 'register_pending_approval_admin') {
-      $email->setTo($email->getParam('user')->getEmail());
+      $email->setAccount($email->getParam('user'));
+    }
+    else {
+      // Set the account from the recipient to set langcode.
+      $email->setAccount();
     }
     $this->tokenOptions(['callback' => 'user_mail_tokens', 'clear' => TRUE]);
   }

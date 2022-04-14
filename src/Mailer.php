@@ -184,7 +184,7 @@ class Mailer implements MailerInterface {
       $this->changeTheme($theme_name);
     }
 
-    $account = $email->getAccount();
+    $account = $email->getAccount(TRUE);
     $must_switch_account = $account && $account->id() != $this->account->id();
 
     if ($must_switch_account) {

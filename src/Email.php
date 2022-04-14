@@ -12,6 +12,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
 /**
@@ -97,11 +98,18 @@ class Email implements InternalEmailInterface {
   protected $variables = [];
 
   /**
-   * The account to switch to for rendering.
+   * The account for the recipient (can be anonymous).
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
   protected $account;
+
+  /**
+   * Whether to switch account for rendering.
+   *
+   * @var bool
+   */
+  protected $switchAccount = FALSE;
 
   /**
    * @var string
@@ -249,17 +257,38 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function setAccount(AccountInterface $account) {
+  public function setAccount(AccountInterface $account = NULL, bool $switch = FALSE) {
     $this->valid(self::PHASE_BUILD);
+    $to = $this->getTo();
+
+    if (empty($account)) {
+      if (count($to) == 1) {
+        $account = user_load_by_mail($to[0]);
+      }
+      if (empty($account)) {
+        $account = User::getAnonymousUser();
+      }
+    }
+
     $this->account = $account;
+    $this->switchAccount = $switch;
+
+    if (!isset($this->langcode)) {
+      $this->setLangcode($account->getPreferredLangcode());
+    }
+
+    if (empty($to) && ($email = $account->getEmail())) {
+      $this->setTo(new Address($email, $account->getDisplayName()));
+    }
+
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getAccount() {
-    return $this->account;
+  public function getAccount(bool $switch = FALSE) {
+    return ($switch && !$this->switchAccount) ? NULL : $this->account;
   }
 
   /**
@@ -289,11 +318,6 @@ class Email implements InternalEmailInterface {
     $build = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId())
       ->view($entity, $view_mode);
     $this->appendBody($build);
-
-    if (!$this->getAccount()) {
-      $this->setAccount($this->getUser());
-    }
-
     return $this;
   }
 
@@ -517,24 +541,6 @@ class Email implements InternalEmailInterface {
       throw new \LogicException("$caller function is only valid in phase $phase");
     }
     return $this;
-  }
-
-  /**
-   * Gets a user account for the recipient of this email.
-   *
-   * If there is a single to address, searcch for a matching user account.
-   *
-   * @return
-   */
-  protected function getUser() {
-    $to = $this->getTo();
-    if (count($to) == 1) {
-      $user = user_load_by_mail($to[0]);
-    }
-    if (empty($user)) {
-      $user = User::getAnonymousUser();
-    }
-    return $user;
   }
 
 }

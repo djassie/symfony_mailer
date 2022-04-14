@@ -123,9 +123,12 @@ function symfony_mailer_bc_mailer_bc_contact_alter(array &$message, ?ConfigEntit
     // Set the associated config entity.
     $entity = $message['params']['contact_form'];
 
-    if ($message['key'] == 'page_copy') {
+    if ($message['key'] == 'page_mail') {
       // Remove the 'to' address as it will be set by Mailer Policy.
       $message['to'] = '';
+
+      // Remove the langcode as we calculate it.
+      $message['langcode'] = '';
     }
   }
 
@@ -188,11 +191,12 @@ function symfony_mailer_bc_mailer_bc_user_alter(array &$message, ?ConfigEntityIn
   // @see \Drupal\symfony_mailer\EmailInterface::setParam()
   $message['params'] = ['user' => $message['params']['account']];
 
-  // Remove the 'to' address as we calculate it.
+  // Remove the 'to' address and langcode as we calculate them.
   $message['to'] = '';
+  $message['langcode'] = '';
 
   // Remove the 'reply-to' address as it will be set by Mailer Policy.
-  $message['reply'] = '';
+  $message['reply-to'] = '';
 }
 
 /**
@@ -200,4 +204,12 @@ function symfony_mailer_bc_mailer_bc_user_alter(array &$message, ?ConfigEntityIn
  */
 function symfony_mailer_bc_mailer_bc_user_registrationpassword_alter(array &$message, ?ConfigEntityInterface &$entity) {
   symfony_mailer_bc_mailer_bc_user_alter($message, $entity);
+}
+
+/**
+ * Implements hook_mailer_bc_MODULE_alter() for update.
+ */
+function symfony_mailer_bc_mailer_bc_update_alter(array &$message, ?ConfigEntityInterface &$entity) {
+  // Remove the langcode as we calculate it.
+  $message['langcode'] = '';
 }

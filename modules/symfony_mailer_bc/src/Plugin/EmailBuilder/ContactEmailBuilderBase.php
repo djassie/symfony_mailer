@@ -19,6 +19,8 @@ class ContactEmailBuilderBase extends EmailProcessorBase {
     $sender = $email->getParam('sender');
     $contact_message = $email->getParam('contact_message');
 
+    // The contact entity cannot contain private information so we don't need
+    // to switch account for rendering it.
     $email->appendBodyEntity($contact_message, 'mail')
       ->addLibrary('symfony_mailer_bc/contact')
       ->setVariable('subject', $contact_message->getSubject())

@@ -150,24 +150,33 @@ interface EmailInterface extends BaseEmailInterface {
   public function send();
 
   /**
-   * Sets the account to switch to for rendering.
+   * Sets the account associated with the recipient of this email.
+   *
+   * Also sets the to address and langcode if they are not already set.
    *
    * Valid: build.
    *
    * @param \Drupal\Core\Session\AccountInterface $account
-   *   The account.
+   *   (Optional) The account, which can be anonymous. If not set, then the
+   *   account will be calculated from the to address.
+   * @param bool $switch
+   *   (Optional) Switch to this account for rendering.
    *
    * @return $this
    */
-  public function setAccount(AccountInterface $account);
+  public function setAccount(AccountInterface $account, bool $switch = FALSE);
 
   /**
-   * Gets the account to switch to for rendering.
+   * Gets the account associated with the recipient of this email.
+   *
+   * @param bool $switch
+   *   (Optional) Only return an account that needs switching to for rendering.
    *
    * @return \Drupal\Core\Session\AccountInterface
    *   The account.
    */
-  public function getAccount();
+  public function getAccount(bool $switch = FALSE);
+
   /**
    * Sets the unrendered email body.
    *
@@ -198,6 +207,9 @@ interface EmailInterface extends BaseEmailInterface {
 
   /**
    * Appends a rendered entity to the email body.
+   *
+   * WARNING: rendering as a trusted user can expose private information . Call
+   * ::setAccount() unless you are sure this cannot occur.
    *
    * Valid: before rendering.
    *
