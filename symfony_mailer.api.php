@@ -8,7 +8,7 @@
 use Drupal\symfony_mailer\EmailInterface;
 
 /**
- * Acts on an email message initialization.
+ * Acts on email initialization.
  *
  * @param \Drupal\symfony_mailer\EmailInterface $email
  *   The email.
@@ -16,7 +16,23 @@ use Drupal\symfony_mailer\EmailInterface;
 function hook_mailer_init(EmailInterface $email) {
 }
 
-// @todo Versions with __TYPE, __SUBTYPE
+/**
+ * Acts on email initialization for a specific email type.
+ *
+ * @param \Drupal\symfony_mailer\EmailInterface $email
+ *   The email.
+ */
+function hook_mailer_TYPE_init(EmailInterface $email) {
+}
+
+/**
+ * Acts on email message initialization for a specific email type and sub-type.
+ *
+ * @param \Drupal\symfony_mailer\EmailInterface $email
+ *   The email.
+ */
+function hook_mailer_TYPE_SUBTYPE_init(EmailInterface $email) {
+}
 
 /**
  * Alters email builder plug-in definitions.
