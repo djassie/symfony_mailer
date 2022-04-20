@@ -4,14 +4,15 @@ namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\symfony_mailer\Processor\EmailProcessorBase;
+use Drupal\symfony_mailer\EmailFactoryInterface;
+use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Drupal\symfony_mailer\EmailInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines the Legacy Email Builder plug-in that calls hook_mail().
  */
-class LegacyEmailBuilder extends EmailProcessorBase implements ContainerFactoryPluginInterface {
+class LegacyEmailBuilder extends EmailBuilderBase implements ContainerFactoryPluginInterface {
 
   /**
    * Mail manager service.
@@ -50,20 +51,25 @@ class LegacyEmailBuilder extends EmailProcessorBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public function build(EmailInterface $email) {
-    $message = $this->mailManager->emailToArray($email);
-    $original = $message;
+  public function fromArray(EmailFactoryInterface $factory, array $message) {
+    $message += [
+      'subject' => '',
+      'body' => [],
+      'headers' => [],
+    ];
 
     // Call hook_mail() on this module.
-    if (function_exists($function = $email->getType() . '_mail')) {
-      $function($email->getSubType(), $message, $email->getParams());
+    if (function_exists($function = $message['module'] . '_mail')) {
+      $function($message['key'], $message, $message['params']);
     }
 
     if (isset($message['send']) && !$message['send']) {
       throw new SkipMailException('Send aborted by hook_mail()');
     }
 
-    $this->mailManager->emailFromArray($email, $message, $original);
+    $email = $factory->newModuleEmail($message['module'], $message['key']);
+    $this->mailManager->emailFromArray($email, $message);
+    return $email;
   }
 
 }

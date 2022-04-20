@@ -2,12 +2,13 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
+use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
 use Drupal\symfony_mailer\MailerHelperTrait;
-use Drupal\symfony_mailer\Processor\EmailProcessorBase;
-use Drupal\symfony_mailer\Processor\MailerPolicyImportInterface;
+use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the Email Builder plug-in for user module.
@@ -33,10 +34,30 @@ use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
  * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can
  * set langcode, to, reply-to so the calling code doesn't need to.
  */
-class UserEmailBuilder extends EmailProcessorBase implements MailerPolicyImportInterface {
+class UserEmailBuilder extends EmailBuilderBase {
 
   use MailerHelperTrait;
   use TokenProcessorTrait;
+
+  /**
+   * Saves the parameters for a newly created email.
+   *
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email to modify.
+   * @param \Drupal\user\UserInterface $user
+   *   The user.
+   */
+  public function createParams(EmailInterface $email, UserInterface $user = NULL) {
+    assert($user != NULL);
+    $email->setParam('user', $user);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fromArray(EmailFactoryInterface $factory, array $message) {
+    return $factory->newModuleEmail($message['module'], $message['key'], $message['params']['account']);
+  }
 
   /**
    * {@inheritdoc}

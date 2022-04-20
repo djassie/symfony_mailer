@@ -42,10 +42,3 @@ function template_preprocess_email(&$variables) {
   $variables['body'] = $email->getBody();
   $variables = array_merge($variables, $email->getVariables());
 }
-
-/**
- * Implements hook_mailer_init().
- */
-function symfony_mailer_mailer_init(EmailInterface $email) {
-  \Drupal::service('plugin.manager.email_adjuster')->applyPolicy($email);
-}

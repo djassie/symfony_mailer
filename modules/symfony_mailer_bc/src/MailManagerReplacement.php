@@ -13,6 +13,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\MailerHelperInterface;
+use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
 
 /**
  * Provides a Symfony Mailer replacement for MailManager.
@@ -47,6 +48,13 @@ class MailManagerReplacement extends MailManager {
   protected $mailerHelper;
 
   /**
+   * The email builder manager.
+   *
+   * @var \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface
+   */
+  protected $emailBuilderManager;
+
+  /**
    * Constructs the MailManagerReplacement object.
    *
    * @param \Traversable $namespaces
@@ -68,11 +76,14 @@ class MailManagerReplacement extends MailManager {
    *   The email factory.
    * @param \Drupal\symfony_mailer\MailerHelperInterface $mailer_helper
    *   The mailer helper.
+   * @param \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface $email_builder_manager
+   *   The email builder manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, EmailFactoryInterface $email_factory, MailerHelperInterface $mailer_helper) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, EmailFactoryInterface $email_factory, MailerHelperInterface $mailer_helper, EmailBuilderManagerInterface $email_builder_manager) {
     parent::__construct($namespaces, $cache_backend, $module_handler, $config_factory, $logger_factory, $string_translation, $renderer);
     $this->emailFactory = $email_factory;
     $this->mailerHelper = $mailer_helper;
+    $this->emailBuilderManager = $email_builder_manager;
   }
 
   /**
@@ -87,22 +98,12 @@ class MailManagerReplacement extends MailManager {
       'params' => $params,
       'reply-to' => $reply,
       'send' => $send,
-      'subject' => '',
-      'body' => [],
     ];
-    $entity = NULL;
 
-    // Call alter hooks.
-    $this->moduleHandler->alter(['mailer_bc', "mailer_bc_$module"], $message, $entity);
+    // Create an email from the array. Always call the plug-in from the module
+    // name, not any variants.
+    $email = $this->emailBuilderManager->createInstance($module)->fromArray($this->emailFactory, $message);
 
-    if ($entity) {
-      $email = $this->emailFactory->newEntityEmail($entity, $message['key']);
-    }
-    else {
-      $email = $this->emailFactory->newModuleEmail($message['module'], $message['key']);
-    }
-
-    $this->emailFromArray($email, $message);
     if ($message['send']) {
       $result = $email->send();
     }

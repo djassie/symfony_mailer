@@ -3,6 +3,8 @@
 namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\symfony_mailer\Processor\EmailAdjusterManager;
 use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
 
 /**
@@ -18,67 +20,95 @@ class EmailFactory implements EmailFactoryInterface {
   protected $emailBuilderManager;
 
   /**
+   * The email adjuster manager.
+   *
+   * @var \Drupal\symfony_mailer\Processor\EmailAdjusterManager
+   */
+  protected $emailAdjusterManager;
+
+  /**
+   * The module handler to invoke the alter hook.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Constructs the EmailFactory object.
    *
    * @param \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface $email_builder_manager
    *   The email builder manager.
+   * @param \Drupal\symfony_mailer\Processor\EmailAdjusterManager $email_adjuster_manager
+   *   The email adjuster manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler to invoke the alter hook with.
    */
-  public function __construct(EmailBuilderManagerInterface $email_builder_manager) {
+  public function __construct(EmailBuilderManagerInterface $email_builder_manager, EmailAdjusterManager $email_adjuster_manager, ModuleHandlerInterface $module_handler) {
     $this->emailBuilderManager = $email_builder_manager;
+    $this->emailAdjusterManager = $email_adjuster_manager;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
-   * Creates an email object unrelated to a config entity.
-   *
-   * @param string $module
-   *   The module name.
-   * @param string $sub_type
-   *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
-   *
-   * @return \Drupal\symfony_mailer\EmailInterface
-   *   A new email object.
+   * {@inheritdoc}
    */
-  public function newModuleEmail(string $module, string $sub_type) {
-    return $this->newEmail($module, $sub_type);
+  public function sendModuleEmail(string $module, string $sub_type, ...$params) {
+    return $this->newModuleEmail($module, $sub_type, ...$params)->send();
   }
 
   /**
-   * Creates an email object from a config entity.
-   *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
-   *   Entity. @see \Drupal\symfony_mailer\EmailInterface::getEntity()
-   * @param string $sub_type
-   *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
-   *
-   * @return \Drupal\symfony_mailer\EmailInterface
-   *   A new email object.
+   * {@inheritdoc}
    */
-  public function newEntityEmail(ConfigEntityInterface $entity, string $sub_type) {
-    return $this->newEmail($entity->getEntityTypeId(), $sub_type, $entity);
+  public function sendEntityEmail(ConfigEntityInterface $entity, string $sub_type, ...$params) {
+    return $this->newEntityEmail($entity, $sub_type, ...$params)->send();
   }
 
   /**
-   * Creates an email.
+   * {@inheritdoc}
+   */
+  public function newModuleEmail(string $module, string $sub_type, ...$params) {
+    $email = Email::create(\Drupal::getContainer(), $module, $sub_type);
+    return $this->initEmail($email, ...$params);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function newEntityEmail(ConfigEntityInterface $entity, string $sub_type, ...$params) {
+    $email = Email::create(\Drupal::getContainer(), $entity->getEntityTypeId(), $sub_type, $entity);
+    return $this->initEmail($email, ...$params);
+  }
+
+  /**
+   * Initializes an email.
    *
-   * @param string $type
-   *   Type. @see \Drupal\symfony_mailer\EmailInterface::getType()
-   * @param string $sub_type
-   *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
-   *   (optional) Entity. @see \Drupal\symfony_mailer\EmailInterface::getEntity()
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email to initialize.
    *
    * @return \Drupal\symfony_mailer\EmailInterface
-   *   A new email object.
+   *   The email.
    */
-  protected function newEmail(string $type, string $sub_type, ?ConfigEntityInterface $entity = NULL) {
-    $email = Email::create(\Drupal::getContainer(), $type, $sub_type, $entity);
-
+  protected function initEmail(EmailInterface $email, ...$params) {
     // Load builders with matching ID.
     foreach ($email->getSuggestions('', '.') as $plugin_id) {
       if ($this->emailBuilderManager->hasDefinition($plugin_id)) {
-        $this->emailBuilderManager->createInstance($plugin_id)->initialize($email);
+        $builder = $this->emailBuilderManager->createInstance($plugin_id);
+        if (empty($created)) {
+          $builder->createParams($email, ...$params);
+          $created = TRUE;
+        }
+        $builder->init($email);
       }
     }
+
+    // Apply policy.
+    $this->emailAdjusterManager->applyPolicy($email);
+
+    // Call hooks/processors.
+    foreach ($email->getSuggestions('mailer_init', '_') as $hook_variant) {
+      $this->moduleHandler->invokeAll($hook_variant, [$email]);
+    }
+    $email->process(EmailInterface::PHASE_BUILD);
 
     return $email;
   }

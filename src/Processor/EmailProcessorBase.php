@@ -16,7 +16,6 @@ class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
    * @var string[]
    */
   protected const FUNCTION_NAMES = [
-    EmailInterface::PHASE_INIT => 'init',
     EmailInterface::PHASE_BUILD => 'build',
     EmailInterface::PHASE_PRE_RENDER => 'preRender',
     EmailInterface::PHASE_POST_RENDER => 'postRender',
@@ -25,7 +24,7 @@ class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
   /**
    * {@inheritdoc}
    */
-  public function initialize(EmailInterface $email) {
+  public function init(EmailInterface $email) {
     foreach (self::FUNCTION_NAMES as $phase => $function) {
       if (method_exists($this, $function)) {
         $email->addProcessor($this->getPluginId(), $phase, [$this, $function], $this->getWeight($phase));

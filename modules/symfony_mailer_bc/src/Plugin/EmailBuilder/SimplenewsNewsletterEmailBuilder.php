@@ -2,12 +2,13 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\simplenews\SubscriberInterface;
 use Drupal\simplenews\Entity\Newsletter;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
 use Drupal\symfony_mailer\MailerHelperTrait;
-use Drupal\symfony_mailer\Processor\EmailProcessorBase;
-use Drupal\symfony_mailer\Processor\MailerPolicyImportInterface;
+use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
 use Symfony\Component\Mime\Address;
 
@@ -27,19 +28,31 @@ use Symfony\Component\Mime\Address;
  * @todo Notes for adopting Symfony Mailer into simplenews. Can remove the
  * MailBuilder class, and many methods of MailEntity.
  */
-class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase implements MailerPolicyImportInterface {
+class SimplenewsNewsletterEmailBuilder extends EmailBuilderBase {
 
   use MailerHelperTrait;
   use TokenProcessorTrait;
 
   /**
-   * {@inheritdoc}
+   * Saves the parameters for a newly created email.
+   *
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email to modify.
+   * @param \Drupal\Core\Entity\ContentEntityInterface $issue
+   *   The newsletter issue to send.
+   * @param \Drupal\simplenews\SubscriberInterface $subscriber
+   *   The subscriber.
+   * @param bool $test
+   *   (Optional) TRUE to send a test email.
    */
-  public function init(EmailInterface $email) {
-    $issue = $email->getParam('issue');
-    $email->setParam('newsletter', $issue->simplenews_issue->entity)
-      ->setParam($issue->getEntityTypeId(), $issue);
-    }
+  public function createParams(EmailInterface $email, ContentEntityInterface $issue = NULL, SubscriberInterface $subscriber = NULL, ?bool $test = FALSE) {
+    assert($subscriber != NULL);
+    $email->setParam('issue', $issue)
+      ->setParam('simplenews_subscriber', $subscriber)
+      ->setParam('newsletter', $issue->simplenews_issue->entity)
+      ->setParam($issue->getEntityTypeId(), $issue)
+      ->setVariable('test', $test);
+  }
 
   /**
    * {@inheritdoc}
@@ -51,8 +64,7 @@ class SimplenewsNewsletterEmailBuilder extends EmailProcessorBase implements Mai
       ->setAccount($subscriber->getUser(), TRUE)
       ->appendBodyEntity($email->getParam('issue'), 'email_html')
       ->addTextHeader('Precedence', 'bulk')
-      ->setVariable('opt_out_hidden', !$email->getEntity()->isAccessible())
-      ->setVariable('test', $email->getParam('test'));
+      ->setVariable('opt_out_hidden', !$email->getEntity()->isAccessible());
 
     // @todo Find a better way rather than using the token.
     if ($unsubscribe_url = \Drupal::token()->replace('[simplenews-subscriber:unsubscribe-url]', $email->getParams(), ['clear' => TRUE])) {

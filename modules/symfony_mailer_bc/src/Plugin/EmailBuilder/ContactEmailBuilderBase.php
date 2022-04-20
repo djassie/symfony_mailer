@@ -2,14 +2,14 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
-use Drupal\symfony_mailer\Processor\EmailProcessorBase;
+use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Defines a base class for contact module email builders.
  * )
  */
-class ContactEmailBuilderBase extends EmailProcessorBase {
+class ContactEmailBuilderBase extends EmailBuilderBase {
 
   /**
    * {@inheritdoc}
@@ -27,6 +27,13 @@ class ContactEmailBuilderBase extends EmailProcessorBase {
       ->setVariable('site_name', \Drupal::config('system.site')->get('name'))
       ->setVariable('sender_name', $sender->getDisplayName())
       ->setVariable('sender_url', $sender->isAuthenticated() ? $sender->toUrl('canonical')->toString() : $sender->getEmail());
+
+    if ($email->getSubType() == 'mail') {
+      $email->setReplyTo($sender->getEmail());
+    }
+    else {
+      $email->setAccount($sender);
+    }
   }
 
 }

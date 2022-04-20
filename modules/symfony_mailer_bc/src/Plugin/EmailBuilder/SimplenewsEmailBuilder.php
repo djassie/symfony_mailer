@@ -2,11 +2,12 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
+use Drupal\simplenews\SubscriberInterface;
+use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
 use Drupal\symfony_mailer\MailerHelperTrait;
-use Drupal\symfony_mailer\Processor\EmailProcessorBase;
-use Drupal\symfony_mailer\Processor\MailerPolicyImportInterface;
+use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
 
 /**
@@ -23,10 +24,36 @@ use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
  *   import_warning = @Translation("This overrides the default HTML messages with imported plain text versions."),
  * )
  */
-class SimplenewsEmailBuilder extends EmailProcessorBase implements MailerPolicyImportInterface {
+class SimplenewsEmailBuilder extends EmailBuilderBase {
 
   use MailerHelperTrait;
   use TokenProcessorTrait;
+
+  /**
+   * Saves the parameters for a newly created email.
+   *
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email to modify.
+   * @param \Drupal\simplenews\SubscriberInterface $subscriber
+   *   The subscriber.
+   */
+  public function createParams(EmailInterface $email, SubscriberInterface $subscriber = NULL) {
+    assert($subscriber != NULL);
+    $email->setParam('simplenews_subscriber', $subscriber);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fromArray(EmailFactoryInterface $factory, array $message) {
+    if ($message['key'] == 'node' || $message['key'] == 'test') {
+      $mail = $message['params']['simplenews_mail'];
+      return $factory->newEntityEmail($mail->getNewsletter(), 'node', $mail->getIssue(), $mail->getSubscriber(), ($mail->getKey() == 'test'));
+    }
+
+    $key = ($message['key'] == 'subscribe_combined') ? 'subscribe' : 'validate';
+    return $factory->newModuleEmail('simplenews', $key, $params['context']['simplenews_subscriber']);
+  }
 
   /**
    * {@inheritdoc}

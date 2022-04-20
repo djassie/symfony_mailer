@@ -133,13 +133,13 @@ trait BaseEmailTrait {
   }
 
   public function setHtmlBody(?string $body) {
-    $this->valid(self::PHASE_POST_RENDER, TRUE);
+    $this->valid(self::PHASE_POST_RENDER, self::PHASE_POST_RENDER);
     $this->inner->html($body);
     return $this;
   }
 
   public function getHtmlBody(): ?string {
-    $this->valid(self::PHASE_POST_RENDER);
+    $this->valid(self::PHASE_POST_SEND, self::PHASE_POST_RENDER);
     return $this->inner->getHtmlBody();
   }
 

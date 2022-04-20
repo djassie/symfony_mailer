@@ -190,7 +190,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function addProcessor(string $id, int $phase, callable $function, int $weight = self::DEFAULT_WEIGHT) {
-    $this->valid(self::PHASE_INIT);
+    $this->valid(self::PHASE_INIT, self::PHASE_INIT);
     $this->processors[$phase][$id] = [
       'function' => $function,
       'weight' => $weight,
@@ -218,7 +218,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function setParams(array $params = []) {
-    $this->valid(self::PHASE_INIT);
+    $this->valid(self::PHASE_INIT, self::PHASE_INIT);
     $this->params = $params;
     return $this;
   }
@@ -227,7 +227,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function setParam(string $key, $value) {
-    $this->valid(self::PHASE_INIT);
+    $this->valid(self::PHASE_INIT, self::PHASE_INIT);
     $this->params[$key] = $value;
     return $this;
   }
@@ -250,7 +250,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function send() {
-    $this->valid(self::PHASE_INIT);
+    $this->valid(self::PHASE_BUILD);
     return $this->mailer->send($this);
   }
 
@@ -333,7 +333,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function setVariables(array $variables) {
-    $this->valid(self::PHASE_BUILD);
+    $this->valid(self::PHASE_BUILD, self::PHASE_INIT);
     $this->variables = $variables;
     return $this;
   }
@@ -342,7 +342,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function setVariable(string $key, $value) {
-    $this->valid(self::PHASE_BUILD);
+    $this->valid(self::PHASE_BUILD, self::PHASE_INIT);
     $this->variables[$key] = $value;
     return $this;
   }
@@ -449,12 +449,11 @@ class Email implements InternalEmailInterface {
    */
   public function process(int $phase) {
     $phase_valid = [
-      self::PHASE_INIT => self::PHASE_INIT,
       self::PHASE_BUILD => self::PHASE_INIT,
       self::PHASE_PRE_RENDER => self::PHASE_BUILD,
       self::PHASE_POST_RENDER => self::PHASE_POST_RENDER,
     ];
-    $this->valid($phase_valid[$phase], TRUE);
+    $this->valid($phase_valid[$phase], $phase_valid[$phase]);
     $this->phase = $phase;
 
     $processors = $this->processors[$phase] ?? [];
@@ -473,7 +472,7 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function render() {
-    $this->valid(self::PHASE_PRE_RENDER, TRUE);
+    $this->valid(self::PHASE_PRE_RENDER, self::PHASE_PRE_RENDER);
 
     // Render subject.
     if ($this->subject instanceof MarkupInterface) {
@@ -501,13 +500,13 @@ class Email implements InternalEmailInterface {
    * {@inheritdoc}
    */
   public function getSymfonyEmail() {
-    $this->valid(self::PHASE_POST_RENDER, TRUE);
+    $this->valid(self::PHASE_POST_RENDER, self::PHASE_POST_RENDER);
 
     if ($this->subject) {
       $this->inner->subject($this->subject);
     }
 
-    $this->phase = 'postSend';
+    $this->phase = self::PHASE_POST_SEND;
     return $this->inner;
   }
 
@@ -522,23 +521,12 @@ class Email implements InternalEmailInterface {
    *
    * @return $this
    */
-  protected function valid(int $phase, bool $exact = FALSE) {
-    if ($exact) {
-      // Exact match specified.
-      $valid = ($this->phase == $phase);
-    }
-    elseif ($phase != self::PHASE_POST_RENDER) {
-      // By default can call functions in the exact phase or earlier.
-      $valid = ($this->phase <= $phase);
-    }
-    else {
-      // Functions valid post-render are by default valid then or after.
-      $valid = ($this->phase >= $phase);
-    }
+  protected function valid(int $max_phase, int $min_phase = self::PHASE_BUILD) {
+    $valid = ($this->phase <= $max_phase) && ($this->phase >= $min_phase);
 
     if (!$valid) {
       $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
-      throw new \LogicException("$caller function is only valid in phase $phase");
+      throw new \LogicException("$caller function is only valid in phases $min_phase-$max_phase, called in $this->phase.");
     }
     return $this;
   }

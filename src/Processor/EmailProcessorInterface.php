@@ -10,12 +10,12 @@ use Drupal\symfony_mailer\EmailInterface;
 interface EmailProcessorInterface {
 
   /**
-   * Runs processing on an email message for a phase.
+   * Initializes an email to call this email processor.
    *
    * @param \Drupal\symfony_mailer\EmailInterface $email
-   *   The email to process.
+   *   The email to initialize.
    */
-  public function initialize(EmailInterface $email);
+  public function init(EmailInterface $email);
 
   /**
    * Gets the weight of the email processor.

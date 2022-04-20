@@ -4,8 +4,7 @@ namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\Entity\MailerTransport;
 use Drupal\symfony_mailer\MailerHelperTrait;
-use Drupal\symfony_mailer\Processor\EmailProcessorBase;
-use Drupal\symfony_mailer\Processor\MailerPolicyImportInterface;
+use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 
 /**
  * Defines the Email Builder plug-in for swiftmailer module.
@@ -17,7 +16,7 @@ use Drupal\symfony_mailer\Processor\MailerPolicyImportInterface;
  *   migrate = @Translation("Swiftmailer transport settings"),
  * )
  */
-class SwiftmailerEmailBuilder extends EmailProcessorBase implements MailerPolicyImportInterface {
+class SwiftmailerEmailBuilder extends EmailBuilderBase {
 
   use MailerHelperTrait;
 

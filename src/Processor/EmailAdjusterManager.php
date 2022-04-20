@@ -43,7 +43,7 @@ class EmailAdjusterManager extends DefaultPluginManager {
     // Add adjusters.
     foreach ($policy_config as $plugin_id => $config) {
       if ($this->hasDefinition($plugin_id)) {
-        $this->createInstance($plugin_id, $config)->initialize($email);
+        $this->createInstance($plugin_id, $config)->init($email);
       }
     }
   }

@@ -3,11 +3,12 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\contact\Entity\ContactForm;
+use Drupal\contact\MessageInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
 use Drupal\symfony_mailer\MailerHelperTrait;
-use Drupal\symfony_mailer\Processor\MailerPolicyImportInterface;
 
 /**
  * Defines the Email Builder plug-in for contact module page forms.
@@ -27,9 +28,25 @@ use Drupal\symfony_mailer\Processor\MailerPolicyImportInterface;
  * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can
  * set langcode, to, reply-to so the calling code doesn't need to.
  */
-class ContactPageEmailBuilder extends ContactEmailBuilderBase implements MailerPolicyImportInterface {
+class ContactPageEmailBuilder extends ContactEmailBuilderBase {
 
   use MailerHelperTrait;
+
+  /**
+   * Saves the parameters for a newly created email.
+   *
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email to modify.
+   * @param \Drupal\contact\MessageInterface $message
+   *   Submitted message entity.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The sender.
+   */
+  public function createParams(EmailInterface $email, MessageInterface $message = NULL, AccountInterface $sender = NULL) {
+    assert($sender != NULL);
+    $email->setParam('contact_message', $message)
+      ->setParam('sender', $sender);
+  }
 
   /**
    * {@inheritdoc}
@@ -44,7 +61,7 @@ class ContactPageEmailBuilder extends ContactEmailBuilderBase implements MailerP
       $email->setAccount();
     }
     if ($email->getSubType() == 'autoreply') {
-      $email->setBody($email->getParam('contact_form')->getReply());
+      $email->setBody($email->getEntity()->getReply());
     }
   }
 

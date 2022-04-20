@@ -2,7 +2,6 @@
 
 namespace Drupal\symfony_mailer;
 
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
@@ -41,13 +40,6 @@ class Mailer implements MailerInterface {
    * @var \Drupal\Core\Render\RendererInterface
    */
   protected $renderer;
-
-  /**
-   * The module handler to invoke the alter hook.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
 
   /**
    * The language default.
@@ -105,8 +97,6 @@ class Mailer implements MailerInterface {
    *   The event dispatcher.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to invoke the alter hook with.
    * @param \Drupal\Core\Language\LanguageDefault $default_language
    *   The default language.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
@@ -122,10 +112,9 @@ class Mailer implements MailerInterface {
    * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
    *   The account switcher service.
    */
-  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, ModuleHandlerInterface $module_handler, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account, ThemeManagerInterface $theme_manager, ThemeInitializationInterface $theme_initialization, AccountSwitcherInterface $account_switcher) {
+  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account, ThemeManagerInterface $theme_manager, ThemeInitializationInterface $theme_initialization, AccountSwitcherInterface $account_switcher) {
     $this->dispatcher = $dispatcher;
     $this->renderer = $renderer;
-    $this->moduleHandler = $module_handler;
     $this->languageDefault = $language_default;
     $this->languageManager = $language_manager;
     $this->loggerFactory = $logger_factory;
@@ -170,11 +159,6 @@ class Mailer implements MailerInterface {
    * @internal
    */
   public function doSend(InternalEmailInterface $email) {
-    // Call hooks/processors.
-    $this->invokeAll('init', $email);
-    $email->process(EmailInterface::PHASE_INIT);
-    $email->process(EmailInterface::PHASE_BUILD);
-
     // Do switching.
     $theme_name = $email->getTheme();
     $active_theme_name = $this->themeManager->getActiveTheme()->getName();
@@ -188,7 +172,7 @@ class Mailer implements MailerInterface {
     $must_switch_account = $account && $account->id() != $this->account->id();
 
     if ($must_switch_account) {
-      $this->accountSwitcher->switchTo($user);
+      $this->accountSwitcher->switchTo($account);
     }
 
     $langcode = $email->getLangcode();
@@ -307,20 +291,6 @@ class Mailer implements MailerInterface {
    */
   protected function changeTheme(string $theme_name) {
     $this->themeManager->setActiveTheme($this->themeInitialization->initTheme($theme_name));
-  }
-
-  /**
-   * Invoke hooks.
-   *
-   * @param string $hook
-   *   The hook to call.
-   * @param \Drupal\symfony_mailer\EmailInterface $email
-   *   The email.
-   */
-  protected function invokeAll(string $hook, EmailInterface $email) {
-    foreach ($email->getSuggestions("mailer_$hook", '_') as $hook_variant) {
-      $this->moduleHandler->invokeAll($hook_variant, [$email]);
-    }
   }
 
 }
