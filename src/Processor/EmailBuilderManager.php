@@ -53,7 +53,7 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
    *   The key value store.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, KeyValueFactoryInterface $key_value_factory) {
-    parent::__construct('Plugin/EmailBuilder', $namespaces, $module_handler, 'Drupal\symfony_mailer\Processor\EmailProcessorInterface', 'Drupal\symfony_mailer\Annotation\EmailBuilder');
+    parent::__construct('Plugin/EmailBuilder', $namespaces, $module_handler, 'Drupal\symfony_mailer\Processor\EmailBuilderInterface', 'Drupal\symfony_mailer\Annotation\EmailBuilder');
     $this->entityTypeManager = $entity_type_manager;
     $this->keyValue = $key_value_factory->get('mailer');
     $this->setCacheBackend($cache_backend, 'symfony_mailer_builder_plugins');
