@@ -364,6 +364,9 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    *   with value as an array of configured settings.
    */
   public static function import($id, array $configuration) {
+    $policy = static::loadOrCreate($id);
+    $configuration += $policy->getConfiguration();
+
     $inherited = static::loadInheritedConfig(static::parentId($id));
     foreach (array_keys($configuration) as $key) {
       if (isset($inherited[$key]) && static::identicalArray($configuration[$key], $inherited[$key])) {
@@ -371,7 +374,6 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
       }
     }
 
-    $policy = static::loadOrCreate($id);
     if ($configuration) {
       $policy->setConfiguration($configuration)->save();
     }

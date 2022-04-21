@@ -77,6 +77,10 @@ function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $f
       'remove' => ['email', 'simplenews_sender_information', 'simplenews_subject'],
       'entity' => ['node'],
     ],
+    'update_settings' => [
+      'remove' => ['update_notify_emails'],
+      'type' => ['update'],
+    ],
     'user_admin_settings' => [
       'remove' => [
         'mail_notification_address',

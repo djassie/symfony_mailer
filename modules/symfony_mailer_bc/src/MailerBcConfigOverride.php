@@ -28,6 +28,14 @@ class MailerBcConfigOverride implements ConfigFactoryOverrideInterface {
         'register_pending_approval' => TRUE,
       ];
     }
+
+    // The notification address is configured using Mailer Policy for
+    // UpdateEmailBuilder. Set a dummy value in update.settings so that the
+    // update module sends an email.
+    if (in_array('update.settings', $names)) {
+      $overrides['update.settings']['notification']['emails'] = ['dummy'];
+    }
+
     return $overrides;
   }
 

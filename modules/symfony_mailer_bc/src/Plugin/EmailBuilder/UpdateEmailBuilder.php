@@ -6,6 +6,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\EmailInterface;
+use Drupal\symfony_mailer\Exception\SkipMailException;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
 use Drupal\symfony_mailer\MailerHelperTrait;
 use Drupal\symfony_mailer\Processor\EmailBuilderBase;
@@ -17,6 +18,8 @@ use Drupal\update\UpdateManagerInterface;
  * @EmailBuilder(
  *   id = "update",
  *   sub_types = { "status_notify" = @Translation("Available updates") },
+ *   common_adjusters = {"email_subject", "email_body", "email_to"},
+ *   import = @Translation("Update notification addresses"),
  * )
  */
 class UpdateEmailBuilder extends EmailBuilderBase {
@@ -34,6 +37,10 @@ class UpdateEmailBuilder extends EmailBuilderBase {
    * {@inheritdoc}
    */
   public function build(EmailInterface $email) {
+    if (empty($email->getTo())) {
+      throw new SkipMailException('No update notification address configured.');
+    }
+
     $update_config = $this->helper()->config()->get('update.settings');
     $notify_all = ($update_config->get('notification.threshold') == 'all');
     \Drupal::moduleHandler()->loadInclude('update', 'install');
@@ -58,6 +65,19 @@ class UpdateEmailBuilder extends EmailBuilderBase {
 
     if (Settings::get('allow_authorize_operations', TRUE)) {
       $email->setVariable('update_manager', Url::fromRoute('update.report_update')->toString());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function import() {
+    $mail_notification = implode(',',$this->helper()->config()->get('update.settings')->get('notification.emails'));
+
+    if ($mail_notification) {
+      $notification_policy = $this->helper()->policyFromAddresses($this->helper()->parseAddress($mail_notification));
+      $config['email_to'] = $notification_policy;
+      MailerPolicy::import("update.status_notify", $config);
     }
   }
 
