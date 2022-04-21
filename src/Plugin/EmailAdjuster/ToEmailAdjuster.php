@@ -19,7 +19,7 @@ class ToEmailAdjuster extends AddressAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function initialize(EmailInterface $email) {
+  public function init(EmailInterface $email) {
     // The to address can be used to default the recipient account. Ensure that
     // it is set early enough to do this.
     $email->addProcessor($this->getPluginId(), EmailInterface::PHASE_BUILD, [$this, 'postRender'], $this->getWeight(EmailInterface::PHASE_BUILD));
