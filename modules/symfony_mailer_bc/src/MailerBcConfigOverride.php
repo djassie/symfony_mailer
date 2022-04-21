@@ -7,7 +7,7 @@ use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\Core\Config\StorageInterface;
 
 /**
- * Example configuration override.
+ * Symfony Mailer Back-compatibility configuration override.
  */
 class MailerBcConfigOverride implements ConfigFactoryOverrideInterface {
 
@@ -16,8 +16,9 @@ class MailerBcConfigOverride implements ConfigFactoryOverrideInterface {
    */
   public function loadOverrides($names) {
     $overrides = [];
-    if (in_array('user.setting', $names)) {
-      $overrides['user.setting']['notify'] = [
+
+    if (in_array('user.settings', $names)) {
+      $overrides['user.settings']['notify'] = [
         'cancel_confirm' => TRUE,
         'password_reset' => TRUE,
         'status_activated' => TRUE,
