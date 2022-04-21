@@ -5,8 +5,9 @@ namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\symfony_mailer\EmailFactoryInterface;
-use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Drupal\symfony_mailer\EmailInterface;
+use Drupal\symfony_mailer\Exception\SkipMailException;
+use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -64,7 +65,7 @@ class LegacyEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlu
     }
 
     if (isset($message['send']) && !$message['send']) {
-      throw new SkipMailException('Send aborted by hook_mail()');
+      throw new SkipMailException('Send aborted by hook_mail().');
     }
 
     $email = $factory->newModuleEmail($message['module'], $message['key']);
