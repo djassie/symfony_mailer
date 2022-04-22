@@ -63,7 +63,7 @@ function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $f
   $config_all = [
     'contact_form_edit_form' => [
       'remove' => ['recipients'],
-      'entity' => ['mail'],
+      'entity' => 'mail',
     ],
 
     'simplenews_admin_settings_newsletter' => [
@@ -71,15 +71,15 @@ function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $f
     ],
     'simplenews_admin_settings_subscription' => [
       'remove' => ['subscription_mail'],
-      'type' => ['simplenews'],
+      'type' => 'simplenews',
     ],
     'simplenews_newsletter_edit_form' => [
       'remove' => ['email', 'simplenews_sender_information', 'simplenews_subject'],
-      'entity' => ['node'],
+      'entity' => 'node',
     ],
     'update_settings' => [
       'remove' => ['update_notify_emails'],
-      'type' => ['update'],
+      'type' => 'update',
     ],
     'user_admin_settings' => [
       'remove' => [
@@ -96,7 +96,7 @@ function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $f
         // For user_registrationpassword.
         'email_user_registrationpassword',
       ],
-      'type' => ['user', ['email_body', 'email_subject']],
+      'type' => 'user',
     ],
   ];
 
@@ -110,12 +110,12 @@ function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $f
 
     // Add policy elements on entity forms.
     if (!empty($config['entity'])) {
-      $form['mailer_policy'] = $helper->renderEntityPolicy($form_state->getFormObject()->getEntity(), ...$config['entity']);
+      $form['mailer_policy'] = $helper->renderEntityPolicy($form_state->getFormObject()->getEntity(), $config['entity']);
     }
 
     // Add policy elements on settings forms.
     if (!empty($config['type'])) {
-      $form['mailer_policy'] = $helper->renderTypePolicy(...$config['type']);
+      $form['mailer_policy'] = $helper->renderTypePolicy($config['type']);
     }
   }
 }
