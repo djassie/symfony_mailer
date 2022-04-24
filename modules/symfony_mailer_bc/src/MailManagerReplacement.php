@@ -97,19 +97,18 @@ class MailManagerReplacement extends MailManager {
       'langcode' => $langcode,
       'params' => $params,
       'reply-to' => $reply,
-      'send' => $send,
     ];
 
     // Create an email from the array. Always call the plug-in from the module
     // name, not any variants.
     $email = $this->emailBuilderManager->createInstance($module)->fromArray($this->emailFactory, $message);
 
-    if ($message['send']) {
+    if ($send) {
       $result = $email->send();
     }
 
     $message = $this->emailToArray($email);
-    return $message + ['result' => $result ?? NULL, 'send' => $message['send']];
+    return $message + ['result' => $result ?? NULL, 'send' => $send];
   }
 
   /**
