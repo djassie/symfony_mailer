@@ -41,8 +41,8 @@ class UpdateEmailBuilder extends EmailBuilderBase {
       throw new SkipMailException('No update notification address configured.');
     }
 
-    $update_config = $this->helper()->config()->get('update.settings');
-    $notify_all = ($update_config->get('notification.threshold') == 'all');
+    $config = $this->helper()->config();
+    $notify_all = ($config->get('update.settings')->get('notification.threshold') == 'all');
     \Drupal::moduleHandler()->loadInclude('update', 'install');
     $requirements = update_requirements('runtime');
 
@@ -55,7 +55,7 @@ class UpdateEmailBuilder extends EmailBuilderBase {
       }
     }
 
-    $site_name = \Drupal::config('system.site')->get('name');
+    $site_name = $config->get('system.site')->get('name');
     // Set the account from the recipient to set langcode.
     $email->setAccount()
       ->setVariable('site_name', $site_name)
