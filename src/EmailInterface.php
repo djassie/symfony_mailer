@@ -178,7 +178,7 @@ interface EmailInterface extends BaseEmailInterface {
   public function getAccount(bool $switch = FALSE);
 
   /**
-   * Sets the unrendered email body.
+   * Sets the unrendered email body array.
    *
    * The email body will be rendered using a template, then used to form both
    * the HTML and plain text body parts. This process can be customised by the
@@ -187,14 +187,14 @@ interface EmailInterface extends BaseEmailInterface {
    * Valid: before rendering.
    *
    * @param $body
-   *   Unrendered email body.
+   *   Unrendered email body array.
    *
    * @return $this
    */
   public function setBody($body);
 
   /**
-   * Appends content to the email body.
+   * Appends content to the email body array.
    *
    * Valid: before rendering.
    *
@@ -206,7 +206,7 @@ interface EmailInterface extends BaseEmailInterface {
   public function appendBody($body);
 
   /**
-   * Appends a rendered entity to the email body.
+   * Appends an entity to the email body array.
    *
    * WARNING: rendering as a trusted user can expose private information . Call
    * ::setAccount() unless you are sure this cannot occur.
@@ -223,7 +223,7 @@ interface EmailInterface extends BaseEmailInterface {
   public function appendBodyEntity(EntityInterface $entity, $view_mode = 'full');
 
   /**
-   * Gets the unrendered email body.
+   * Gets the unrendered email body array.
    *
    * Valid: before rendering.
    *
