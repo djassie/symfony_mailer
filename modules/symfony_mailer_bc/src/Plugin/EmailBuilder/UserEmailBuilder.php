@@ -85,7 +85,7 @@ class UserEmailBuilder extends EmailBuilderBase {
 
     if ($mail_notification = $config_factory->get('system.site')->get('mail_notification')) {
       $notification_policy = $this->helper()->policyFromAddresses($this->helper()->parseAddress($mail_notification));
-      $config['email_reply_to'] = $notification_policy;
+      $config['email_from'] = $notification_policy;
       MailerPolicy::import("user", $config);
     }
 
