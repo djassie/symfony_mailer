@@ -81,6 +81,7 @@ class UserEmailBuilder extends EmailBuilderBase {
     $notify = $config_factory->get('user.settings')->get('notify');
     $mail = $config_factory->get('user.mail')->get();
     unset($mail['langcode']);
+    unset($mail['_core']);
 
     if ($mail_notification = $config_factory->get('system.site')->get('mail_notification')) {
       $notification_policy = $this->helper()->policyFromAddresses($this->helper()->parseAddress($mail_notification));
