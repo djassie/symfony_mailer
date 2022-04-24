@@ -2,6 +2,7 @@
 
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
+use Drupal\Core\Url;
 use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Drupal\symfony_mailer\EmailInterface;
 
@@ -26,7 +27,7 @@ class ContactEmailBuilderBase extends EmailBuilderBase {
       ->setVariable('subject', $contact_message->getSubject())
       ->setVariable('site_name', \Drupal::config('system.site')->get('name'))
       ->setVariable('sender_name', $sender->getDisplayName())
-      ->setVariable('sender_url', $sender->isAuthenticated() ? $sender->toUrl('canonical')->toString() : $sender->getEmail());
+      ->setVariable('sender_url', $sender->isAuthenticated() ? $sender->toUrl('canonical')->toString() : Url::fromUri('mailto:' . $sender->getEmail()));
 
     if ($email->getSubType() == 'mail') {
       $email->setReplyTo($sender->getEmail());
