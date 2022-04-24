@@ -4,9 +4,9 @@ namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\contact\MessageInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\EmailInterface;
+use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 
 /**
  * Defines the Email Builder plug-in for contact module personal forms.
