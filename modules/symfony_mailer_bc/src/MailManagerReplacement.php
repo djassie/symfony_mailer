@@ -91,12 +91,14 @@ class MailManagerReplacement extends MailManager {
    */
   public function mail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
     $message = [
+      'id' => $module . '_' . $key,
       'module' => $module,
       'key' => $key,
       'to' => $to,
       'langcode' => $langcode,
       'params' => $params,
       'reply-to' => $reply,
+      'send' => $send,
     ];
 
     // Create an email from the array. Always call the plug-in from the module
@@ -104,11 +106,24 @@ class MailManagerReplacement extends MailManager {
     $email = $this->emailBuilderManager->createInstance($module)->fromArray($this->emailFactory, $message);
 
     if ($send) {
-      $result = $email->send();
+      $message['result'] = $email->send();
     }
 
-    $message = $this->emailToArray($email);
-    return $message + ['result' => $result ?? NULL, 'send' => $send];
+    // Update the message array.
+    $message['subject'] = $email->getSubject();
+    $message['body'] = ($email->getPhase() >= EmailInterface::PHASE_POST_RENDER) ? $email->getHtmlBody() : $email->getBody();
+
+    $headers = $email->getHeaders();
+    foreach (self::HEADERS as $name => $key) {
+      if ($headers->has($name)) {
+        $message['headers'][$name] = $headers->get($name)->getBodyAsString();
+      }
+      if ($key) {
+        $message[$key] = $message['headers'][$name] ?? NULL;
+      }
+    }
+
+    return $message;
   }
 
   /**
@@ -153,43 +168,6 @@ class MailManagerReplacement extends MailManager {
     else {
       $email->setHtmlBody($message['body']);
     }
-  }
-
-  /**
-   * Gets a message array for an Email.
-   *
-   * @param \Drupal\symfony_mailer\EmailInterface $email
-   *   The email to convert.
-   *
-   * @return array
-   *   Message array.
-   */
-  public function emailToArray(EmailInterface $email) {
-    $module = $email->getType();
-    $key = $email->getSubType();
-    $message = [
-      'id' => $module . '_' . $key,
-      'module' => $module,
-      'key' => $key,
-      'langcode' => $email->getLangcode(),
-      'params' => $email->getParams(),
-      'send' => TRUE,
-      'subject' => $email->getSubject(),
-      'body' => ($email->getPhase() >= EmailInterface::PHASE_POST_RENDER) ? $email->getHtmlBody() : $email->getBody(),
-    ];
-
-    // Address headers.
-    $headers = $email->getHeaders();
-    foreach (self::HEADERS as $name => $key) {
-      if ($headers->has($name)) {
-        $message['headers'][$name] = $headers->get($name)->getBodyAsString();
-      }
-      if ($key) {
-        $message[$key] = $message['headers'][$name] ?? NULL;
-      }
-    }
-
-    return $message;
   }
 
 }

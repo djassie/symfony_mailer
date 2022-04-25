@@ -22,7 +22,7 @@ class SkipSendingEmailAdjuster extends EmailAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function init(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     throw new SkipMailException($this->configuration['message']);
   }
 

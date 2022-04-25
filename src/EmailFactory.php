@@ -104,11 +104,11 @@ class EmailFactory implements EmailFactoryInterface {
     // Apply policy.
     $this->emailAdjusterManager->applyPolicy($email);
 
-    // Call hooks/processors.
+    // Call hooks.
     foreach ($email->getSuggestions('mailer_init', '_') as $hook_variant) {
       $this->moduleHandler->invokeAll($hook_variant, [$email]);
     }
-    $email->process(EmailInterface::PHASE_BUILD);
+    $email->initDone();
 
     return $email;
   }

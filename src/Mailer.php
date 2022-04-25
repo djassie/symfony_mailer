@@ -160,6 +160,9 @@ class Mailer implements MailerInterface {
    * @internal
    */
   public function doSend(InternalEmailInterface $email) {
+    // Process the build phase.
+    $email->process();
+
     // Do switching.
     $theme_name = $email->getTheme();
     $active_theme_name = $this->themeManager->getActiveTheme()->getName();
@@ -197,14 +200,14 @@ class Mailer implements MailerInterface {
       $this->changeActiveLanguage($langcode);
     }
 
-    // Call processors.
-    $email->process(EmailInterface::PHASE_PRE_RENDER);
+    // Process the pre-render phase.
+    $email->process();
 
     // Render.
     $email->render();
 
-    // Call processors.
-    $email->process(EmailInterface::PHASE_POST_RENDER);
+    // Process the post-render phase.
+    $email->process();
 
     try {
       // Send.

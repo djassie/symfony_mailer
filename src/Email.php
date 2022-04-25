@@ -401,16 +401,8 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function process(int $phase) {
-    $phase_valid = [
-      self::PHASE_BUILD => self::PHASE_INIT,
-      self::PHASE_PRE_RENDER => self::PHASE_PRE_RENDER,
-      self::PHASE_POST_RENDER => self::PHASE_POST_RENDER,
-    ];
-    $this->valid($phase_valid[$phase], $phase_valid[$phase]);
-    $this->phase = $phase;
-
-    $processors = $this->processors[$phase] ?? [];
+  public function process() {
+    $processors = $this->processors[$this->phase] ?? [];
     uasort($processors, function ($a, $b) {
       return $a['weight'] <=> $b['weight'];
     });
@@ -420,6 +412,14 @@ class Email implements InternalEmailInterface {
     }
 
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function initDone() {
+    $this->valid(self::PHASE_INIT, self::PHASE_INIT);
+    $this->phase = self::PHASE_BUILD;
   }
 
   /**

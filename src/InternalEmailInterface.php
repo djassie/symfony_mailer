@@ -12,14 +12,20 @@ use Drupal\Core\Session\AccountInterface;
 interface InternalEmailInterface extends EmailInterface {
 
   /**
-   * Runs processing of a phase for all email processors.
-   *
-   * @param int $phase
-   *   The phase, one of the PHASE_ constants.
+   * Runs processing of the current phase for all email processors.
    *
    * @return $this
    */
-  public function process(int $phase);
+  public function process();
+
+  /**
+   * Ends the initialization phase.
+   *
+   * Valid: initialisation.
+   *
+   * @return $this
+   */
+  public function initDone();
 
   /**
    * Customizes the email.
