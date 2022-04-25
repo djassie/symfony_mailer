@@ -13,7 +13,7 @@ use Drupal\symfony_mailer\Processor\EmailBuilderBase;
  *
  * @EmailBuilder(
  *   id = "swiftmailer",
- *   migrate = @Translation("Swiftmailer transport settings"),
+ *   import = @Translation("Swiftmailer transport settings"),
  * )
  */
 class SwiftmailerEmailBuilder extends EmailBuilderBase {
