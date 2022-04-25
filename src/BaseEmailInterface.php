@@ -2,7 +2,7 @@
 
 namespace Drupal\symfony_mailer;
 
-use Symfony\Component\Mime\Address;
+use Drupal\symfony_mailer\AddressInterface;
 use Symfony\Component\Mime\Header\Headers;
 
 /**
@@ -43,7 +43,7 @@ interface BaseEmailInterface {
   /**
    * Sets the sender address.
    *
-   * @param \Symfony\Component\Mime\Address|string $address
+   * @param mixed $address
    *   The address to set.
    *
    * @return $this
@@ -53,147 +53,111 @@ interface BaseEmailInterface {
   /**
    * Gets the sender address.
    *
-   * @return \Symfony\Component\Mime\Address
+   * @return \Drupal\symfony_mailer\AddressInterface
    *  The sender address, or NULL if not set.
    */
-  public function getSender(): ?Address;
+  public function getSender(): ?AddressInterface;
 
   /**
-   * Adds one or more from addresses.
+   * Sets one or more addresses.
    *
-   * @param \Symfony\Component\Mime\Address|string ...$addresses
-   *   The addresses to set.
+   * @param string $name
+   *   The name of the header to set.
+   * @param mixed $addresses
+   *   The addresses to set, see Address::convert().
    *
    * @return $this
    */
-  public function addFrom(...$addresses);
+  public function setAddress(string $name, $addresses);
 
   /**
    * Sets one or more from addresses.
    *
-   * @param \Symfony\Component\Mime\Address|string ...$addresses
-   *   The addresses to set.
+   * @param mixed $addresses
+   *   The addresses to set, see Address::convert().
    *
    * @return $this
    */
-  public function setFrom(...$addresses);
+  public function setFrom($addresses);
 
   /**
    * Gets the from addresses.
    *
-   * @return \Symfony\Component\Mime\Address[]
+   * @return \Drupal\symfony_mailer\AddressInterface[]
    *   The from addresses.
    */
   public function getFrom(): array;
 
   /**
-   * Adds one or more reply-to addresses.
-   *
-   * @param \Symfony\Component\Mime\Address|string ...$addresses
-   *   The addresses to set.
-   *
-   * @return $this
-   */
-  public function addReplyTo(...$addresses);
-
-  /**
    * Sets one or more reply-to addresses.
    *
-   * @param \Symfony\Component\Mime\Address|string ...$addresses
-   *   The addresses to set.
+   * @param mixed $addresses
+   *   The addresses to set, see Address::convert().
    *
    * @return $this
    */
-  public function setReplyTo(...$addresses);
+  public function setReplyTo($addresses);
 
   /**
    * Gets the reply-to addresses.
    *
-   * @return \Symfony\Component\Mime\Address[]
+   * @return \Drupal\symfony_mailer\AddressInterface[]
    *   The reply-to addresses.
    */
   public function getReplyTo(): array;
 
   /**
-   * Adds one or more to addresses.
-   *
-   * @param \Symfony\Component\Mime\Address|string ...$addresses
-   *   The addresses to set.
-   *
-   * @return $this
-   */
-  public function addTo(...$addresses);
-
-  /**
    * Sets one or more to addresses.
    *
-   * @param \Symfony\Component\Mime\Address|string ...$addresses
-   *   The addresses to set.
+   * Valid: build.
+   *
+   * @param mixed $addresses
+   *   The addresses to set, see Address::convert().
    *
    * @return $this
    */
-  public function setTo(...$addresses);
+  public function setTo($addresses);
 
   /**
    * Gets the to addresses.
    *
-   * @return \Symfony\Component\Mime\Address[]
+   * @return \Drupal\symfony_mailer\AddressInterface[]
    *   The to addresses.
    */
   public function getTo(): array;
 
   /**
-   * Adds one or more cc addresses.
-   *
-   * @param \Symfony\Component\Mime\Address|string ...$addresses
-   *   The addresses to set.
-   *
-   * @return $this
-   */
-  public function addCc(...$addresses);
-
-  /**
    * Sets one or more cc addresses.
    *
-   * @param \Symfony\Component\Mime\Address|string ...$addresses
-   *   The addresses to set.
+   * @param mixed $addresses
+   *   The addresses to set, see Address::convert().
    *
    * @return $this
    */
-  public function setCc(...$addresses);
+  public function setCc($addresses);
 
   /**
    * Gets the cc addresses.
    *
-   * @return \Symfony\Component\Mime\Address[]
+   * @return \Drupal\symfony_mailer\AddressInterface[]
    *   The cc addresses.
    */
   public function getCc(): array;
 
   /**
-   * Adds one or more bcc addresses.
-   *
-   * @param \Symfony\Component\Mime\Address|string ...$addresses
-   *   The addresses to set.
-   *
-   * @return $this
-   */
-  public function addBcc(...$addresses);
-
-  /**
    * Sets one or more bcc addresses.
    *
-   * @param \Symfony\Component\Mime\Address|string ...$addresses
-   *   The addresses to set.
+   * @param mixed $addresses
+   *   The addresses to set, see Address::convert().
    *
    * @return $this
    */
-  public function setBcc(...$addresses);
+  public function setBcc($addresses);
 
   /**
    * Gets the bcc addresses.
    *
-   * @return \Symfony\Component\Mime\Address[]
+   * @return \Drupal\symfony_mailer\AddressInterface[]
    *   The bcc addresses.
    */
   public function getBcc(): array;

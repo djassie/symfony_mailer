@@ -2,7 +2,6 @@
 
 namespace Drupal\symfony_mailer;
 
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\Headers;
 
 /**
@@ -24,6 +23,26 @@ trait BaseEmailTrait {
    */
   protected $subject;
 
+  /**
+   * The addresses.
+   *
+   * @var array
+   */
+  protected $addresses = [
+    'From' => [],
+    'Reply-To' => [],
+    'To' => [],
+    'Cc' => [],
+    'Bcc' => [],
+  ];
+
+  /**
+   * The sender.
+   *
+   * @var \Drupal\symfony_mailer\AddressInterface
+   */
+  protected $sender;
+
   public function setSubject($subject) {
     // We must not force conversion of the subject to a string as this could
     // cause translation before switching to the correct language.
@@ -36,82 +55,59 @@ trait BaseEmailTrait {
   }
 
   public function setSender($address) {
-    $this->inner->sender($address);
+    $this->sender = Address::create($address);
     return $this;
   }
 
-  public function getSender(): ?Address {
-    return $this->inner->getSender();
+  public function getSender(): ?AddressInterface {
+    return $this->sender;
   }
 
-  public function addFrom(...$addresses) {
-    $this->inner->addFrom(...$addresses);
+  public function setAddress(string $name, $addresses) {
+    assert(isset($this->addresses[$name]));
+    $this->addresses[$name] = Address::convert($addresses);
     return $this;
   }
 
-  public function setFrom(...$addresses) {
-    $this->inner->from(...$addresses);
-    return $this;
+  public function setFrom($addresses) {
+    return $this->setAddress('From', $addresses);
   }
 
   public function getFrom(): array {
-    return $this->inner->getFrom();
+    return $this->addresses['From'];
   }
 
-  public function addReplyTo(...$addresses) {
-    $this->inner->addReplyTo(...$addresses);
-    return $this;
-  }
-
-  public function setReplyTo(...$addresses) {
-    $this->inner->replyTo(...$addresses);
-    return $this;
+  public function setReplyTo($addresses) {
+    return $this->setAddress('Reply-To', $addresses);
   }
 
   public function getReplyTo(): array {
-    return $this->inner->getReplyTo();
+    return $this->addresses['Reply-To'];
   }
 
-  public function addTo(...$addresses) {
-    $this->inner->addTo(...$addresses);
-    return $this;
-  }
-
-  public function setTo(...$addresses) {
-    $this->inner->to(...$addresses);
-    return $this;
+  public function setTo($addresses) {
+    $this->valid(self::PHASE_BUILD);
+    return $this->setAddress('To', $addresses);
   }
 
   public function getTo(): array {
-    return $this->inner->getTo();
+    return $this->addresses['To'];
   }
 
-  public function addCc(...$addresses) {
-    $this->inner->addCc(...$addresses);
-    return $this;
-  }
-
-  public function setCc(...$addresses) {
-    $this->inner->cc(...$addresses);
-    return $this;
+  public function setCc($addresses) {
+    return $this->setAddress('Cc', $addresses);
   }
 
   public function getCc(): array {
-    return $this->inner->getCc();
+    return $this->addresses['Cc'];
   }
 
-  public function addBcc(...$addresses) {
-    $this->inner->addBcc(...$addresses);
-    return $this;
-  }
-
-  public function setBcc(...$addresses) {
-    $this->inner->bcc(...$addresses);
-    return $this;
+  public function setBcc($addresses) {
+    return $this->setAddress('Bcc', $addresses);
   }
 
   public function getBcc(): array {
-    return $this->inner->getBcc();
+    return $this->addresses['Bcc'];
   }
 
   public function setPriority(int $priority) {

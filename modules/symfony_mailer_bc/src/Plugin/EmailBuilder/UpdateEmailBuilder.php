@@ -56,9 +56,7 @@ class UpdateEmailBuilder extends EmailBuilderBase {
     }
 
     $site_name = $config->get('system.site')->get('name');
-    // Set the account from the recipient to set langcode.
-    $email->setAccount()
-      ->setVariable('site_name', $site_name)
+    $email->setVariable('site_name', $site_name)
       ->setVariable('update_status', Url::fromRoute('update.status')->toString())
       ->setVariable('update_settings', Url::fromRoute('update.settings')->toString())
       ->setVariable('messages', $messages);

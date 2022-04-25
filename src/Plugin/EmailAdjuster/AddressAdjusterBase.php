@@ -3,11 +3,11 @@
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\symfony_mailer\Address;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\MailerHelperTrait;
 use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
 use Drupal\user\Entity\User;
-use Symfony\Component\Mime\Address;
 
 /**
  * Defines a base class for Email Adjusters that set an address field.
@@ -15,16 +15,6 @@ use Symfony\Component\Mime\Address;
 abstract class AddressAdjusterBase extends EmailAdjusterBase {
   // @todo Setting whether to replace existing addresses or add to them.
   use MailerHelperTrait;
-
-  /**
-   * Sets the address in the appropriate header.
-   *
-   * @param \Drupal\symfony_mailer\EmailInterface $email
-   *   The email to process.
-   * @param \Symfony\Component\Mime\Address[] $addresses
-   *   The addresses to set.
-   */
-  abstract protected function setAddresses(EmailInterface $email, array $addresses);
 
   /**
    * {@inheritdoc}
@@ -35,17 +25,17 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
       $display = $item['display'];
 
       if ($value === '<site>') {
-        $addresses[] = $this->helper()->getSiteAddress();
+        $addresses[] = $value;
       }
       elseif ((strpos($value, '@') === FALSE) && ($user = User::load($value))) {
-        $addresses[] = new Address($user->getEmail(), $user->getDisplayName());
+        $addresses[] = $user;
       }
       else {
         $addresses[] = new Address($value, $display);
       }
     }
 
-    $this->setAddresses($email, $addresses);
+    $email->setAddress(static::NAME, $addresses);
   }
 
   /**

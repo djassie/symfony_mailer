@@ -16,10 +16,8 @@ use Drupal\symfony_mailer\EmailInterface;
 class BccEmailAdjuster extends AddressAdjusterBase {
 
   /**
-   * {@inheritdoc}
+   * The name of the associated header.
    */
-  protected function setAddresses(EmailInterface $email, array $addresses) {
-    $email->setBcc(...$addresses);
-  }
+  protected const NAME = 'Bcc';
 
 }

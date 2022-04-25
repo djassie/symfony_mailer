@@ -5,12 +5,9 @@ namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\simplenews\SubscriberInterface;
 use Drupal\simplenews\Entity\Newsletter;
+use Drupal\symfony_mailer\Address;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
-use Drupal\symfony_mailer\MailerHelperTrait;
-use Drupal\symfony_mailer\Processor\EmailBuilderBase;
-use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
-use Symfony\Component\Mime\Address;
 
 /**
  * Defines the Email Builder plug-in for simplenews_newsletter entity.
@@ -28,10 +25,7 @@ use Symfony\Component\Mime\Address;
  * @todo Notes for adopting Symfony Mailer into simplenews. Can remove the
  * MailBuilder class, and many methods of MailEntity.
  */
-class SimplenewsNewsletterEmailBuilder extends EmailBuilderBase {
-
-  use MailerHelperTrait;
-  use TokenProcessorTrait;
+class SimplenewsNewsletterEmailBuilder extends SimplenewsEmailBuilderBase {
 
   /**
    * Saves the parameters for a newly created email.
@@ -58,15 +52,12 @@ class SimplenewsNewsletterEmailBuilder extends EmailBuilderBase {
    * {@inheritdoc}
    */
   public function build(EmailInterface $email) {
-    $subscriber = $email->getParam('simplenews_subscriber');
-    $email->setTo($subscriber->getMail())
-      ->setLangcode($subscriber->getLangcode())
-      ->setAccount($subscriber->getUser(), TRUE)
-      ->appendBodyEntity($email->getParam('issue'), 'email_html')
+    parent::build($email);
+    $email->appendBodyEntity($email->getParam('issue'), 'email_html')
       ->addTextHeader('Precedence', 'bulk')
       ->setVariable('opt_out_hidden', !$email->getEntity()->isAccessible());
 
-    // @todo Find a better way rather than using the token.
+    // @todo Create SubscriberInterface::getUnsubscriberUrl().
     if ($unsubscribe_url = \Drupal::token()->replace('[simplenews-subscriber:unsubscribe-url]', $email->getParams(), ['clear' => TRUE])) {
       $email->addTextHeader('List-Unsubscribe', "<$unsubscribe_url>");
     }

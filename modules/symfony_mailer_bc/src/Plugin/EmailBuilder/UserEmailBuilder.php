@@ -64,11 +64,7 @@ class UserEmailBuilder extends EmailBuilderBase {
    */
   public function build(EmailInterface $email) {
     if ($email->getSubType() != 'register_pending_approval_admin') {
-      $email->setAccount($email->getParam('user'));
-    }
-    else {
-      // Set the account from the recipient to set langcode.
-      $email->setAccount();
+      $email->setTo($email->getParam('user'));
     }
     $this->tokenOptions(['callback' => 'user_mail_tokens', 'clear' => TRUE]);
   }

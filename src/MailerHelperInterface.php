@@ -24,18 +24,20 @@ interface MailerHelperInterface {
    *
    * @param string $encoded
    *   Encoded address string.
+   * @param string $langcode
+   *   (Optional) Language code to add to the address.
    *
-   * @return \Symfony\Component\Mime\Address[]
+   * @return \Drupal\symfony_mailer\Address[]
    *   The parsed address structures.
    */
-  public function parseAddress(string $encoded);
+  public function parseAddress(string $encoded, string $langcode = NULL);
 
   /**
    * Converts an address array into Policy configuration.
    *
    * This function should only be used for migration.
    *
-   * @param \Symfony\Component\Mime\Address[] $addresses
+   * @param \Drupal\symfony_mailer\Address[] $addresses
    *   Array of address structures.
    *
    * @return array
@@ -49,14 +51,6 @@ interface MailerHelperInterface {
    * @return \Drupal\Core\Config\ConfigFactoryInterface
    */
   public function config();
-
-  /**
-   * Gets an address using the site mail and name.
-   *
-   * @return \Symfony\Component\Mime\Address
-   *   The address.
-   */
-  public function getSiteAddress();
 
   /**
    * Renders an element that lists policy related to a config entity.

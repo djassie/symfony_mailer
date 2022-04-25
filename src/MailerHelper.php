@@ -6,9 +6,9 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\symfony_mailer\Address;
 use Drupal\symfony_mailer\Processor\EmailAdjusterManager;
 use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
-use Symfony\Component\Mime\Address;
 
 /**
  * Provides the mailer helper service.
@@ -16,6 +16,15 @@ use Symfony\Component\Mime\Address;
 class MailerHelper implements MailerHelperInterface {
 
   use StringTranslationTrait;
+
+  /**
+     * A regex that matches a structure like 'Name <email@address.com>'.
+     * It matches anything between the first < and last > as email address.
+     * This allows to use a single string to construct an Address, which can be convenient to use in
+     * config, and allows to have more readable config.
+     * This does not try to cover all edge cases for address.
+     */
+  protected const FROM_STRING_PATTERN = '~(?<displayName>[^<]*)<(?<addrSpec>.*)>[^>]*~';
 
   /**
    * The entity type manager.
@@ -67,9 +76,18 @@ class MailerHelper implements MailerHelperInterface {
   /**
    * {@inheritdoc}
    */
-  public function parseAddress(string $encoded) {
+  public function parseAddress(string $encoded, string $langcode = NULL) {
     foreach (explode(',', $encoded) as $part) {
-      $addresses[] = Address::create($part);
+      // Code copied from \Symfony\Component\Mime\Address::create().
+      if (strpos($part, '<')) {
+        if (!preg_match(self::FROM_STRING_PATTERN, $part, $matches)) {
+          throw new InvalidArgumentException("Could not parse $part as an address.");
+        }
+        $addresses[] = new Address($matches['addrSpec'], trim($matches['displayName'], ' \'"'), $langcode);
+      }
+      else {
+        $addresses[] = new Address($part, NULL, $langcode);
+      }
     }
     return $addresses ?: [];
   }
@@ -81,7 +99,7 @@ class MailerHelper implements MailerHelperInterface {
     $site_mail = $this->configFactory->get('system.site')->get('mail');
 
     foreach ($addresses as $address) {
-      $value = $address->getAddress();
+      $value = $address->getEmail();
       if ($value == $site_mail) {
         $value = '<site>';
       }
@@ -89,7 +107,7 @@ class MailerHelper implements MailerHelperInterface {
         $value = $user->id();
       }
       else {
-        $display = $address->getName();
+        $display = $address->getDisplayName();
       }
 
       $config['addresses'][] = [
@@ -106,15 +124,6 @@ class MailerHelper implements MailerHelperInterface {
    */
   public function config() {
     return $this->configFactory;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getSiteAddress() {
-    $site_config = $this->configFactory->get('system.site');
-    $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
-    return new Address($site_mail, $site_config->get('name'));
   }
 
   /**

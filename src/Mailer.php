@@ -16,6 +16,7 @@ use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\Exception\MissingTransportException;
 use Drupal\symfony_mailer\Exception\SkipMailException;
+use Drupal\user\Entity\User;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -168,16 +169,29 @@ class Mailer implements MailerInterface {
       $this->changeTheme($theme_name);
     }
 
-    $account = $email->getAccount(TRUE);
-    $must_switch_account = $account && $account->id() != $this->account->id();
+    // Determine langcode and account from the to address, if there is
+    // agreement.
+    $langcodes = $accounts = [];
+    foreach ($email->getTo() as $to) {
+      if ($loop_langcode = $to->getLangcode()) {
+        $langcodes[$loop_langcode] = $loop_langcode;
+      }
+      if ($loop_account = $to->getAccount()) {
+        $accounts[$loop_account->id()] = $loop_account;
+      }
+    }
+    $langcode = (count($langcodes) == 1) ? reset($langcodes) : $this->languageManager->getDefaultLanguage()->getId();
+    $account = (count($accounts) == 1) ? reset($accounts) : User::getAnonymousUser();
+    $email->customize($langcode, $account);
+
+    $must_switch_account = $account->id() != $this->account->id();
 
     if ($must_switch_account) {
       $this->accountSwitcher->switchTo($account);
     }
 
-    $langcode = $email->getLangcode();
     $current_langcode = $this->languageManager->getCurrentLanguage()->getId();
-    $must_switch_language = isset($langcode) && $langcode !== $current_langcode;
+    $must_switch_language = $langcode !== $current_langcode;
 
     if ($must_switch_language) {
       $this->changeActiveLanguage($langcode);
@@ -201,9 +215,10 @@ class Mailer implements MailerInterface {
 
       $transport = Transport::fromDsn($transport_dsn);
       $mailer = new SymfonyMailer($transport, NULL, $this->dispatcher);
+      $symfony_email = $email->getSymfonyEmail();
 
-      // ksm($email, $email->getHeaders());
-      $mailer->send($email->getSymfonyEmail());
+      // ksm($email, $symfony_email->getHeaders());
+      $mailer->send($symfony_email);
       $result = TRUE;
     }
     catch (\Exception $e) {

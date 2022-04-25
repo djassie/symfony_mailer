@@ -16,10 +16,8 @@ use Drupal\symfony_mailer\EmailInterface;
 class FromEmailAdjuster extends AddressAdjusterBase {
 
   /**
-   * {@inheritdoc}
+   * The name of the associated header.
    */
-  protected function setAddresses(EmailInterface $email, array $addresses) {
-    $email->setFrom(...$addresses);
-  }
+  protected const NAME = 'From';
 
 }

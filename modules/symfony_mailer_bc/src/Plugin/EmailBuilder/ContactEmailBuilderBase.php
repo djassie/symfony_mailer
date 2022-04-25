@@ -20,8 +20,6 @@ class ContactEmailBuilderBase extends EmailBuilderBase {
     $sender = $email->getParam('sender');
     $contact_message = $email->getParam('contact_message');
 
-    // The contact entity cannot contain private information so we don't need
-    // to switch account for rendering it.
     $email->appendBodyEntity($contact_message, 'mail')
       ->addLibrary('symfony_mailer_bc/contact')
       ->setVariable('subject', $contact_message->getSubject())
@@ -30,10 +28,10 @@ class ContactEmailBuilderBase extends EmailBuilderBase {
       ->setVariable('sender_url', $sender->isAuthenticated() ? $sender->toUrl('canonical')->toString() : Url::fromUri('mailto:' . $sender->getEmail()));
 
     if ($email->getSubType() == 'mail') {
-      $email->setReplyTo($sender->getEmail());
+      $email->setReplyTo($sender);
     }
     else {
-      $email->setAccount($sender);
+      $email->setTo($sender);
     }
   }
 

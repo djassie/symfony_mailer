@@ -6,9 +6,6 @@ use Drupal\simplenews\SubscriberInterface;
 use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
-use Drupal\symfony_mailer\MailerHelperTrait;
-use Drupal\symfony_mailer\Processor\EmailBuilderBase;
-use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
 
 /**
  * Defines the Email Builder plug-in for simplenews module.
@@ -24,10 +21,7 @@ use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
  *   import_warning = @Translation("This overrides the default HTML messages with imported plain text versions."),
  * )
  */
-class SimplenewsEmailBuilder extends EmailBuilderBase {
-
-  use MailerHelperTrait;
-  use TokenProcessorTrait;
+class SimplenewsEmailBuilder extends SimplenewsEmailBuilderBase {
 
   /**
    * Saves the parameters for a newly created email.
@@ -53,15 +47,6 @@ class SimplenewsEmailBuilder extends EmailBuilderBase {
 
     $key = ($message['key'] == 'subscribe_combined') ? 'subscribe' : 'validate';
     return $factory->newModuleEmail('simplenews', $key, $params['context']['simplenews_subscriber']);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function build(EmailInterface $email) {
-    $subscriber = $email->getParam('simplenews_subscriber');
-    $email->setTo($subscriber->getMail())
-      ->setLangcode($subscriber->getLangcode());
   }
 
   /**

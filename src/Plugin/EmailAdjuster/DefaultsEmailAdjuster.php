@@ -5,7 +5,6 @@ namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 use Drupal\symfony_mailer\Processor\EmailAdjusterBase;
 use Drupal\symfony_mailer\Entity\MailerTransport;
 use Drupal\symfony_mailer\EmailInterface;
-use Drupal\symfony_mailer\MailerHelperTrait;
 
 /**
  * Defines the Default headers Email Adjuster.
@@ -19,15 +18,12 @@ use Drupal\symfony_mailer\MailerHelperTrait;
  */
 class DefaultsEmailAdjuster extends EmailAdjusterBase {
 
-  use MailerHelperTrait;
-
   /**
    * {@inheritdoc}
    */
   public function build(EmailInterface $email) {
-    $sender = $this->helper()->getSiteAddress();
     $theme = $email->getTheme();
-    $email->setSender($sender)
+    $email->setSender('<site>')
       ->addTextHeader('X-Mailer', 'Drupal')
       ->addLibrary("$theme/email");
 

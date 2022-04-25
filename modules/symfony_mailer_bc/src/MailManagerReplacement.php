@@ -118,12 +118,9 @@ class MailManagerReplacement extends MailManager {
    *   The email to fill.
    * @param array $message
    *   The array to fill from.
-   * @param array $original
-   *   (Optional) The original message array.
    */
-  public function emailFromArray(EmailInterface $email, array $message, array $original = []) {
-    $email->setLangcode($message['langcode'])
-      ->setSubject($message['subject']);
+  public function emailFromArray(EmailInterface $email, array $message) {
+    $email->setSubject($message['subject']);
 
     if ($email->getPhase() == EmailInterface::PHASE_INIT) {
       $email->setParams($message['params']);
@@ -132,17 +129,9 @@ class MailManagerReplacement extends MailManager {
     // Address headers.
     $headers = $email->getHeaders();
     foreach (self::HEADERS as $name => $key) {
-      // If the header hasn't change then no need to parse it.
       $encoded = $message['headers'][$name] ?? $message[$key] ?? NULL;
-      $encoded_original = $original['headers'][$name] ?? $original[$key] ?? NULL;
-      if (isset($encoded) && ($encoded != $encoded_original)) {
-        $addresses = $this->mailerHelper->parseAddress($encoded);
-        if ($header = $headers->get($name)) {
-          $header->setAddresses($addresses);
-        }
-        else {
-          $headers->addMailboxListHeader($name, $addresses);
-        }
+      if (isset($encoded)) {
+        $email->setAddress($name, $this->mailerHelper->parseAddress($encoded, $message['langcode']));
       }
     }
 

@@ -71,8 +71,7 @@ class ContactEmailBuilder extends ContactEmailBuilderBase {
       ->setVariable('recipient_edit_url', $recipient->toUrl('edit-form')->toString());
 
     if ($email->getSubType() == 'mail') {
-      // Set the account from the recipient.
-      $email->setAccount($recipient);
+      $email->setTo($recipient);
     }
   }
 

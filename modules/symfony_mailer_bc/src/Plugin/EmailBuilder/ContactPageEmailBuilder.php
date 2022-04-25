@@ -56,10 +56,6 @@ class ContactPageEmailBuilder extends ContactEmailBuilderBase {
     $email->setVariable('form', $email->getEntity()->label())
       ->setVariable('form_url', Url::fromRoute('<current>')->toString());
 
-    if ($email->getSubType() == 'mail') {
-      // Set the account from the recipient to set langcode.
-      $email->setAccount();
-    }
     if ($email->getSubType() == 'autoreply') {
       $email->setBody($email->getEntity()->getReply());
     }

@@ -16,10 +16,8 @@ use Drupal\symfony_mailer\EmailInterface;
 class CcEmailAdjuster extends AddressAdjusterBase {
 
   /**
-   * {@inheritdoc}
+   * The name of the associated header.
    */
-  protected function setAddresses(EmailInterface $email, array $addresses) {
-    $email->setCc(...$addresses);
-  }
+  protected const NAME = 'Cc';
 
 }
