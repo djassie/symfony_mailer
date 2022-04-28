@@ -31,7 +31,7 @@ function hook_mailer_TYPE_init(EmailInterface $email) {
  * @param \Drupal\symfony_mailer\EmailInterface $email
  *   The email.
  */
-function hook_mailer_TYPE_SUBTYPE_init(EmailInterface $email) {
+function hook_mailer_TYPE__SUBTYPE_init(EmailInterface $email) {
 }
 
 /**
