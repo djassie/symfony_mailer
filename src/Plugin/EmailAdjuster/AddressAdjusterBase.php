@@ -52,10 +52,7 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
     ];
 
     // Synchronise with any existing form state.
-    $addresses = $form_state->getValue(['config', $id, 'addresses']);
-    if (!is_array($addresses)) {
-      $addresses = $this->configuration['addresses'];
-    }
+    $addresses = $form_state->getValue(['config', $id, 'addresses']) ?? $this->configuration['addresses'] ?? [[]];
 
     foreach ($addresses as $item) {
       $form_item['value'] = [
@@ -136,11 +133,22 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
    */
   public static function addressesValidate($element, FormStateInterface $form_state, $form) {
     $id = $element['#parents'][1];
-    $addresses = $form_state->getValue(['config', $id, 'addresses']);
+    $addresses = $form_state->getValue(['config', $id, 'addresses']) ?? [];
+
+    // Remove any empty addresses.
     $addresses = array_filter($addresses, function ($a) {
       return !empty($a['value']);
     });
-    $form_state->setValueForElement($element, $addresses);
+
+    // Raise an error for no addresses if the policy is being saved. Skip this
+    // for the non-primary 'Add address' button.
+    if (empty($addresses) && ($form_state->getTriggeringElement()['#button_type'] == 'primary')) {
+      $label = \Drupal::service('plugin.manager.email_adjuster')->getDefinition($id)['label'];
+      $form_state->setError($element, t('You must set at least one %label address.', ['%label' => $label]));
+    }
+    else {
+      $form_state->setValueForElement($element, $addresses);
+    }
   }
 
 }
