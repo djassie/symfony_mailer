@@ -19,7 +19,7 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function postRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     foreach ($this->configuration['addresses'] as $item) {
       $value = $item['value'];
       $display = $item['display'];

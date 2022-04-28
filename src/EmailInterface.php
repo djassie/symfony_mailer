@@ -12,8 +12,6 @@ interface EmailInterface extends BaseEmailInterface {
 
   /**
    * The default weight for an email processor.
-   *
-   * Set processors and parameters.
    */
   const DEFAULT_WEIGHT = 500;
 

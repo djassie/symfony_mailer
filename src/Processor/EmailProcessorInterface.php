@@ -17,15 +17,4 @@ interface EmailProcessorInterface {
    */
   public function init(EmailInterface $email);
 
-  /**
-   * Gets the weight of the email processor.
-   *
-   * @param int $phase
-   *   The phase that will run, one of the EmailInterface::PHASE_ constants.
-   *
-   * @return int
-   *   The weight.
-   */
-  public function getWeight(int $phase);
-
 }

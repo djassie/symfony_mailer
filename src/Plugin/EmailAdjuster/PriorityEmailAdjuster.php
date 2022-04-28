@@ -21,7 +21,7 @@ class PriorityEmailAdjuster extends EmailAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function postRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     $priority = $this->configuration['value'];
     $email->setPriority($priority);
   }

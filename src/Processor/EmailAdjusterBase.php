@@ -10,6 +10,11 @@ use Drupal\Core\Form\FormStateInterface;
 class EmailAdjusterBase extends EmailProcessorBase implements EmailAdjusterInterface {
 
   /**
+   * The default weight for an email adjuster.
+   */
+  const DEFAULT_WEIGHT = 400;
+
+  /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {

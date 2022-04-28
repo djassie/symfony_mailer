@@ -20,7 +20,7 @@ class PlainEmailAdjuster extends EmailAdjusterBase {
   /**
    * {@inheritdoc}
    */
-  public function postRender(EmailInterface $email) {
+  public function build(EmailInterface $email) {
     $email->setTextBody($this->configuration['value']);
   }
 

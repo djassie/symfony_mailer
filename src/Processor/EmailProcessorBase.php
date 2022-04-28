@@ -33,10 +33,16 @@ class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the weight of the email processor.
+   *
+   * @param int $phase
+   *   The phase that will run, one of the EmailInterface::PHASE_ constants.
+   *
+   * @return int
+   *   The weight.
    */
-  public function getWeight(int $phase) {
-    $weight = $this->getPluginDefinition()['weight'] ?? EmailInterface::DEFAULT_WEIGHT;
+  protected function getWeight(int $phase) {
+    $weight = $this->getPluginDefinition()['weight'] ?? static::DEFAULT_WEIGHT;
     return is_array($weight) ? $weight[$phase] : $weight;
   }
 
