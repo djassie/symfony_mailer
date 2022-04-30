@@ -2,7 +2,7 @@ entity.mailer_transport.collection:
   path: '/admin/config/system/mailer/transport'
   defaults:
     _entity_list: 'mailer_transport'
-    _title: 'Mailer'
+    _title: 'Mailer transport'
   requirements:
     _permission: 'administer mailer'
 
@@ -105,5 +105,13 @@ symfony_mailer.import.skip:
   defaults:
     _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::skip'
     _title: 'Skip'
+  requirements:
+    _permission: 'administer mailer'
+
+symfony_mailer.test:
+  path: '/admin/config/system/mailer/test'
+  defaults:
+    _form: '\Drupal\symfony_mailer\Form\TestForm'
+    _title: 'Mailer test'
   requirements:
     _permission: 'administer mailer'
