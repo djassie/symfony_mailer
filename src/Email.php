@@ -180,11 +180,12 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function addProcessor(string $id, int $phase, callable $function, int $weight = self::DEFAULT_WEIGHT) {
+  public function addProcessor(callable $function, int $phase = self::PHASE_BUILD, int $weight = self::DEFAULT_WEIGHT, string $id = NULL) {
     $this->valid(self::PHASE_INIT, self::PHASE_INIT);
-    $this->processors[$phase][$id] = [
+    $this->processors[$phase][] = [
       'function' => $function,
       'weight' => $weight,
+      'id' => $id,
     ];
     return $this;
   }
@@ -403,7 +404,7 @@ class Email implements InternalEmailInterface {
    */
   public function process() {
     $processors = $this->processors[$this->phase] ?? [];
-    uasort($processors, function ($a, $b) {
+    usort($processors, function ($a, $b) {
       return $a['weight'] <=> $b['weight'];
     });
 

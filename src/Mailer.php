@@ -209,6 +209,19 @@ class Mailer implements MailerInterface {
     // Process the post-render phase.
     $email->process();
 
+    // Switch back.
+    if ($must_switch_account) {
+      $this->accountSwitcher->switchBack();
+    }
+
+    if ($must_switch_language) {
+      $this->changeActiveLanguage($current_langcode);
+    }
+
+    if ($must_switch_theme) {
+      $this->changeTheme($active_theme_name);
+    }
+
     try {
       // Send.
       $transport_dsn = $email->getTransportDsn();
@@ -248,18 +261,8 @@ class Mailer implements MailerInterface {
       $result = FALSE;
     }
 
-    // Switch back.
-    if ($must_switch_account) {
-      $this->accountSwitcher->switchBack();
-    }
-
-    if ($must_switch_language) {
-      $this->changeActiveLanguage($current_langcode);
-    }
-
-    if ($must_switch_theme) {
-      $this->changeTheme($active_theme_name);
-    }
+    // Process the post-send phase.
+    $email->process();
 
     return $result;
   }

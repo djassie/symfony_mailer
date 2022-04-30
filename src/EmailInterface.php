@@ -52,22 +52,34 @@ interface EmailInterface extends BaseEmailInterface {
   const PHASE_POST_SEND = 4;
 
   /**
+   * Names of the email phases.
+   */
+  const PHASE_NAMES = [
+    self::PHASE_INIT => 'init',
+    self::PHASE_BUILD => 'build',
+    self::PHASE_PRE_RENDER => 'pre_render',
+    self::PHASE_POST_RENDER => 'post_render',
+    self::PHASE_POST_SEND => 'post_send',
+  ];
+
+  /**
    * Add an email processor.
    *
    * Valid: initialisation.
    *
-   * @param string $id
-   *   A ID that can be used to alter or debug. Use a class or module name.
-   * @param int $phase
-   *   The phase to run in, one of the EmailInterface::PHASE_ constants.
-   * @param callable
+   * @param callable $function
    *   The function to call.
+   * @param int $phase
+   *   (Optional) The phase to run in, one of the EmailInterface::PHASE_
+   *   constants.
    * @param int
-   *   The weight, lower values run earlier.
+   *   (Optional) The weight, lower values run earlier.
+   * @param string $id
+   *   (Optional) An ID that can be used to alter or debug.
    *
    * @return $this
    */
-  public function addProcessor(string $id, int $phase, callable $function, int $weight = self::DEFAULT_WEIGHT);
+  public function addProcessor(callable $function, int $phase = self::PHASE_BUILD, int $weight = self::DEFAULT_WEIGHT, string $id = NULL);
 
   /**
    * Gets the langcode.

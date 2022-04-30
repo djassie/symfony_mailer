@@ -2,16 +2,15 @@
 
 namespace Drupal\symfony_mailer\Processor;
 
-use Drupal\Core\Plugin\PluginBase;
 use Drupal\symfony_mailer\EmailInterface;
 
 /**
- * Defines the base class for EmailProcessorInterface implementations.
+ * Defines the base class for custom EmailProcessorInterface implementations.
  *
- * This base class is for plug-ins. Use EmailProcessorCustomBase for custom
- * processors.
+ * This base class is for custom processors that are not plug-ins. Use
+ * EmailProcessorBase for plug-ins.
  */
-class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
+class EmailProcessorCustomBase implements EmailProcessorInterface {
 
   /**
    * {@inheritdoc}
@@ -19,7 +18,7 @@ class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
   public function init(EmailInterface $email) {
     foreach (self::FUNCTION_NAMES as $phase => $function) {
       if (method_exists($this, $function)) {
-        $email->addProcessor([$this, $function], $phase, $this->getWeight($phase), $this->getPluginId());
+        $email->addProcessor([$this, $function], $phase, $this->getWeight($phase), static::class);
       }
     }
   }
@@ -34,8 +33,7 @@ class EmailProcessorBase extends PluginBase implements EmailProcessorInterface {
    *   The weight.
    */
   protected function getWeight(int $phase) {
-    $weight = $this->getPluginDefinition()['weight'] ?? static::DEFAULT_WEIGHT;
-    return is_array($weight) ? $weight[$phase] : $weight;
+    return EmailInterface::DEFAULT_WEIGHT;
   }
 
 }
