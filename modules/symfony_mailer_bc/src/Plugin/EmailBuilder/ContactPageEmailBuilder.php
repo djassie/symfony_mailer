@@ -8,7 +8,6 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
-use Drupal\symfony_mailer\MailerHelperTrait;
 
 /**
  * Defines the Email Builder plug-in for contact module page forms.
@@ -29,8 +28,6 @@ use Drupal\symfony_mailer\MailerHelperTrait;
  * set langcode, to, reply-to so the calling code doesn't need to.
  */
 class ContactPageEmailBuilder extends ContactEmailBuilderBase {
-
-  use MailerHelperTrait;
 
   /**
    * Saves the parameters for a newly created email.

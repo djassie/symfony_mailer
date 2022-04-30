@@ -3,14 +3,17 @@
 namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
 
 use Drupal\Core\Url;
-use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Drupal\symfony_mailer\EmailInterface;
+use Drupal\symfony_mailer\MailerHelperTrait;
+use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 
 /**
  * Defines a base class for contact module email builders.
  * )
  */
 class ContactEmailBuilderBase extends EmailBuilderBase {
+
+  use MailerHelperTrait;
 
   /**
    * {@inheritdoc}
@@ -23,7 +26,7 @@ class ContactEmailBuilderBase extends EmailBuilderBase {
     $email->setBodyEntity($contact_message, 'mail')
       ->addLibrary('symfony_mailer_bc/contact')
       ->setVariable('subject', $contact_message->getSubject())
-      ->setVariable('site_name', \Drupal::config('system.site')->get('name'))
+      ->setVariable('site_name', $this->helper()->config()->get('system.site')->get('name'))
       ->setVariable('sender_name', $sender->getDisplayName())
       ->setVariable('sender_url', $sender->isAuthenticated() ? $sender->toUrl('canonical')->toString() : Url::fromUri('mailto:' . $sender->getEmail()));
 
