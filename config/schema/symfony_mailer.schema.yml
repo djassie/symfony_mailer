@@ -40,6 +40,19 @@ symfony_mailer.transport_plugin.null:
   type: mapping
   label: 'Null transport'
 
+symfony_mailer.transport_plugin.sendmail:
+  type: mapping
+  label: 'Sendmail transport'
+  mapping:
+    query:
+      type: mapping
+      label: 'URL query parameters'
+      mapping:
+        command:
+          type: string
+          label: 'Sendmail command'
+
+
 symfony_mailer.transport_plugin.smtp:
   type: mapping
   label: 'SMTP transport'
