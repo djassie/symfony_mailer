@@ -154,16 +154,16 @@ class MailManagerReplacement extends MailManager {
     if (is_array($message['body'])) {
       foreach ($message['body'] as $part) {
         if ($part instanceof MarkupInterface) {
-          $content = ['#markup' => $part];
+          $body[] = ['#markup' => $part];
         }
         else {
-          $content = [
+          $body[] = [
             '#type' => 'processed_text',
             '#text' => $part,
           ];
         }
-        $email->appendBody($content);
       }
+      $email->setBody($body ?? []);
     }
     else {
       $email->setHtmlBody($message['body']);

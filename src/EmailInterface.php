@@ -180,22 +180,7 @@ interface EmailInterface extends BaseEmailInterface {
   public function setBody($body);
 
   /**
-   * Appends content to the email body array.
-   *
-   * Valid: before rendering.
-   *
-   * @param $body
-   *   Unrendered body part to append to the existing body array.
-   *
-   * @return $this
-   */
-  public function appendBody($body);
-
-  /**
-   * Appends an entity to the email body array.
-   *
-   * WARNING: rendering as a trusted user can expose private information . Call
-   * ::setAccount() unless you are sure this cannot occur.
+   * Builds the email body array from an entity.
    *
    * Valid: before rendering.
    *
@@ -206,7 +191,7 @@ interface EmailInterface extends BaseEmailInterface {
    *
    * @return $this
    */
-  public function appendBodyEntity(EntityInterface $entity, $view_mode = 'full');
+  public function setBodyEntity(EntityInterface $entity, $view_mode = 'full');
 
   /**
    * Gets the unrendered email body array.

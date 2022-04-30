@@ -25,7 +25,9 @@ function hook_mailer_PHASE(EmailInterface $email) {
 
   // hook_mailer_build():
   $email->setTo('user@example.com');
-  $email->appendBody(['#markup' => 'Extra text']);
+  $body = $email->getBody();
+  $body['extra'] = ['#markup' => 'Extra text'];
+  $email->setBody($body);
 
   // hook_mailer_post_render():
   $email->setHtmlBody($email->getHtmlBody() . '<p><b>More</b> extra text</p>');

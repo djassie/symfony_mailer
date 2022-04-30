@@ -20,7 +20,7 @@ class ContactEmailBuilderBase extends EmailBuilderBase {
     $sender = $email->getParam('sender');
     $contact_message = $email->getParam('contact_message');
 
-    $email->appendBodyEntity($contact_message, 'mail')
+    $email->setBodyEntity($contact_message, 'mail')
       ->addLibrary('symfony_mailer_bc/contact')
       ->setVariable('subject', $contact_message->getSubject())
       ->setVariable('site_name', \Drupal::config('system.site')->get('name'))

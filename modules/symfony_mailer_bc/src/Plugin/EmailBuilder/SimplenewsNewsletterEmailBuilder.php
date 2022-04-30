@@ -53,7 +53,7 @@ class SimplenewsNewsletterEmailBuilder extends SimplenewsEmailBuilderBase {
    */
   public function build(EmailInterface $email) {
     parent::build($email);
-    $email->appendBodyEntity($email->getParam('issue'), 'email_html')
+    $email->setBodyEntity($email->getParam('issue'), 'email_html')
       ->addTextHeader('Precedence', 'bulk')
       ->setVariable('opt_out_hidden', !$email->getEntity()->isAccessible());
 

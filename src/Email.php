@@ -272,21 +272,11 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
-  public function appendBody($body) {
-    $this->valid(self::PHASE_PRE_RENDER);
-    $name = 'n' . count($this->body);
-    $this->body[$name] = $body;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function appendBodyEntity(EntityInterface $entity, $view_mode = 'full') {
+  public function setBodyEntity(EntityInterface $entity, $view_mode = 'full') {
     $this->valid(self::PHASE_PRE_RENDER);
     $build = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId())
       ->view($entity, $view_mode);
-    $this->appendBody($build);
+    $this->setBody($build);
     return $this;
   }
 
