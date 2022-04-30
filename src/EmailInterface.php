@@ -219,6 +219,26 @@ interface EmailInterface extends BaseEmailInterface {
   public function getBody();
 
   /**
+   * Sets the email subject.
+   *
+   * @param \Drupal\Component\Render\MarkupInterface|string $subject
+   *   The email subject.
+   * @param bool $replace
+   *   (Optional) TRUE to replace variables in the email subject.
+   *
+   * @return $this
+   */
+  public function setSubject($subject, bool $replace = FALSE);
+
+  /**
+   * Gets the email subject.
+   *
+   * @return \Drupal\Component\Render\MarkupInterface|string
+   *   The email subject, or NULL if not set.
+   */
+  public function getSubject();
+
+  /**
    * Sets variables available in the email template.
    *
    * Valid: build.

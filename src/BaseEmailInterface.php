@@ -23,24 +23,6 @@ use Symfony\Component\Mime\Header\Headers;
 interface BaseEmailInterface {
 
   /**
-   * Sets the email subject.
-   *
-   * @param \Drupal\Component\Render\MarkupInterface|string $subject
-   *   The email subject.
-   *
-   * @return $this
-   */
-  public function setSubject($subject);
-
-  /**
-   * Gets the email subject.
-   *
-   * @return \Drupal\Component\Render\MarkupInterface|string
-   *   The email subject, or NULL if not set.
-   */
-  public function getSubject();
-
-  /**
    * Sets the sender address.
    *
    * @param mixed $address

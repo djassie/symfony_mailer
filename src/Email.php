@@ -76,6 +76,20 @@ class Email implements InternalEmailInterface {
   protected $body = [];
 
   /**
+   * The email subject.
+   *
+   * @var \Drupal\Component\Render\MarkupInterface|string
+   */
+  protected $subject;
+
+  /**
+   * Whether to replace variables in the email subject.
+   *
+   * @var bool
+   */
+  protected $replaceSubject;
+
+  /**
    * @var array
    */
   protected $processors = [];
@@ -287,6 +301,24 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
+  public function setSubject($subject, bool $replace = FALSE) {
+    // We must not force conversion of the subject to a string as this could
+    // cause translation before switching to the correct language.
+    $this->subject = $subject;
+    $this->subjectReplace = $replace;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSubject() {
+    return $this->subject;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setVariables(array $variables) {
     $this->valid(self::PHASE_BUILD, self::PHASE_INIT);
     $this->variables = $variables;
@@ -440,6 +472,15 @@ class Email implements InternalEmailInterface {
     $this->valid(self::PHASE_PRE_RENDER, self::PHASE_PRE_RENDER);
 
     // Render subject.
+    if ($this->subjectReplace && $this->variables) {
+      $subject = [
+        '#type' => 'inline_template',
+        '#template' => $this->subject,
+        '#context' => $this->variables,
+      ];
+      $this->subject = $this->renderer->renderPlain($subject);
+    }
+
     if ($this->subject instanceof MarkupInterface) {
       $this->subject = PlainTextOutput::renderFromHtml($this->subject);
     }

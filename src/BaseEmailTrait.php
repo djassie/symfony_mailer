@@ -17,13 +17,6 @@ trait BaseEmailTrait {
   protected $inner;
 
   /**
-   * The email subject.
-   *
-   * @var \Drupal\Component\Render\MarkupInterface|string
-   */
-  protected $subject;
-
-  /**
    * The addresses.
    *
    * @var array
@@ -42,17 +35,6 @@ trait BaseEmailTrait {
    * @var \Drupal\symfony_mailer\AddressInterface
    */
   protected $sender;
-
-  public function setSubject($subject) {
-    // We must not force conversion of the subject to a string as this could
-    // cause translation before switching to the correct language.
-    $this->subject = $subject;
-    return $this;
-  }
-
-  public function getSubject() {
-    return $this->subject;
-  }
 
   public function setSender($address) {
     $this->sender = Address::create($address);
