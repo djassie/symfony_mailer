@@ -539,4 +539,23 @@ class Email implements InternalEmailInterface {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * Serialization is intended only for testing.
+   *
+   * @internal
+   */
+  public function __serialize() {
+    return [$this->subject, $this->addresses, $this->inner];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __unserialize(array $data) {
+    $this->phase = self::PHASE_POST_SEND;
+    [$this->subject, $this->addresses, $this->inner] = $data;
+  }
+
 }

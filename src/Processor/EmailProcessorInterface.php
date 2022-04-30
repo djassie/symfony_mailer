@@ -18,6 +18,7 @@ interface EmailProcessorInterface {
     EmailInterface::PHASE_BUILD => 'build',
     EmailInterface::PHASE_PRE_RENDER => 'preRender',
     EmailInterface::PHASE_POST_RENDER => 'postRender',
+    EmailInterface::PHASE_POST_SEND => 'postSend',
   ];
 
   /**
