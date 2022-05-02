@@ -4,21 +4,21 @@ namespace Drupal\symfony_mailer\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\EmailFactory;
+use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\MailerHelperInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Symfony Mailer test form.
+ * Symfony Mailer test email form.
  */
-class TestForm extends FormBase {
+class TestEmailForm extends FormBase {
 
   /**
    * The email factory service.
    *
-   * @var \Drupal\symfony_mailer\EmailFactory
+   * @var \Drupal\symfony_mailer\EmailFactoryInterface
    */
-  protected EmailFactory $emailFactory;
+  protected $emailFactory;
 
   /**
    * The mailer helper.
@@ -30,12 +30,12 @@ class TestForm extends FormBase {
   /**
    * Constructs a new TestForm.
    *
-   * @param \Drupal\symfony_mailer\EmailFactory $email_factory
+   * @param \Drupal\symfony_mailer\EmailFactoryInterface $email_factory
    *   The email factory service.
    * @param \Drupal\symfony_mailer\MailerHelperInterface $helper
    *   The mailer helper.
    */
-  public function __construct(EmailFactory $email_factory, MailerHelperInterface $helper) {
+  public function __construct(EmailFactoryInterface $email_factory, MailerHelperInterface $helper) {
     $this->emailFactory = $email_factory;
     $this->helper = $helper;
   }

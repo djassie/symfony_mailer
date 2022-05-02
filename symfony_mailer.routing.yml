@@ -111,7 +111,7 @@ symfony_mailer.import.skip:
 symfony_mailer.test:
   path: '/admin/config/system/mailer/test'
   defaults:
-    _form: '\Drupal\symfony_mailer\Form\TestForm'
+    _form: '\Drupal\symfony_mailer\Form\TestEmailForm'
     _title: 'Mailer test'
   requirements:
     _permission: 'administer mailer'
