@@ -6,7 +6,6 @@ use Drupal\contact\MessageInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\EmailInterface;
-use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 
 /**
  * Defines the Email Builder plug-in for contact module personal forms.
@@ -31,9 +30,9 @@ class ContactEmailBuilder extends ContactEmailBuilderBase {
    *   The email to modify.
    * @param \Drupal\contact\MessageInterface $message
    *   Submitted message entity.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $sender
    *   The sender.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $recipient
    *   The recipient.
    */
   public function createParams(EmailInterface $email, MessageInterface $message = NULL, AccountInterface $sender = NULL, AccountInterface $recipient = NULL) {

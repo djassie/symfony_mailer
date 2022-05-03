@@ -3,7 +3,6 @@
 namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the interface for an Email.
@@ -72,7 +71,7 @@ interface EmailInterface extends BaseEmailInterface {
    * @param int $phase
    *   (Optional) The phase to run in, one of the EmailInterface::PHASE_
    *   constants.
-   * @param int
+   * @param int $weight
    *   (Optional) The weight, lower values run earlier.
    * @param string $id
    *   (Optional) An ID that can be used to alter or debug.
@@ -115,7 +114,7 @@ interface EmailInterface extends BaseEmailInterface {
    *
    * @param string $key
    *   Parameter key to set.
-   * @param $value
+   * @param mixed $value
    *   Parameter value to set.
    *
    * @return $this
@@ -172,7 +171,7 @@ interface EmailInterface extends BaseEmailInterface {
    *
    * Valid: before rendering.
    *
-   * @param $body
+   * @param mixed $body
    *   Unrendered email body array.
    *
    * @return $this
@@ -242,7 +241,7 @@ interface EmailInterface extends BaseEmailInterface {
    *
    * @param string $key
    *   Variable key to set.
-   * @param $value
+   * @param mixed $value
    *   Variable value to set.
    *
    * @return $this
@@ -364,6 +363,6 @@ interface EmailInterface extends BaseEmailInterface {
    * @return string
    *   Transport DSN.
    */
-  public function getTransportDSN();
+  public function getTransportDsn();
 
 }

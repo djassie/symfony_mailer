@@ -3,7 +3,6 @@
 namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\simplenews\SubscriberInterface;
 use Symfony\Component\Mime\Address as SymfonyAddress;
 
 /**
@@ -15,10 +14,33 @@ use Symfony\Component\Mime\Address as SymfonyAddress;
  */
 class Address implements AddressInterface {
 
+  /**
+   * The email address.
+   *
+   * @var string
+   */
   protected $email;
+
+  /**
+   * The display name, or NULL.
+   *
+   * @var string
+   */
   protected $displayName;
+
+  /**
+   * The language code, or NULL.
+   *
+   * @var string
+   */
   protected $langcode;
-  protected $address;
+
+  /**
+   * The account, or NULL.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $account;
 
   /**
    * Constructs an address object.
@@ -29,14 +51,14 @@ class Address implements AddressInterface {
    *   (Optional) The display name.
    * @param string $langcode
    *   (Optional) The language code.
-   * @param \Drupal\Core\Session\AccountInterface $address
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   (Optional) The account.
    */
-  public function __construct(string $email, string $display_name = NULL, string $langcode = NULL, AccountInterface $address = NULL) {
+  public function __construct(string $email, string $display_name = NULL, string $langcode = NULL, AccountInterface $account = NULL) {
     $this->email = $email;
     $this->displayName = $display_name;
     $this->langcode = $langcode;
-    $this->account = $address;
+    $this->account = $account;
   }
 
   /**
@@ -117,4 +139,4 @@ class Address implements AddressInterface {
     return $result;
   }
 
-};
+}

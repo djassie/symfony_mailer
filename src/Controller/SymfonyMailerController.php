@@ -132,7 +132,7 @@ class SymfonyMailerController extends ControllerBase {
   /**
    * Sets the transport as the default.
    *
-   * @param \Drupal\symfony_mailer\Entity\MailerTransport $mailer_transport
+   * @param \Drupal\symfony_mailer\MailerTransportInterface $mailer_transport
    *   The mailer transport entity.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse

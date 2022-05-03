@@ -3,7 +3,6 @@
 namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
 
 use Drupal\symfony_mailer\EmailFactoryInterface;
-use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 use Drupal\symfony_mailer\Processor\TokenProcessorTrait;
 

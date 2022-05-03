@@ -34,7 +34,7 @@ interface InternalEmailInterface extends EmailInterface {
    *
    * @param string $langcode
    *   The language code.
-   * @param \Drupal\Core\Session\AccountInterface $address
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   The account.
    *
    * @return $this

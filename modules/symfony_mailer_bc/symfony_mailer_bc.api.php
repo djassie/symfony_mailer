@@ -13,7 +13,7 @@
  *
  * @param array $message
  *   A message array, as described in hook_mail_alter().
- * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+ * @param \Drupal\Core\Config\Entity\ConfigEntityInterface|null $entity
  *   (optional) Entity. @see \Drupal\symfony_mailer\EmailInterface::getEntity()
  *
  * @see \Drupal\Core\Mail\MailManagerInterface::mail()
@@ -27,7 +27,7 @@ function hook_mailer_bc_alter(array &$message, ?ConfigEntityInterface $entity) {
  *
  * @param array $message
  *   A message array, as described in hook_mail_alter().
- * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+ * @param \Drupal\Core\Config\Entity\ConfigEntityInterface|null $entity
  *   (optional) Entity. @see \Drupal\symfony_mailer\EmailInterface::getEntity()
  */
 function hook_mailer_bc_MODULE_alter(array &$message, ?ConfigEntityInterface $entity) {

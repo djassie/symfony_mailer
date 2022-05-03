@@ -9,7 +9,6 @@ use Drupal\symfony_mailer\Processor\EmailBuilderBase;
 
 /**
  * Defines a base class for contact module email builders.
- * )
  */
 class ContactEmailBuilderBase extends EmailBuilderBase {
 

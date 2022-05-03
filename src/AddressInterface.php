@@ -15,7 +15,7 @@ interface AddressInterface {
    *   - \Drupal\symfony_mailer\AddressInterface
    *   - string
    *   - \Drupal\Core\Session\AccountInterface
-   *   - \Symfony\Component\Mime\Address
+   *   - \Symfony\Component\Mime\Address.
    *
    * @return \Drupal\symfony_mailer\AddressInterface
    *   The address.
@@ -74,4 +74,4 @@ interface AddressInterface {
    */
   public static function convert($addresses);
 
-};
+}

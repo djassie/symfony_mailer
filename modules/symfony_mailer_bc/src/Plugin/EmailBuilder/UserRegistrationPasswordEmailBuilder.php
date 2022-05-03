@@ -21,7 +21,10 @@ class UserRegistrationPasswordEmailBuilder extends UserEmailBuilder {
    */
   public function build(EmailInterface $email) {
     parent::build($email);
-    $this->tokenOptions(['callback' => 'user_registrationpassword_mail_tokens', 'clear' => TRUE]);
+    $this->tokenOptions([
+      'callback' => 'user_registrationpassword_mail_tokens',
+      'clear' => TRUE,
+    ]);
   }
 
 }

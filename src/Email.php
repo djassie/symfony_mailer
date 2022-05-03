@@ -59,9 +59,9 @@ class Email implements InternalEmailInterface {
   protected $subType;
 
   /**
-   * @var string
+   * @var \Drupal\Core\Config\Entity\ConfigEntityInterface
    */
-  protected $entity_id;
+  protected $entity;
 
   /**
    * Current phase, one of the PHASE_ constants.
@@ -145,11 +145,11 @@ class Email implements InternalEmailInterface {
    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
    *   The theme manager.
    * @param string $type
-   *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
+   *   Type. @see self::getType()
    * @param string $sub_type
-   *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
-   *   (optional) Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
+   *   Sub-type. @see self::getSubType()
+   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface|null $entity
+   *   (optional) Entity. @see self::getEntity()
    */
   public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, ThemeManagerInterface $theme_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
     $this->mailer = $mailer;
@@ -170,11 +170,11 @@ class Email implements InternalEmailInterface {
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The current service container.
    * @param string $type
-   *   Type. @see \Drupal\symfony_mailer\BaseEmailInterface::getType()
+   *   Type. @see self::getType()
    * @param string $sub_type
-   *   Sub-type. @see \Drupal\symfony_mailer\BaseEmailInterface::getSubType()
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
-   *   (optional) Entity. @see \Drupal\symfony_mailer\BaseEmailInterface::getEntity()
+   *   Sub-type. @see self::getSubType()
+   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface|null $entity
+   *   (optional) Entity. @see self::getEntity()
    *
    * @return static
    *   A new email object.
@@ -521,11 +521,10 @@ class Email implements InternalEmailInterface {
   /**
    * Checks that a function was called in the correct phase.
    *
-   * @param int $phase
-   *   The correct phase, one of the PHASE_ constants.
-   * @param bool $exact
-   *   If TRUE, require the exact phase, if FALSE allow earlier phases (later
-   *   phases for post-render).
+   * @param int $max_phase
+   *   Latest allowed phase, one of the PHASE_ constants.
+   * @param int $min_phase
+   *   (Optional) Earliest allowed phase, one of the PHASE_ constants.
    *
    * @return $this
    */

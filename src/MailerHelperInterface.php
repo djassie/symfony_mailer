@@ -49,6 +49,7 @@ interface MailerHelperInterface {
    * Returns the configuration factory.
    *
    * @return \Drupal\Core\Config\ConfigFactoryInterface
+   *   The config factory.
    */
   public function config();
 

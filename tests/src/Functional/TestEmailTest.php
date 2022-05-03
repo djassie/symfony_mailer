@@ -3,8 +3,6 @@
 namespace Drupal\Tests\symfony_mailer\Functional;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Test\AssertMailTrait;
-use Drupal\Tests\BrowserTestBase;
 
 /**
  * Test the test email.

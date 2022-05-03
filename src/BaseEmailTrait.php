@@ -36,91 +36,149 @@ trait BaseEmailTrait {
    */
   protected $sender;
 
+  /**
+   * {@inheritdoc}
+   */
   public function setSender($address) {
     $this->sender = Address::create($address);
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getSender(): ?AddressInterface {
     return $this->sender;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setAddress(string $name, $addresses) {
     assert(isset($this->addresses[$name]));
     $this->addresses[$name] = Address::convert($addresses);
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setFrom($addresses) {
     return $this->setAddress('From', $addresses);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFrom(): array {
     return $this->addresses['From'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setReplyTo($addresses) {
     return $this->setAddress('Reply-To', $addresses);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getReplyTo(): array {
     return $this->addresses['Reply-To'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setTo($addresses) {
     $this->valid(self::PHASE_BUILD);
     return $this->setAddress('To', $addresses);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getTo(): array {
     return $this->addresses['To'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setCc($addresses) {
     return $this->setAddress('Cc', $addresses);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getCc(): array {
     return $this->addresses['Cc'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setBcc($addresses) {
     return $this->setAddress('Bcc', $addresses);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getBcc(): array {
     return $this->addresses['Bcc'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setPriority(int $priority) {
     $this->inner->priority($priority);
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getPriority(): int {
     return $this->inner->getPriority();
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setTextBody(string $body) {
     $this->inner->text($body);
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getTextBody(): ?string {
     return $this->inner->getTextBody();
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setHtmlBody(?string $body) {
     $this->valid(self::PHASE_POST_RENDER, self::PHASE_POST_RENDER);
     $this->inner->html($body);
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getHtmlBody(): ?string {
     $this->valid(self::PHASE_POST_SEND, self::PHASE_POST_RENDER);
     return $this->inner->getHtmlBody();
   }
 
+  // @codingStandardsIgnoreStart
   // public function attach(string $body, string $name = null, string $contentType = null);
 
   // public function attachFromPath(string $path, string $name = null, string $contentType = null);
@@ -132,11 +190,18 @@ trait BaseEmailTrait {
   // public function attachPart(DataPart $part);
 
   // public function getAttachments();
+  // @codingStandardsIgnoreEnd
 
+  /**
+   * {@inheritdoc}
+   */
   public function getHeaders(): Headers {
     return $this->inner->getHeaders();
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function addTextHeader(string $name, string $value) {
     $this->getHeaders()->addTextHeader($name, $value);
     return $this;

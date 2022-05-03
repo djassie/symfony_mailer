@@ -2,8 +2,7 @@
 
 /**
  * @file
- * Install, update and uninstall functions for the Symfony Mailer
- * Back-compatibility module.
+ * Install, functions for the Symfony Mailer Back-compatibility module.
  */
 
 /**

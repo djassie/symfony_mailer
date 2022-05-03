@@ -30,6 +30,11 @@ abstract class SymfonyMailerTestBase extends BrowserTestBase {
    */
   protected $adminUser;
 
+  /**
+   * The site name.
+   *
+   * @var string
+   */
   protected $siteName = 'Tom & Jerry';
 
   /**
@@ -41,12 +46,32 @@ abstract class SymfonyMailerTestBase extends BrowserTestBase {
     $this->adminUser = $this->drupalCreateUser(['administer mailer']);
   }
 
+  /**
+   * Asserts that a policy listing introduction text is correct.
+   *
+   * @param string $type
+   *   The expected email type.
+   * @param string $common
+   *   The expected common adjusters text.
+   */
   protected function assertPolicyListingIntro(string $type, string $common) {
     $this->assertSession()->pageTextContains("Configure Mailer policy records to customise the emails sent for $type.");
     $this->assertSession()->pageTextContains("You can set the $common and more.");
   }
 
-  protected function assertPolicyListingRow(string $row, string $sub_type, string $summary, string $id) {
+  /**
+   * Asserts that a policy listing row text is correct.
+   *
+   * @param int $row
+   *   The row number to check.
+   * @param string $sub_type
+   *   The expected email sub-type.
+   * @param string $summary
+   *   The expected summary text.
+   * @param string $id
+   *   The expected policy ID that the button links to.
+   */
+  protected function assertPolicyListingRow(int $row, string $sub_type, string $summary, string $id) {
     $base = "#edit-mailer-policy-listing-table tbody tr:nth-of-type($row)";
     $add = $summary ? '' : '/add';
     $this->assertSession()->elementContains('css', "$base td:nth-of-type(1)", $sub_type);

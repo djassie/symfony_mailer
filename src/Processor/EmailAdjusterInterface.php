@@ -10,6 +10,13 @@ use Drupal\Core\Form\FormStateInterface;
 interface EmailAdjusterInterface extends EmailProcessorInterface {
 
   /**
+   * The maximum length of a summary, beyond which it will be truncated.
+   *
+   * @var int
+   */
+  const MAX_SUMMARY = 50;
+
+  /**
    * Generates an adjuster's settings form.
    *
    * @param array $form
@@ -27,6 +34,7 @@ interface EmailAdjusterInterface extends EmailProcessorInterface {
    * Returns the administrative label for this plugin.
    *
    * @return string
+   *   The label.
    */
   public function getLabel();
 
@@ -34,6 +42,7 @@ interface EmailAdjusterInterface extends EmailProcessorInterface {
    * Returns a summary for this plugin.
    *
    * @return string
+   *   The summary, which will be truncated to length self::MAX_SUMMARY.
    */
   public function getSummary();
 

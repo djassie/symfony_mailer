@@ -74,7 +74,11 @@ function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $f
       'type' => 'simplenews',
     ],
     'simplenews_newsletter_edit_form' => [
-      'remove' => ['email', 'simplenews_sender_information', 'simplenews_subject'],
+      'remove' => [
+        'email',
+        'simplenews_sender_information',
+        'simplenews_subject',
+      ],
       'entity' => 'node',
     ],
     'update_settings' => [

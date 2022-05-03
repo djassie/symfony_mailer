@@ -6,7 +6,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\symfony_mailer\Address;
 use Drupal\symfony_mailer\Processor\EmailAdjusterManager;
 use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
 
@@ -18,12 +17,12 @@ class MailerHelper implements MailerHelperInterface {
   use StringTranslationTrait;
 
   /**
-     * A regex that matches a structure like 'Name <email@address.com>'.
-     * It matches anything between the first < and last > as email address.
-     * This allows to use a single string to construct an Address, which can be convenient to use in
-     * config, and allows to have more readable config.
-     * This does not try to cover all edge cases for address.
-     */
+   * Regular expression for parsing addresses.
+   *
+   * Matches a string like 'Name <email@address.com>' Anything between the
+   * first < and last > counts as the email address. This does not try to cover
+   * all edge cases for address.
+   */
   protected const FROM_STRING_PATTERN = '~(?<displayName>[^<]*)<(?<addrSpec>.*)>[^>]*~';
 
   /**

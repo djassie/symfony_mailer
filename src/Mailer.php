@@ -98,7 +98,7 @@ class Mailer implements MailerInterface {
    *   The event dispatcher.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Language\LanguageDefault $default_language
+   * @param \Drupal\Core\Language\LanguageDefault $language_default
    *   The default language.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.

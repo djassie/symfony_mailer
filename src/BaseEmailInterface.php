@@ -2,7 +2,6 @@
 
 namespace Drupal\symfony_mailer;
 
-use Drupal\symfony_mailer\AddressInterface;
 use Symfony\Component\Mime\Header\Headers;
 
 /**
@@ -36,7 +35,7 @@ interface BaseEmailInterface {
    * Gets the sender address.
    *
    * @return \Drupal\symfony_mailer\AddressInterface
-   *  The sender address, or NULL if not set.
+   *   The sender address, or NULL if not set.
    */
   public function getSender(): ?AddressInterface;
 
@@ -190,7 +189,7 @@ interface BaseEmailInterface {
    * Valid: after rendering. Email builders should instead call
    * EmailInterface::setBody() or related functions before rendering.
    *
-   * @param string $body
+   * @param string|null $body
    *   (optional) The HTML body, or NULL to remove the HTML body.
    *
    * @return $this
@@ -207,6 +206,7 @@ interface BaseEmailInterface {
    */
   public function getHtmlBody(): ?string;
 
+  // @codingStandardsIgnoreStart
   /**
    * @param string $body
    *
@@ -240,6 +240,7 @@ interface BaseEmailInterface {
    * @return array|DataPart[]
    */
   // public function getAttachments(): array;
+  // @codingStandardsIgnoreEnd
 
   /**
    * Gets the headers object for getting or setting headers.
@@ -261,4 +262,4 @@ interface BaseEmailInterface {
    */
   public function addTextHeader(string $name, string $value);
 
-};
+}

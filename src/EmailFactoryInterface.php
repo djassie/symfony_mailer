@@ -16,7 +16,7 @@ interface EmailFactoryInterface {
    *   The module name.
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
-   * @param ... $params
+   * @param mixed $params
    *   Parameters for building this email.
    *
    * @return \Drupal\symfony_mailer\EmailInterface
@@ -31,7 +31,7 @@ interface EmailFactoryInterface {
    *   Entity. @see \Drupal\symfony_mailer\EmailInterface::getEntity()
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
-   * @param ... $params
+   * @param mixed $params
    *   Parameters for building this email.
    *
    * @return \Drupal\symfony_mailer\EmailInterface
@@ -50,7 +50,7 @@ interface EmailFactoryInterface {
    *   The module name.
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
-   * @param ... $params
+   * @param mixed $params
    *   Parameters for building this email.
    *
    * @return \Drupal\symfony_mailer\EmailInterface
@@ -69,7 +69,7 @@ interface EmailFactoryInterface {
    *   Entity. @see \Drupal\symfony_mailer\EmailInterface::getEntity()
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
-   * @param ... $params
+   * @param mixed $params
    *   Parameters for building this email.
    *
    * @return \Drupal\symfony_mailer\EmailInterface

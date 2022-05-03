@@ -31,9 +31,12 @@ class MailerCommands extends DrushCommands {
   /**
    * Imports legacy config.
    *
+   * @param string $id
+   *   EmailBuilder ID to import.
    * @param array $options
    *   An associative array of options whose values come from cli, aliases,
    *   config, etc.
+   *
    * @option skip
    *   Skip the import.
    *

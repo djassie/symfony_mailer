@@ -2,8 +2,6 @@
 
 namespace Drupal\symfony_mailer\Plugin\EmailAdjuster;
 
-use Drupal\symfony_mailer\EmailInterface;
-
 /**
  * Defines the Bcc Email Adjuster.
  *

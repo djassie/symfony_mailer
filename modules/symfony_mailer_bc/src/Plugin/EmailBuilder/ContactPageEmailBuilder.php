@@ -36,7 +36,7 @@ class ContactPageEmailBuilder extends ContactEmailBuilderBase {
    *   The email to modify.
    * @param \Drupal\contact\MessageInterface $message
    *   Submitted message entity.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $sender
    *   The sender.
    */
   public function createParams(EmailInterface $email, MessageInterface $message = NULL, AccountInterface $sender = NULL) {

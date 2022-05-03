@@ -72,7 +72,7 @@ class MailManagerReplacement extends MailManager {
    *   The string translation service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\symfony_mailer\EmailFactoryInterface $email_factory;
+   * @param \Drupal\symfony_mailer\EmailFactoryInterface $email_factory
    *   The email factory.
    * @param \Drupal\symfony_mailer\MailerHelperInterface $mailer_helper
    *   The mailer helper.

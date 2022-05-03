@@ -36,7 +36,10 @@ class SendmailTransport extends TransportBase {
       '#type' => 'radios',
       '#title' => $this->t('Command'),
       '#default_value' => $this->configuration['query']['command'],
-      '#description' => $this->t('Sendmail command to execute. Configure available commands by setting the variable %var in %file.', ['%var' => 'mailer_sendmail_commands', '%file' => 'settings.php']),
+      '#description' => $this->t('Sendmail command to execute. Configure available commands by setting the variable %var in %file.', [
+        '%var' => 'mailer_sendmail_commands',
+        '%file' => 'settings.php',
+      ]),
       '#options' => $commands,
     ];
 

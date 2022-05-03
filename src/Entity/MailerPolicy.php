@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\symfony_mailer\Annotation\EmailBuilder;
 use Drupal\symfony_mailer\Processor\AdjusterPluginCollection;
+use Drupal\symfony_mailer\Processor\EmailAdjusterInterface;
 
 /**
  * Defines a Mailer Policy configuration entity class.
@@ -43,13 +44,6 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   use StringTranslationTrait;
 
   /**
-   * Maximum length of a summary for a adjuster.
-   *
-   * @var int
-   */
-  protected const MAX_SUMMARY = 50;
-
-  /**
    * The unique ID of the policy record.
    *
    * @var string
@@ -83,6 +77,8 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    *
    * An associative array of email adjuster configuration, keyed by the plug-in
    * ID with value as an array of configured settings.
+   *
+   * @var array
    */
   protected $configuration = [];
 
@@ -196,7 +192,11 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    * {@inheritdoc}
    */
   public function label() {
-    $labels = [$this->getTypeLabel(), $this->getSubTypeLabel(), $this->getEntityLabel()];
+    $labels = [
+      $this->getTypeLabel(),
+      $this->getSubTypeLabel(),
+      $this->getEntityLabel(),
+    ];
     return implode(' » ', array_filter($labels));
   }
 
@@ -268,8 +268,8 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
     foreach ($this->adjusters()->sort() as $adjuster) {
       $element = $adjuster->getLabel();
       if ($expanded && ($element_summary = $adjuster->getSummary())) {
-        if (strlen($element_summary) > static::MAX_SUMMARY) {
-          $element_summary = substr($element_summary, 0, static::MAX_SUMMARY) . '…';
+        if (strlen($element_summary) > EmailAdjusterInterface::MAX_SUMMARY) {
+          $element_summary = substr($element_summary, 0, EmailAdjusterInterface::MAX_SUMMARY) . '…';
         }
         $element .= ": $element_summary";
         $separator = '<br>';

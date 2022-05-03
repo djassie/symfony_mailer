@@ -36,7 +36,7 @@ class SimplenewsNewsletterEmailBuilder extends SimplenewsEmailBuilderBase {
    *   The newsletter issue to send.
    * @param \Drupal\simplenews\SubscriberInterface $subscriber
    *   The subscriber.
-   * @param bool $test
+   * @param bool|null $test
    *   (Optional) TRUE to send a test email.
    */
   public function createParams(EmailInterface $email, ContentEntityInterface $issue = NULL, SubscriberInterface $subscriber = NULL, ?bool $test = FALSE) {

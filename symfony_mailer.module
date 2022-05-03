@@ -5,8 +5,6 @@
  * Allows sending emails with Symfony Mailer.
  */
 
-use Drupal\symfony_mailer\EmailInterface;
-
 /**
  * Implements hook_theme().
  */
@@ -37,7 +35,7 @@ function symfony_mailer_theme_suggestions_email(array $variables) {
  *   An associative array containing:
  *   - email: An associative array containing the Email object.
  */
-function template_preprocess_email(&$variables) {
+function template_preprocess_email(array &$variables) {
   $email = $variables['email'];
   $variables['body'] = $email->getBody();
   $variables = array_merge($variables, $email->getVariables());

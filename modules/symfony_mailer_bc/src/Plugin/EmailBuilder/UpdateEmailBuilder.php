@@ -70,7 +70,7 @@ class UpdateEmailBuilder extends EmailBuilderBase {
    * {@inheritdoc}
    */
   public function import() {
-    $mail_notification = implode(',',$this->helper()->config()->get('update.settings')->get('notification.emails'));
+    $mail_notification = implode(',', $this->helper()->config()->get('update.settings')->get('notification.emails'));
 
     if ($mail_notification) {
       $notification_policy = $this->helper()->policyFromAddresses($this->helper()->parseAddress($mail_notification));

@@ -84,6 +84,8 @@ class EmailFactory implements EmailFactoryInterface {
    *
    * @param \Drupal\symfony_mailer\EmailInterface $email
    *   The email to initialize.
+   * @param mixed $params
+   *   Parameters for building this email.
    *
    * @return \Drupal\symfony_mailer\EmailInterface
    *   The email.
