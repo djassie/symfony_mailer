@@ -4,6 +4,7 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\Mime\Address as SymfonyAddress;
+use Drupal\user\Entity\User;
 
 /**
  * Defines the class for an Email address.
@@ -137,6 +138,27 @@ class Address implements AddressInterface {
     }
 
     return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Serialization is intended only for testing.
+   *
+   * @internal
+   */
+  public function __serialize() {
+    return [$this->email, $this->displayName, $this->langcode, $this->account ? $this->account->id() : NULL];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __unserialize(array $data) {
+    [$this->email, $this->displayName, $this->langcode, $account_id] = $data;
+    if ($account_id) {
+      $this->account = User::load($account_id);
+    }
   }
 
 }

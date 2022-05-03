@@ -4,12 +4,14 @@ namespace Drupal\symfony_mailer;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
@@ -144,6 +146,8 @@ class Email implements InternalEmailInterface {
    *   The entity type manager.
    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
    *   The theme manager.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
    * @param string $type
    *   Type. @see self::getType()
    * @param string $sub_type
@@ -151,11 +155,12 @@ class Email implements InternalEmailInterface {
    * @param \Drupal\Core\Config\Entity\ConfigEntityInterface|null $entity
    *   (optional) Entity. @see self::getEntity()
    */
-  public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, ThemeManagerInterface $theme_manager, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
+  public function __construct(MailerInterface $mailer, RendererInterface $renderer, EntityTypeManagerInterface $entity_type_manager, ThemeManagerInterface $theme_manager, ConfigFactoryInterface $config_factory, string $type, string $sub_type, ?ConfigEntityInterface $entity) {
     $this->mailer = $mailer;
     $this->renderer = $renderer;
     $this->entityTypeManager = $entity_type_manager;
     $this->themeManager = $theme_manager;
+    $this->configFactory = $config_factory;
     $this->type = $type;
     $this->subType = $sub_type;
     $this->entity = $entity;
@@ -185,6 +190,7 @@ class Email implements InternalEmailInterface {
       $container->get('renderer'),
       $container->get('entity_type.manager'),
       $container->get('theme.manager'),
+      $container->get('config.factory'),
       $type,
       $sub_type,
       $entity
@@ -546,15 +552,22 @@ class Email implements InternalEmailInterface {
    * @internal
    */
   public function __serialize() {
-    return [$this->subject, $this->addresses, $this->inner];
+    // Exclude $this->params, $this->variables as they may not serialize.
+    return [$this->type, $this->subType, $this->entity ? $this->entity->id() : '', $this->phase, $this->subject, $this->langcode, $this->account ? $this->account->id() : '', $this->theme, $this->libraries, $this->transportDsn, $this->inner, $this->addresses, $this->sender];
   }
 
   /**
    * {@inheritdoc}
    */
   public function __unserialize(array $data) {
-    $this->phase = self::PHASE_POST_SEND;
-    [$this->subject, $this->addresses, $this->inner] = $data;
+    [$this->type, $this->subType, $entity_id, $this->phase, $this->subject, $this->langcode, $account_id, $this->theme, $this->libraries, $this->transportDsn, $this->inner, $this->addresses, $this->sender] = $data;
+
+    if ($entity_id) {
+      $this->entity = $this->configFactory->get($entity_id);
+    }
+    if ($account_id) {
+      $this->account = User::load($account_id);
+    }
   }
 
 }

@@ -3,11 +3,14 @@
 namespace Drupal\Tests\symfony_mailer\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use Drupal\symfony_mailer_test\MailerTestTrait;
 
 /**
  * Base class for Symfony Mailer browser tests.
  */
 abstract class SymfonyMailerTestBase extends BrowserTestBase {
+
+  use MailerTestTrait;
 
   protected const TYPE_ALL = '<b>*All*</b>';
 
@@ -47,6 +50,15 @@ abstract class SymfonyMailerTestBase extends BrowserTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function tearDown() {
+    parent::tearDown();
+    // @todo Test for no mail not working?
+    $this->noMail();
+  }
+
+  /**
    * Asserts that a policy listing introduction text is correct.
    *
    * @param string $type
@@ -77,52 +89,6 @@ abstract class SymfonyMailerTestBase extends BrowserTestBase {
     $this->assertSession()->elementContains('css', "$base td:nth-of-type(1)", $sub_type);
     $this->assertSession()->elementContains('css', "$base td:nth-of-type(2)", $summary);
     $this->assertSession()->elementAttributeContains('css', "$base td:nth-of-type(3) li a", 'href', "/admin/config/system/mailer/policy$add/$id");
-  }
-
-  /**
-   * Gets the next email, removing it from the list.
-   *
-   * @return \Symfony\Component\Mime\Email
-   *   The email.
-   */
-  protected function nextMail() {
-    $emails = \Drupal::state()->get('mailer_test.emails', []);
-    $email = array_shift($emails);
-    \Drupal::state()->set('mailer_test.emails', $emails);
-    return $email;
-  }
-
-  /**
-   * Checks that the most recently sent email contains text.
-   *
-   * @param string $value
-   *   Text to check for.
-   */
-  protected function assertBodyContains($value) {
-    $captured_emails = $this->container->get('state')->get('system.test_mail_collector') ?: [];
-    $email = end($captured_emails);
-    $this->assertStringContainsString($value, (string) $email['body']);
-  }
-
-  /**
-   * Checks the subject of the most recently sent email.
-   *
-   * @param string $value
-   *   Text to check for.
-   */
-  protected function assertSubject($value) {
-    $captured_emails = $this->container->get('state')->get('system.test_mail_collector') ?: [];
-    $email = end($captured_emails);
-    $this->assertEquals($value, (string) $email['subject']);
-  }
-
-  /**
-   * Enables Plain text emails.
-   */
-  protected function enablePlain() {
-    $this->config('swiftmailer.message')
-      ->set('content_type', SWIFTMAILER_FORMAT_PLAIN)
-      ->save();
   }
 
 }

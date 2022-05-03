@@ -24,13 +24,11 @@ class TestEmailTest extends SymfonyMailerTestBase {
 
     $this->submitForm([], 'Send');
     $this->assertSession()->pageTextContains('An attempt has been made to send an email to you.');
-    $email = $this->nextMail();
-    $to = $email->getTo()[0];
-    $this->assertEquals($this->adminUser->getEmail(), $to->getEmail());
-    $this->assertEquals($this->adminUser->getDisplayName(), $to->getDisplayName());
-    $this->assertEquals("Test email from $this->siteName", $email->getSubject());
+    $this->readMail();
+    $this->assertTo($this->adminUser->getEmail(), $this->adminUser->getDisplayName());
+    $this->assertSubject("Test email from $this->siteName");
     $escaped_site_name = Html::escape($this->siteName);
-    $this->assertStringContainsString("This is a test email from <a href=\"$this->baseUrl/\">$escaped_site_name</a>.", $email->getHtmlBody());
+    $this->assertBodyContains("This is a test email from <a href=\"$this->baseUrl/\">$escaped_site_name</a>.");
   }
 
 }

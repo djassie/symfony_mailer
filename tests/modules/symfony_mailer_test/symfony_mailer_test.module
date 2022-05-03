@@ -12,5 +12,5 @@ use Drupal\symfony_mailer_test\MailerTest;
  * Implements hook_mailer_init().
  */
 function symfony_mailer_test_mailer_init(EmailInterface $email) {
-  (new MailerTest())->init($email);
+  \Drupal::service('symfony_mailer.test')->init($email);
 }
