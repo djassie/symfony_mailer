@@ -118,6 +118,21 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
   /**
    * {@inheritdoc}
    */
+  public function importRequired() {
+    $state_all = $this->keyValue->get('import', []);
+
+    foreach ($this->getDefinitions() as $id => $definition) {
+      if ($definition['import'] && (($state_all[$id] ?? self::IMPORT_READY) == self::IMPORT_READY)) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function import(string $id) {
     $this->createInstance($id)->import();
     $this->setImportState($id, self::IMPORT_COMPLETE);

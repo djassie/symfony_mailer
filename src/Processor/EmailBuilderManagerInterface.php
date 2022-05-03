@@ -37,6 +37,14 @@ interface EmailBuilderManagerInterface extends PluginManagerInterface {
   public function getImportInfo();
 
   /**
+   * Checks if config importing is required.
+   *
+   * @return bool
+   *   TRUE if import is required.
+   */
+  public function importRequired();
+
+  /**
    * Imports config for the specified id.
    *
    * @param string $id

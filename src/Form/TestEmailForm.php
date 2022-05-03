@@ -63,10 +63,6 @@ class TestEmailForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['#tree'] = TRUE;
 
-    $form['description'] = [
-      '#markup' => '<p>' . $this->t('This page allows you to send a test email to a recipient of your choice.') . '</p>',
-    ];
-
     $form['recipient'] = [
       '#title' => $this->t('Recipient'),
       '#type' => 'textfield',
