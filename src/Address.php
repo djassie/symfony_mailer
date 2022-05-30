@@ -129,6 +129,8 @@ class Address implements AddressInterface {
    * {@inheritdoc}
    */
   public static function convert($addresses) {
+    $result = [];
+
     if (!is_array($addresses)) {
       $addresses = [$addresses];
     }
