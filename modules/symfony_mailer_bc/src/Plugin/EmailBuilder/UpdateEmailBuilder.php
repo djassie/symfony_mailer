@@ -83,10 +83,10 @@ class UpdateEmailBuilder extends EmailBuilderBase {
    * {@inheritdoc}
    */
   public function import() {
-    $mail_notification = implode(',', $this->helper()->config()->get('update.settings')->get('notification.emails'));
+    // Get without overrides to avoid the dummy value set by MailerBcConfigOverride.
+    $mail_notification = implode(',', $this->helper()->config()->get('update.settings')->getOriginal('notification.emails', FALSE));
 
-    // Ignore the dummy value set by MailerBcConfigOverride.
-    if ($mail_notification && ($mail_notification != 'dummy')) {
+    if ($mail_notification) {
       $notification_policy = $this->helper()->policyFromAddresses($this->helper()->parseAddress($mail_notification));
       $config['email_to'] = $notification_policy;
       MailerPolicy::import("update.status_notify", $config);
