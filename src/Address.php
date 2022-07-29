@@ -75,6 +75,9 @@ class Address implements AddressInterface {
         $site_mail = $site_config->get('mail') ?: ini_get('sendmail_from');
         return new static($site_mail, $site_config->get('name'));
       }
+      elseif ($user = user_load_by_mail($address)) {
+        return static::create($user);
+      }
       else {
         return new static($address);
       }
