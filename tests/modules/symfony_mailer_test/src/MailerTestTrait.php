@@ -2,16 +2,23 @@
 
 namespace Drupal\symfony_mailer_test;
 
-use Drupal\Core\DestructableInterface;
-use Drupal\symfony_mailer\EmailInterface;
-use Drupal\symfony_mailer_test\MailerTestServiceInterface;
-
 /**
  * Tracks sent emails for testing.
  */
 trait MailerTestTrait {
 
+  /**
+   * The emails that have been sent and not yet checked.
+   *
+   * @var \Drupal\symfony_mailer\EmailInterface[]
+   */
   protected $emails;
+
+  /**
+   * The most recently sent email.
+   *
+   * @var \Drupal\symfony_mailer\EmailInterface
+   */
   protected $email;
 
   /**
@@ -24,6 +31,7 @@ trait MailerTestTrait {
     $this->init();
     $this->email = array_shift($this->emails);
     $this->assertNotNull($this->email);
+    return $this->email;
   }
 
   /**
@@ -90,8 +98,6 @@ trait MailerTestTrait {
 
   /**
    * Checks there are no more emails.
-   *
-   * @return $this
    */
   protected function noMail() {
     $this->init();
@@ -100,6 +106,9 @@ trait MailerTestTrait {
     unset($this->emails);
   }
 
+  /**
+   * Initializes the list of emails.
+   */
   protected function init() {
     if (is_null($this->emails)) {
       $this->emails = \Drupal::state()->get(MailerTestServiceInterface::STATE_KEY, []);

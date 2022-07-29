@@ -150,7 +150,9 @@ class Address implements AddressInterface {
    * @internal
    */
   public function __serialize() {
-    return [$this->email, $this->displayName, $this->langcode, $this->account ? $this->account->id() : NULL];
+    return [$this->email, $this->displayName, $this->langcode,
+      $this->account ? $this->account->id() : NULL,
+    ];
   }
 
   /**

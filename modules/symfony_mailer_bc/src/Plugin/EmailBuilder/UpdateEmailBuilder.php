@@ -83,7 +83,8 @@ class UpdateEmailBuilder extends EmailBuilderBase {
    * {@inheritdoc}
    */
   public function import() {
-    // Get without overrides to avoid the dummy value set by MailerBcConfigOverride.
+    // Get without overrides to avoid the dummy value
+    // set by MailerBcConfigOverride.
     $mail_notification = implode(',', $this->helper()->config()->get('update.settings')->getOriginal('notification.emails', FALSE));
 
     if ($mail_notification) {

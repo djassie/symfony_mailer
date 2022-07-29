@@ -38,6 +38,8 @@ class LegacyEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlu
   ];
 
   /**
+   * Constructor.
+   *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id

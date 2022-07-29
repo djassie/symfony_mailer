@@ -82,7 +82,7 @@ class MailManagerReplacement extends MailManager {
       'id' => $module . '_' . $key,
       'module' => $module,
       'key' => $key,
-      'to' => $to ?: null,
+      'to' => $to ?: NULL,
       'langcode' => $langcode,
       'params' => $params,
       'reply-to' => $reply,
