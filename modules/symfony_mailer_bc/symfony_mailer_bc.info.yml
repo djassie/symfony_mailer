@@ -1,6 +1,6 @@
 name: Symfony Mailer Back-compatibility
 type: module
-description: Back-compatibility mapper for Symfony Mailer.
+description: 'Back-compatibility mapper for Symfony Mailer. Entirely replaces the default mail system, so that all Drupal emails will be sent via Symfony Mailer.'
 core_version_requirement: ^9.1
 package: Mail
 dependencies:
