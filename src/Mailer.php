@@ -161,6 +161,7 @@ class Mailer implements MailerInterface {
    */
   public function doSend(InternalEmailInterface $email) {
     // Process the build phase.
+    // @see \Drupal\symfony_mailer\EmailInterface::PHASE_BUILD
     $email->process();
 
     // Do switching.
@@ -202,12 +203,14 @@ class Mailer implements MailerInterface {
 
     try {
       // Process the pre-render phase.
+      // @see \Drupal\symfony_mailer\EmailInterface::PHASE_PRE_RENDER
       $email->process();
 
       // Render.
       $email->render();
 
       // Process the post-render phase.
+      // @see \Drupal\symfony_mailer\EmailInterface::PHASE_POST_RENDER
       $email->process();
     }
     finally {
@@ -265,6 +268,7 @@ class Mailer implements MailerInterface {
     }
 
     // Process the post-send phase.
+    // @see \Drupal\symfony_mailer\EmailInterface::PHASE_POST_SEND
     $email->process();
 
     return $result;

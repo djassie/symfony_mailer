@@ -94,6 +94,7 @@ class EmailFactory implements EmailFactoryInterface {
     // Load builders with matching ID.
     foreach ($email->getSuggestions('', '.') as $plugin_id) {
       if ($this->emailBuilderManager->hasDefinition($plugin_id)) {
+        /** @var \Drupal\symfony_mailer\Processor\EmailBuilderInterface $builder */
         $builder = $this->emailBuilderManager->createInstance($plugin_id);
         if (empty($created)) {
           $builder->createParams($email, ...$params);
@@ -127,6 +128,10 @@ class EmailFactory implements EmailFactoryInterface {
    *
    * @param \Drupal\symfony_mailer\EmailInterface $email
    *   The email.
+   *
+   * @see hook_mailer_PHASE()
+   * @see hook_mailer_TYPE_PHASE()
+   * @see hook_mailer_TYPE__SUBTYPE_PHASE()
    */
   public function invokeHooks(EmailInterface $email) {
     $name = EmailInterface::PHASE_NAMES[$email->getPhase()];
