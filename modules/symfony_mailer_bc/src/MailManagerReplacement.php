@@ -16,7 +16,7 @@ use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
 /**
  * Provides a Symfony Mailer replacement for MailManager.
  */
-class MailManagerReplacement extends MailManager {
+class MailManagerReplacement extends MailManager implements MailManagerReplacementInterface {
 
   /**
    * List of headers for conversion to array.

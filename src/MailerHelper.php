@@ -6,7 +6,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\symfony_mailer\Processor\EmailAdjusterManager;
+use Drupal\symfony_mailer\Processor\EmailAdjusterManagerInterface;
 use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
 
 /**
@@ -35,7 +35,7 @@ class MailerHelper implements MailerHelperInterface {
   /**
    * The email adjuster manager.
    *
-   * @var \Drupal\symfony_mailer\Processor\EmailAdjusterManager
+   * @var \Drupal\symfony_mailer\Processor\EmailAdjusterManagerInterface
    */
   protected $adjusterManager;
 
@@ -58,14 +58,14 @@ class MailerHelper implements MailerHelperInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\symfony_mailer\Processor\EmailAdjusterManager $email_adjuster_manager
+   * @param \Drupal\symfony_mailer\Processor\EmailAdjusterManagerInterface $email_adjuster_manager
    *   The email adjuster manager.
    * @param \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface $email_builder_manager
    *   The email builder manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EmailAdjusterManager $email_adjuster_manager, EmailBuilderManagerInterface $email_builder_manager, ConfigFactoryInterface $config_factory) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EmailAdjusterManagerInterface $email_adjuster_manager, EmailBuilderManagerInterface $email_builder_manager, ConfigFactoryInterface $config_factory) {
     $this->entityTypeManager = $entity_type_manager;
     $this->adjusterManager = $email_adjuster_manager;
     $this->builderManager = $email_builder_manager;
