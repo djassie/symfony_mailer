@@ -45,11 +45,27 @@ class SmtpTransport extends TransportBase {
       '#description' => $this->t('User name to log in.'),
     ];
 
+    // By default, keep the existing password except for a new transport
+    // (which has empty host).
+    $new = empty($this->configuration['host']);
+    $form['change_pass'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Change password'),
+      '#default_value' => $new,
+      '#access' => !$new,
+      '#description' => $this->t('Your password is stored; select to change it.'),
+    ];
+
     $form['pass'] = [
       '#type' => 'password',
       '#title' => $this->t('Password'),
       '#default_value' => $this->configuration['pass'],
       '#description' => $this->t('Password to log in.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="change_pass"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $form['host'] = [
@@ -120,7 +136,9 @@ class SmtpTransport extends TransportBase {
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['user'] = $form_state->getValue('user');
-    $this->configuration['pass'] = $form_state->getValue('pass');
+    if (!empty($form_state->getValue('change_pass'))) {
+      $this->configuration['pass'] = $form_state->getValue('pass');
+    }
     $this->configuration['host'] = $form_state->getValue('host');
     $this->configuration['port'] = $form_state->getValue('port');
     $this->configuration['query']['verify_peer'] = $form_state->getValue('verify_peer');
