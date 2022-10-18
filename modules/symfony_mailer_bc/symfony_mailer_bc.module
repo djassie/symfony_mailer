@@ -126,4 +126,9 @@ function symfony_mailer_bc_form_alter(&$form, FormStateInterface $form_state, $f
       $form['mailer_policy'] = $helper->renderTypePolicy($config['type']);
     }
   }
+
+  if ($form_id == 'contact_form_add_form') {
+    // Set a default value for the hidden field so the form can verify.
+    $form['recipients']['#default_value'] = \Drupal::config('system.site')->get('mail');
+  }
 }
