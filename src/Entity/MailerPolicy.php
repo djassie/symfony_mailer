@@ -202,7 +202,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    */
   public function getEntityLabel() {
     if (empty($this->builderDefinition['has_entity'])) {
-      return NULL;
+      return '';
     }
     if ($this->entity) {
       return $this->entity->label();
