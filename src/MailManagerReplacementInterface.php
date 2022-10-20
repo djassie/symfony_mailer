@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc;
+namespace Drupal\symfony_mailer;
 
 use Drupal\Core\Mail\MailManagerInterface;
 

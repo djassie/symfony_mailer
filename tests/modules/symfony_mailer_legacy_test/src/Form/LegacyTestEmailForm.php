@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc_test\Form;
+namespace Drupal\symfony_mailer_legacy_test\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -8,9 +8,9 @@ use Drupal\Core\Mail\MailManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Test module form to send a test BC mail.
+ * Test module form to send a test legacy email.
  */
-class BcTestMailForm extends FormBase {
+class LegacyTestEmailForm extends FormBase {
 
   /**
    * The mail manager service.
@@ -42,7 +42,7 @@ class BcTestMailForm extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'symfony_mailer_bc_test_form';
+    return 'symfony_mailer_legacy_test_form';
   }
 
   /**
@@ -52,7 +52,7 @@ class BcTestMailForm extends FormBase {
     $form = [];
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => 'Send test mail',
+      '#value' => 'Send test email',
     ];
     /** @var \Drupal\Core\Theme\ThemeManagerInterface $theme_manager */
     $theme_manager = \Drupal::service('theme.manager');
@@ -68,7 +68,7 @@ class BcTestMailForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->mailManager->mail('symfony_mailer_bc_test', 'bc_test', 'test@example.com', 'en');
+    $this->mailManager->mail('symfony_mailer_legacy_test', 'legacy_test', 'test@example.com', 'en');
   }
 
 }

@@ -1,15 +1,13 @@
 <?php
 
-namespace Drupal\Tests\symfony_mailer_bc\Functional;
-
-use Drupal\Tests\symfony_mailer\Functional\SymfonyMailerTestBase;
+namespace Drupal\Tests\symfony_mailer\Functional;
 
 /**
  * Test the Symfony Mailer Back-compatibility module.
  *
  * @group symfony_mailer
  */
-class TestBcMail extends SymfonyMailerTestBase {
+class TestLegacyEmail extends SymfonyMailerTestBase {
 
   /**
    * Modules to enable.
@@ -18,9 +16,8 @@ class TestBcMail extends SymfonyMailerTestBase {
    */
   protected static $modules = [
     'symfony_mailer',
-    'symfony_mailer_bc',
     'symfony_mailer_test',
-    'symfony_mailer_bc_test',
+    'symfony_mailer_legacy_test',
   ];
 
   /**
@@ -36,13 +33,13 @@ class TestBcMail extends SymfonyMailerTestBase {
   }
 
   /**
-   * Test sending a backwards compatible email rendered via hook_mail().
+   * Test sending a legacy email rendered via hook_mail().
    */
-  public function testSendBcMail() {
+  public function testSendLegacyEmail() {
     $this->drupalLogin($this->adminUser);
-    // Trigger sending a backwards compatible email via hook_mail().
-    $this->drupalGet('admin/symfony_mailer_bc_test/send');
-    $this->submitForm([], 'Send test mail');
+    // Trigger sending a legacy email via hook_mail().
+    $this->drupalGet('admin/symfony_mailer_legacy_test/send');
+    $this->submitForm([], 'Send test email');
     $this->readMail();
 
     // Check email recipients.
@@ -50,34 +47,36 @@ class TestBcMail extends SymfonyMailerTestBase {
     $this->assertCc('cc@example.com', '');
 
     // Check email contents.
-    $this->assertSubject("Backwards compatible mail sent via hook_mail().");
+    $this->assertSubject("Legacy email sent via hook_mail().");
     $this->assertBodyContains("This email is sent via hook_mail().");
-    $this->assertBodyContains("This is the default BC test mail template.");
+    $this->assertBodyContains("This email was altered via hook_mail_alter().");
+    $this->assertBodyContains("This is the default legacy test email template.");
     $this->assertBodyContains("Rendered in theme: stark");
   }
 
   /**
-   * Test sending a backwards compatible email with custom email body template.
+   * Test sending a legacy email with custom email body template.
    */
-  public function testSendBcMailWithTheme() {
+  public function testSendLegacyEmailWithTheme() {
     $this->drupalLogin($this->adminUser);
     // Switch the current default theme and admin theme, and test if template
     // renders in the default theme instead of the admin theme, even though the
     // admin theme is active when the mail gets triggered.
-    \Drupal::service('theme_installer')->install(['test_bc_mail_theme', 'stark']);
+    $themes = ['test_legacy_email_theme', 'stark'];
+    \Drupal::service('theme_installer')->install($themes);
     $this->config('system.theme')
-      ->set('default', 'test_bc_mail_theme')
+      ->set('default', 'test_legacy_email_theme')
       ->set('admin', 'stark')
       ->save();
 
     /** @var \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler */
     $theme_handler = $this->container->get('theme_handler');
-    $this->assertTrue($theme_handler->themeExists('test_bc_mail_theme'));
+    $this->assertTrue($theme_handler->themeExists('test_legacy_email_theme'));
 
-    // Trigger sending a backwards compatible email via hook_mail().
-    $this->drupalGet('admin/symfony_mailer_bc_test/send');
+    // Trigger sending a legacy email via hook_mail().
+    $this->drupalGet('admin/symfony_mailer_legacy_test/send');
     $this->assertSession()->pageTextContains('Current theme: stark');
-    $this->submitForm([], 'Send test mail');
+    $this->submitForm([], 'Send test email');
     $this->readMail();
 
     // Check email recipients.
@@ -85,10 +84,11 @@ class TestBcMail extends SymfonyMailerTestBase {
     $this->assertCc('cc@example.com', '');
 
     // Check email contents.
-    $this->assertSubject("Backwards compatible mail sent via hook_mail().");
+    $this->assertSubject("Legacy email sent via hook_mail().");
     $this->assertBodyContains("This email is sent via hook_mail().");
-    $this->assertBodyContains("This is the overridden BC test mail template.");
-    $this->assertBodyContains("Rendered in theme: test_bc_mail_theme");
+    $this->assertBodyContains("This email was altered via hook_mail_alter().");
+    $this->assertBodyContains("This is the overridden legacy test email template.");
+    $this->assertBodyContains("Rendered in theme: test_legacy_email_theme");
   }
 
 }
