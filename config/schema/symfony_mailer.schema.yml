@@ -203,6 +203,10 @@ symfony_mailer.email_adjuster_plugin.mailer_inline_css:
   type: mapping
   label: 'Inline CSS'
 
+symfony_mailer.email_adjuster_plugin.mailer_plain_only:
+  type: mapping
+  label: 'Plain text only'
+
 symfony_mailer.email_adjuster_plugin.mailer_url_to_absolute:
   type: mapping
   label: 'URL to absolute'
