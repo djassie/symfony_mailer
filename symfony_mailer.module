@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\Annotation\EmailBuilder;
 
@@ -19,6 +20,13 @@ function symfony_mailer_theme($existing, $type, $theme, $path) {
         'email' => NULL,
       ],
       'mail theme' => TRUE,
+    ],
+    'email_wrap' => [
+      'variables' => [
+        'email' => NULL,
+        'body' => '',
+        'is_html' => TRUE,
+      ],
     ],
   ];
 }
@@ -59,12 +67,30 @@ function symfony_mailer_mailer_builder_info_alter(array &$email_builders) {
  *
  * @param array $variables
  *   An associative array containing:
- *   - email: An associative array containing the Email object.
+ *   - email: Email object.
  */
 function template_preprocess_email(array &$variables) {
   $email = $variables['email'];
   $variables['body'] = $email->getBody();
   $variables = array_merge($variables, $email->getVariables());
+}
+
+/**
+ * Prepares variables for email wrap template.
+ *
+ * Default template: email-wrap.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - email: Email object.
+ *   - body: Body string.
+ *   - is_html: True if generating HTML output, false for plain text.
+ */
+function template_preprocess_email_wrap(array &$variables) {
+  $email = $variables['email'];
+  $variables['type'] = $email->getType();
+  $variables['sub_type'] = $email->getSubType();
+  $variables['attributes'] = new Attribute();
 }
 
 /**

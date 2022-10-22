@@ -122,3 +122,20 @@ function symfony_mailer_update_10005() {
     }
   }
 }
+
+/**
+ * Add new "Wrap and convert" email policy element.
+ */
+function symfony_mailer_update_10006() {
+  foreach (MailerPolicy::loadMultiple() as $policy) {
+    $config = $policy->getConfiguration();
+    if (isset($config['mailer_html_to_text'])) {
+      $config['mailer_wrap_and_convert'] = [
+        'rewrap' => FALSE,
+        'swiftmailer' => FALSE,
+      ];
+      unset($config['mailer_html_to_text']);
+      $policy->setConfiguration($config)->save();
+    }
+  }
+}

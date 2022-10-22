@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\symfony_mailer\Processor\EmailAdjusterManagerInterface;
 use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
+use Html2Text\Html2Text;
 
 /**
  * Provides the mailer helper service.
@@ -116,6 +117,20 @@ class MailerHelper implements MailerHelperInterface {
     }
 
     return $config ?? [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function htmlToText(string $html) {
+    // Convert to plain text.
+    // - Core uses MailFormatHelper::htmlToText(). However this is old code
+    //   that's not actively maintained there's no need for a Drupal-specific
+    //   version of this generic code.
+    // - Symfony Mailer library uses league/html-to-markdown. This is a bigger
+    //   step away from what's been done in Drupal before, so we won't do that.
+    // - Swiftmailer uses html2text/html2text, and that's what we do.
+    return (new Html2Text($html))->getText();
   }
 
   /**
