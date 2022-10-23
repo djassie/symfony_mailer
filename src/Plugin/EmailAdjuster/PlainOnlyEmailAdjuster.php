@@ -8,7 +8,8 @@ use Drupal\symfony_mailer\EmailInterface;
 /**
  * Defines the Plain text only Email Adjuster.
  *
- * @EmailAdjuster(
+ * @todo Disabled for now - use WrapAndConvertEmailAdjuster
+ * EmailAdjuster(
  *   id = "mailer_plain_only",
  *   label = @Translation("Plain text only"),
  *   description = @Translation("Sends email as plain text only."),

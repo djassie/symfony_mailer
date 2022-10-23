@@ -131,7 +131,7 @@ function symfony_mailer_update_10006() {
     $config = $policy->getConfiguration();
     if (isset($config['mailer_html_to_text'])) {
       $config['mailer_wrap_and_convert'] = [
-        'rewrap' => FALSE,
+        'plain' => FALSE,
         'swiftmailer' => FALSE,
       ];
       unset($config['mailer_html_to_text']);

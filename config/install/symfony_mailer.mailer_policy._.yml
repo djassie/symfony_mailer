@@ -7,7 +7,7 @@ configuration:
   mailer_url_to_absolute: {}
   mailer_inline_css: {}
   mailer_wrap_and_convert:
-    rewrap: false
+    plain: false
     swiftmailer: false
   email_theme:
     theme: _active_fallback

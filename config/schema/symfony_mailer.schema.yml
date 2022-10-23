@@ -215,9 +215,9 @@ symfony_mailer.email_adjuster_plugin.mailer_wrap_and_convert:
   type: mapping
   label: 'Wrap and convert'
   mapping:
-    rewrap:
+    plain:
       type: boolean
-      label: 'Rewrap'
+      label: 'Plain text'
     swiftmailer:
       type: boolean
       label: 'Emulate swiftmailer'

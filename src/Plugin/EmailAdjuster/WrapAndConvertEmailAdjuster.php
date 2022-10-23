@@ -91,7 +91,7 @@ class WrapAndConvertEmailAdjuster extends EmailAdjusterBase implements Container
     $orig_html = $email->getHtmlBody();
     $plain = $html = NULL;
 
-    if ($orig_html) {
+    if ($orig_html && !$this->configuration['plain']) {
       $html = $this->render($email, $orig_html, TRUE);
     }
     $email->setHtmlBody($html);
@@ -100,11 +100,9 @@ class WrapAndConvertEmailAdjuster extends EmailAdjusterBase implements Container
       // To wrap the plain text we need to convert to HTML to render the
       // template then convert back again. We avoid check_markup() as it would
       // convert URLs to links.
+      // @todo Inefficient? Could set second parameter to `{{ body }}` then
+      // search and replace with the actual body after.
       $plain = $this->render($email, _filter_autop(HTML::escape($orig_plain)), FALSE);
-    }
-    elseif (isset($html) && !$this->configuration['rewrap']) {
-      // Reuse wrapped HTML text.
-      $plain = $html;
     }
     elseif ($orig_html) {
       // Wrap plain text.
@@ -120,11 +118,11 @@ class WrapAndConvertEmailAdjuster extends EmailAdjusterBase implements Container
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $form['rewrap'] = [
-      '#title' => $this->t('Rewrap'),
+    $form['plain'] = [
+      '#title' => $this->t('Plain text'),
       '#type' => 'checkbox',
-      '#default_value' => $this->configuration['rewrap'],
-      '#description' => $this->t('Wrap the plain text and HTML separately to allow the wrapper to be different for each.'),
+      '#default_value' => $this->configuration['plain'],
+      '#description' => $this->t('Send as plain text only.'),
     ];
 
     $form['swiftmailer'] = [
@@ -143,7 +141,7 @@ class WrapAndConvertEmailAdjuster extends EmailAdjusterBase implements Container
    */
   public function getSummary() {
     $titles = [
-      'rewrap' => $this->t('Rewrap'),
+      'plain' => $this->t('Plain text'),
       'swiftmailer' => $this->t('Emulate swiftmailer'),
     ];
     foreach ($this->configuration as $id => $value) {
