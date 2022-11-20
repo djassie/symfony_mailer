@@ -181,7 +181,7 @@ class WrapAndConvertEmailAdjuster extends EmailAdjusterBase implements Container
       $render = [
         '#theme' => 'email_wrap',
         '#email' => $email,
-        '#body' => ['#markup' => $body],
+        '#body' => Markup::create($body),
         '#is_html' => $is_html,
       ];
     }
