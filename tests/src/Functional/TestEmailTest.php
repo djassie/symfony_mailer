@@ -29,6 +29,10 @@ class TestEmailTest extends SymfonyMailerTestBase {
     $this->assertSubject("Test email from $this->siteName");
     $escaped_site_name = Html::escape($this->siteName);
     $this->assertBodyContains("This is a test email from <a href=\"$this->baseUrl/\">$escaped_site_name</a>.");
+
+    // Check that inline styles are preserved in the email.
+    // The padding is added in email-wrap.html.twig.
+    $this->assertBodyContains('style="padding: 0px 0px 0px 0px;"');
   }
 
 }
