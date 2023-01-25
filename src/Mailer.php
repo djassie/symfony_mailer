@@ -19,6 +19,7 @@ use Drupal\symfony_mailer\Exception\SkipMailException;
 use Drupal\user\Entity\User;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -92,6 +93,13 @@ class Mailer implements MailerInterface {
   protected $accountSwitcher;
 
   /**
+   * The transport manager.
+   *
+   * @var \Symfony\Component\Mailer\Transport
+   */
+  protected $transportManager;
+
+  /**
    * Constructs the Mailer object.
    *
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
@@ -112,8 +120,10 @@ class Mailer implements MailerInterface {
    *   The theme initialization.
    * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
    *   The account switcher service.
+   * @param \Drupal\symfony_mailer\TransportFactoryManagerInterface $transport_factory_manager
+   *   The transport factory manager.
    */
-  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account, ThemeManagerInterface $theme_manager, ThemeInitializationInterface $theme_initialization, AccountSwitcherInterface $account_switcher) {
+  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account, ThemeManagerInterface $theme_manager, ThemeInitializationInterface $theme_initialization, AccountSwitcherInterface $account_switcher, TransportFactoryManagerInterface $transport_factory_manager) {
     $this->dispatcher = $dispatcher;
     $this->renderer = $renderer;
     $this->languageDefault = $language_default;
@@ -123,6 +133,7 @@ class Mailer implements MailerInterface {
     $this->themeManager = $theme_manager;
     $this->themeInitialization = $theme_initialization;
     $this->accountSwitcher = $account_switcher;
+    $this->transportManager = new Transport($transport_factory_manager->getFactories());
   }
 
   /**
@@ -250,7 +261,8 @@ class Mailer implements MailerInterface {
         throw new MissingTransportException();
       }
 
-      $transport = Transport::fromDsn($transport_dsn);
+      $dsn = Dsn::fromString($transport_dsn);
+      $transport = $this->transportManager->fromDsnObject($dsn);
       $mailer = new SymfonyMailer($transport, NULL, $this->dispatcher);
       $symfony_email = $email->getSymfonyEmail();
 
