@@ -1,4 +1,4 @@
-name: Symfony Mailer Legacy Email Test
+name: Drupal Symfony Mailer Legacy Email Test
 type: module
 package: Testing
 hidden: true

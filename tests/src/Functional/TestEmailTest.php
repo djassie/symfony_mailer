@@ -18,7 +18,7 @@ class TestEmailTest extends SymfonyMailerTestBase {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/config/system/mailer/test');
 
-    $this->assertPolicyListingIntro('Symfony Mailer', 'Subject, Body');
+    $this->assertPolicyListingIntro('Drupal Symfony Mailer', 'Subject, Body');
     $this->assertPolicyListingRow(1, self::TYPE_ALL, '', 'symfony_mailer');
     $this->assertPolicyListingRow(2, 'Test email', 'Body<br>Subject: Test email from [site:name]', 'symfony_mailer.test');
 
