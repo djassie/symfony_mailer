@@ -14,12 +14,29 @@ class LegacyMailerHelper implements LegacyMailerHelperInterface {
    *
    * @var array
    */
-  protected const HEADERS = [
+  protected const ADDRESS_HEADERS = [
     'From' => 'from',
     'Reply-To' => 'reply-to',
     'To' => 'to',
     'Cc' => 'cc',
     'Bcc' => 'bcc',
+  ];
+
+  /**
+   * List of headers to skip copying from the array.
+   *
+   * @var array
+   */
+  protected const SKIP_HEADERS = [
+    // Set by Symfony mailer library.
+    'Content-Transfer-Encoding' => 1,
+    'Content-Type' => 1,
+    'Date' => 1,
+    'Message-ID' => 1,
+    'MIME-Version' => 1,
+
+    // Set by sending MTA.
+    'Return-Path' => 1,
   ];
 
   /**
@@ -67,7 +84,7 @@ class LegacyMailerHelper implements LegacyMailerHelperInterface {
     }
 
     $headers = $email->getHeaders();
-    foreach (self::HEADERS as $name => $key) {
+    foreach (self::ADDRESS_HEADERS as $name => $key) {
       if ($headers->has($name)) {
         $message['headers'][$name] = $headers->get($name)->getBodyAsString();
       }
@@ -90,11 +107,24 @@ class LegacyMailerHelper implements LegacyMailerHelperInterface {
     }
 
     // Address headers.
-    foreach (self::HEADERS as $name => $key) {
+    foreach (self::ADDRESS_HEADERS as $name => $key) {
       $encoded = $message['headers'][$name] ?? $message[$key] ?? NULL;
       if (isset($encoded)) {
         $email->setAddress($name, $this->mailerHelper->parseAddress($encoded));
       }
+    }
+
+    // Other headers.
+    $headers = $email->getHeaders();
+    foreach ($message['headers'] as $name => $value) {
+      if (!isset(self::SKIP_HEADERS[$name]) && !isset(self::ADDRESS_HEADERS[$name])) {
+        $headers->addHeader($name, $value);
+      }
+    }
+
+    // Plain-text version.
+    if (isset($message['plain'])) {
+      $email->setTextBody($message['plain']);
     }
   }
 
