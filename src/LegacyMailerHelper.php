@@ -103,7 +103,12 @@ class LegacyMailerHelper implements LegacyMailerHelperInterface {
     // Attachments.
     $attachments = $message['params']['attachments'] ?? [];
     foreach ($attachments as $attachment) {
-      $email->attachFromPath($attachment['filepath'], $attachment['filename'] ?? NULL, $attachment['filemime'] ?? NULL);
+      if (!empty($attachment['filepath'])) {
+        $email->attachFromPath($attachment['filepath'], $attachment['filename'] ?? NULL, $attachment['filemime'] ?? NULL);
+      }
+      elseif (!empty($attachment['filecontent'])) {
+        $email->attachNoPath($attachment["filecontent"], $attachment['filename'] ?? NULL, $attachment['filemime'] ?? NULL);
+      }
     }
 
     // Address headers.
