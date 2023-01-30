@@ -51,6 +51,13 @@ class Email implements InternalEmailInterface {
   protected $themeManager;
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * The type.
    *
    * @var string
