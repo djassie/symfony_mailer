@@ -90,6 +90,11 @@ class LegacyEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlu
       'headers' => [],
     ];
 
+    if ($reply = $message['reply-to']) {
+      // Match the non-standard lower-case 't' used by Drupal Core.
+      $message['headers']['Reply-to'] = $reply;
+    }
+
     // Build the email by invoking hook_mail() on this module.
     $args = [$message['key'], &$message, $message['params']];
     $this->moduleHandler->invoke($message['module'], 'mail', $args);

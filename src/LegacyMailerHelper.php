@@ -10,33 +10,36 @@ use Drupal\Component\Render\MarkupInterface;
 class LegacyMailerHelper implements LegacyMailerHelperInterface {
 
   /**
-   * List of headers for conversion to array.
+   * List of lower-cased address headers.
+   *
+   * Some address headers are stored directly in $message in addition to
+   * $message['headers']. The array value indicates whether this is the case.
    *
    * @var array
    */
   protected const ADDRESS_HEADERS = [
-    'From' => 'from',
-    'Reply-To' => 'reply-to',
-    'To' => 'to',
-    'Cc' => 'cc',
-    'Bcc' => 'bcc',
+    'from' => TRUE,
+    'reply-to' => TRUE,
+    'to' => TRUE,
+    'cc' => FALSE,
+    'bcc' => FALSE,
   ];
 
   /**
-   * List of headers to skip copying from the array.
+   * List of lower-cased headers to skip copying from the array.
    *
    * @var array
    */
   protected const SKIP_HEADERS = [
     // Set by Symfony mailer library.
-    'Content-Transfer-Encoding' => 1,
-    'Content-Type' => 1,
-    'Date' => 1,
-    'Message-ID' => 1,
-    'MIME-Version' => 1,
+    'content-transfer-encoding' => TRUE,
+    'content-type' => TRUE,
+    'date' => TRUE,
+    'message-id' => TRUE,
+    'mime-version' => TRUE,
 
     // Set by sending MTA.
-    'Return-Path' => 1,
+    'return-path' => TRUE,
   ];
 
   /**
@@ -83,15 +86,22 @@ class LegacyMailerHelper implements LegacyMailerHelperInterface {
       $message['body'] = $email->getHtmlBody();
     }
 
-    $headers = $email->getHeaders();
-    foreach (self::ADDRESS_HEADERS as $name => $key) {
-      if ($headers->has($name)) {
-        $message['headers'][$name] = $headers->get($name)->getBodyAsString();
+    foreach ($email->getHeaders()->all() as $name => $header) {
+      $lc_name = strtolower($name);
+      if (isset(self::SKIP_HEADERS[$lc_name])) {
+        continue;
       }
-      if ($key) {
-        $message[$key] = $message['headers'][$name] ?? NULL;
+
+      // Copy the header.
+      $message['headers'][$name] = $header->getBodyAsString();
+      if (!empty(self::ADDRESS_HEADERS[$lc_name])) {
+        // Also copy directly to $message.
+        $message[$lc_name] = $message['headers'][$name];
       }
     }
+
+    // Drupal doesn't store the 'To' header in $message['headers'].
+    unset($message['headers']['To']);
   }
 
   /**
@@ -111,19 +121,31 @@ class LegacyMailerHelper implements LegacyMailerHelperInterface {
       }
     }
 
-    // Address headers.
-    foreach (self::ADDRESS_HEADERS as $name => $key) {
-      $encoded = $message['headers'][$name] ?? $message[$key] ?? NULL;
-      if (isset($encoded)) {
-        $email->setAddress($name, $this->mailerHelper->parseAddress($encoded));
-      }
+    // Headers.
+    $src_headers = $message['headers'];
+    $dest_headers = $email->getHeaders();
+
+    // Add in 'To' header which is stored directly in the message.
+    // @see \Drupal\Core\Mail\Plugin\Mail\PhpMail::mail()
+    if (isset($message['to'])) {
+      $src_headers['To'] = $message['to'];
     }
 
-    // Other headers.
-    $headers = $email->getHeaders();
-    foreach ($message['headers'] as $name => $value) {
-      if (!isset(self::SKIP_HEADERS[$name]) && !isset(self::ADDRESS_HEADERS[$name])) {
-        $headers->addHeader($name, $value);
+    foreach ($src_headers as $name => $value) {
+      $lc_name = strtolower($name);
+      if (isset(self::SKIP_HEADERS[$lc_name])) {
+        continue;
+      }
+
+      if (isset(self::ADDRESS_HEADERS[$lc_name])) {
+        if ($name == 'Reply-to') {
+          // Convert to standard case.
+          $name = 'Reply-To';
+        }
+        $email->setAddress($name, $this->mailerHelper->parseAddress($value));
+      }
+      else {
+        $dest_headers->addHeader($name, $value);
       }
     }
 
