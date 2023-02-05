@@ -18,6 +18,13 @@ class TransportFactoryManager implements TransportFactoryManagerInterface {
   protected $factories;
 
   /**
+   * Constructs the TransportFactoryManager object.
+   */
+  public function __construct() {
+    $this->factories = iterator_to_array(Transport::getDefaultFactories());
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function addFactory(TransportFactoryInterface $factory) {
@@ -28,14 +35,7 @@ class TransportFactoryManager implements TransportFactoryManagerInterface {
    * {@inheritdoc}
    */
   public function getFactories() {
-
-    foreach (Transport::getDefaultFactories() as $f) {
-      yield $f;
-    }
-
-    foreach ($this->factories as $f) {
-      yield $f;
-    }
+    return $this->factories;
   }
 
 }
