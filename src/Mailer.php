@@ -256,6 +256,7 @@ class Mailer implements MailerInterface {
 
     try {
       // Send.
+      $symfony_email = $email->getSymfonyEmail();
       $transport_dsn = $email->getTransportDsn();
       if (empty($transport_dsn)) {
         throw new MissingTransportException();
@@ -264,7 +265,6 @@ class Mailer implements MailerInterface {
       $dsn = Dsn::fromString($transport_dsn);
       $transport = $this->transportManager->fromDsnObject($dsn);
       $mailer = new SymfonyMailer($transport, NULL, $this->dispatcher);
-      $symfony_email = $email->getSymfonyEmail();
 
       // ksm($email, $symfony_email->getHeaders());
       $mailer->send($symfony_email);
@@ -279,6 +279,7 @@ class Mailer implements MailerInterface {
       else {
         $message = $e->getMessage();
       }
+      $email->setError($message);
 
       // Log.
       $params = ['%message' => $message];

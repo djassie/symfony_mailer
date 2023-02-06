@@ -163,6 +163,13 @@ class Email implements InternalEmailInterface {
   protected $transportDsn = '';
 
   /**
+   * The error message from sending.
+   *
+   * @var string
+   */
+  protected $errorMessage;
+
+  /**
    * Constructs the Email object.
    *
    * @param \Drupal\symfony_mailer\MailerInterface $mailer
@@ -457,6 +464,22 @@ class Email implements InternalEmailInterface {
   /**
    * {@inheritdoc}
    */
+  public function setError(string $error) {
+    $this->valid(self::PHASE_POST_SEND, self::PHASE_POST_SEND);
+    $this->errorMessage = $error;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getError() {
+    return $this->errorMessage;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function process() {
     $processors = $this->processors[$this->phase] ?? [];
     usort($processors, function ($a, $b) {
@@ -530,6 +553,7 @@ class Email implements InternalEmailInterface {
    */
   public function getSymfonyEmail() {
     $this->valid(self::PHASE_POST_RENDER, self::PHASE_POST_RENDER);
+    $this->phase = self::PHASE_POST_SEND;
 
     if ($this->subject) {
       $this->inner->subject($this->subject);
@@ -547,7 +571,6 @@ class Email implements InternalEmailInterface {
       }
     }
 
-    $this->phase = self::PHASE_POST_SEND;
     return $this->inner;
   }
 
