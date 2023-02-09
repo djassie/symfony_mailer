@@ -171,19 +171,15 @@ class Mailer implements MailerInterface {
    * @internal
    */
   public function doSend(InternalEmailInterface $email) {
+    // LegacyEmailBuilder sets the theme during the process phase. Save the
+    // active theme so we can change back.
+    $active_theme_name = $this->themeManager->getActiveTheme()->getName();
+
     // Process the build phase.
     // @see \Drupal\symfony_mailer\EmailInterface::PHASE_BUILD
     $email->process();
 
     // Do switching.
-    $theme_name = $email->getTheme();
-    $active_theme_name = $this->themeManager->getActiveTheme()->getName();
-    $must_switch_theme = $theme_name !== $active_theme_name;
-
-    if ($must_switch_theme) {
-      $this->changeTheme($theme_name);
-    }
-
     $current_langcode = $this->languageManager->getCurrentLanguage()->getId();
     if ($email->getParam('__disable_customize__')) {
       // Undocumented setting for use from LegacyEmailBuilder only for
@@ -198,6 +194,8 @@ class Mailer implements MailerInterface {
       $account = $this->account;
     }
     else {
+      $this->changeTheme($email->getTheme());
+
       // Determine langcode and account from the to address, if there is
       // agreement.
       $langcodes = $accounts = [];
@@ -249,9 +247,7 @@ class Mailer implements MailerInterface {
         $this->changeActiveLanguage($current_langcode);
       }
 
-      if ($must_switch_theme) {
-        $this->changeTheme($active_theme_name);
-      }
+      $this->changeTheme($active_theme_name);
     }
 
     try {
@@ -303,6 +299,18 @@ class Mailer implements MailerInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function changeTheme(string $theme_name) {
+    $active_theme_name = $this->themeManager->getActiveTheme()->getName();
+    if ($theme_name !== $active_theme_name) {
+      $this->themeManager->setActiveTheme($this->themeInitialization->initTheme($theme_name));
+    }
+
+    return $active_theme_name;
+  }
+
+  /**
    * Changes the active language for translations.
    *
    * @param string $langcode
@@ -337,16 +345,6 @@ class Mailer implements MailerInterface {
       $string_translation->setDefaultLangcode($language->getId());
       $string_translation->reset();
     }
-  }
-
-  /**
-   * Changes the active theme for email.
-   *
-   * @param string $theme_name
-   *   The theme name.
-   */
-  protected function changeTheme(string $theme_name) {
-    $this->themeManager->setActiveTheme($this->themeInitialization->initTheme($theme_name));
   }
 
 }
