@@ -3,6 +3,7 @@
 namespace Drupal\symfony_mailer\Processor;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Provides the interface for the email builder plugin manager.
@@ -23,6 +24,16 @@ interface EmailBuilderManagerInterface extends PluginManagerInterface {
    * Import skipped.
    */
   const IMPORT_SKIPPED = 2;
+
+  /**
+   * Adds email builders to an email.
+   *
+   * @param \Drupal\symfony_mailer\EmailInterface $email
+   *   The email.
+   * @param array $params
+   *   Parameters for building this email.
+   */
+  public function applyBuilders(EmailInterface $email, array $params);
 
   /**
    * Gets information about config importing.
@@ -66,5 +77,13 @@ interface EmailBuilderManagerInterface extends PluginManagerInterface {
    *   The state, one of the IMPORT_ constants.
    */
   public function setImportState(string $id, int $state);
+
+  /**
+   * Creates a plugin instance from a legacy message array.
+   *
+   * @param array $message
+   *   The message.
+   */
+  public function createInstanceFromMessage(array $message);
 
 }

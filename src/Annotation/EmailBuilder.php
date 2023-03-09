@@ -19,6 +19,27 @@ class EmailBuilder extends Plugin {
   public $id;
 
   /**
+   * The type.
+   *
+   * This is the part of the ID before the dot. This value is set
+   * automatically and should not be part of the annotation comment.
+   *
+   * @var string
+   */
+  public $type;
+
+  /**
+   * The sub-type.
+   *
+   * This is the part of the ID after the dot. Most often there is no dot, and
+   * this is the empty string. This value is set automatically and should not
+   * be part of the annotation comment.
+   *
+   * @var string
+   */
+  public $sub_type;
+
+  /**
    * The human-readable name of the plugin.
    *
    * Leave blank to derive from an entity type or module matching the ID.
@@ -45,11 +66,24 @@ class EmailBuilder extends Plugin {
   public $has_entity = FALSE;
 
   /**
-   * Whether the plugin is proxied for another module.
+   * Information about replacing (proxy) for another module.
+   *
+   * The value is an array of email IDs to proxy. The annotation may set the
+   * value TRUE which is automatically converted to an single-value array
+   * containing the plugin ID.
+   *
+   * @var bool|string[]
+   */
+  public $proxy = [];
+
+  /**
+   * Whether the plugin is internal.
+   *
+   * Internal plugins are not available to add in GUI.
    *
    * @var bool
    */
-  public $proxy = FALSE;
+  public $internal = FALSE;
 
   /**
    * Array of common adjuster IDs.

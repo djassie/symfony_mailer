@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Provides the email builder plugin manager.
@@ -36,6 +37,15 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
    * @var string[]
    */
   protected $stateName;
+
+  /**
+   * Array of registered proxy plugin settings.
+   *
+   * The key is the email ID to proxy and the value is the plugin ID.
+   *
+   * @var string[]
+   */
+  protected $proxyMapping;
 
   /**
    * Constructs the EmailBuilderManager object.
@@ -72,9 +82,7 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
   public function processDefinition(&$definition, $plugin_id) {
     $parts = explode('.', $plugin_id);
     $type = $definition['type'] = array_shift($parts);
-    if ($parts) {
-      $definition['sub_type'] = array_shift($parts);
-    }
+    $definition['sub_type'] = $parts ? array_shift($parts) : '';
 
     // Look up the related entity or module, which can be used to generate the
     // label and provider.
@@ -94,11 +102,33 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
       // the definition to be removed if the related module is not installed.
       // @see DefaultPluginManager::findDefinitions()
       $definition['provider'] = $proxy_provider ?? '_';
+
+      if ($definition['proxy'] === TRUE) {
+        $definition['proxy'] = [$plugin_id];
+      }
     }
 
     if (isset($default_label) && !$definition['label']) {
       // Default the label.
       $definition['label'] = $default_label;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applyBuilders(EmailInterface $email, array $params) {
+    // Load builders with matching ID.
+    foreach ($email->getSuggestions('', '.') as $plugin_id) {
+      if ($this->hasDefinition($plugin_id)) {
+        /** @var \Drupal\symfony_mailer\Processor\EmailBuilderInterface $builder */
+        $builder = $this->createInstance($plugin_id);
+        if (empty($created)) {
+          $builder->createParams($email, ...$params);
+          $created = TRUE;
+        }
+        $builder->init($email);
+      }
     }
   }
 
@@ -166,5 +196,40 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
     $state_all[$id] = $state;
     $this->keyValue->set('import', $state_all);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createInstanceFromMessage(array $message) {
+    $suggestions = [
+      "$message[module].$message[key]",
+      $message['module'],
+    ];
+
+    $proxy_mapping = $this->getProxyMapping();
+
+    foreach ($suggestions as $plugin_id) {
+      if ($this->hasDefinition($plugin_id)) {
+        return $this->createInstance($plugin_id);
+      }
+      if ($proxy_id = $proxy_mapping[$plugin_id] ?? NULL) {
+        return $this->createInstance($proxy_id);
+      }
+    }
+  }
+
+  protected function getProxyMapping() {
+    if (is_null($this->proxyMapping)) {
+      $this->proxy = [];
+      foreach ($this->getDefinitions() as $id => $definition) {
+        foreach ($definition['proxy'] as $proxy_id) {
+          $this->proxyMapping[$proxy_id] = $id;
+        }
+      }
+    }
+
+    return $this->proxyMapping;
+  }
+
 
 }
