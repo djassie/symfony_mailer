@@ -151,7 +151,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
     if (!$this->builderDefinition) {
       $this->builderDefinition = ['label' => $this->labelUnknown];
     }
-    if ($this->entityId && !empty($this->builderDefinition['has_entity'])) {
+    if ($this->entityId && $this->builderDefinition['has_entity']) {
       $this->entity = $this->entityTypeManager()->getStorage($this->type)->load($this->entityId);
     }
   }
