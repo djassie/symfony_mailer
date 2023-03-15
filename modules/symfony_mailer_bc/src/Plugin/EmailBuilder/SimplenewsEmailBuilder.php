@@ -59,7 +59,12 @@ class SimplenewsEmailBuilder extends SimplenewsEmailBuilderBase {
     foreach ($convert as $from => $to) {
       $config = [
         'email_subject' => ['value' => $subscription["{$from}_subject"]],
-        'email_body' => ['value' => $subscription["{$from}_body"]],
+        'email_body' => [
+          'content' => [
+            'value' => $subscription["{$from}_body"],
+            'format' => 'plain_text',
+          ],
+        ],
       ];
       MailerPolicy::import("simplenews.$to", $config);
     }
