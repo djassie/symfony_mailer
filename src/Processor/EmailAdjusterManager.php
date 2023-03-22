@@ -50,7 +50,6 @@ class EmailAdjusterManager extends DefaultPluginManager implements EmailAdjuster
         $this->createInstance($plugin_id, $config)->init($email);
       }
     }
-
   }
 
 }

@@ -61,7 +61,7 @@ class EmailFactory implements EmailFactoryInterface {
    */
   public function newTypedEmail(string $type, string $sub_type, ...$params) {
     $email = Email::create(\Drupal::getContainer(), $type, $sub_type);
-    return $this->initEmail($email, $params);
+    return $this->initEmail($email, ...$params);
   }
 
   /**
@@ -69,7 +69,7 @@ class EmailFactory implements EmailFactoryInterface {
    */
   public function newEntityEmail(ConfigEntityInterface $entity, string $sub_type, ...$params) {
     $email = Email::create(\Drupal::getContainer(), $entity->getEntityTypeId(), $sub_type, $entity);
-    return $this->initEmail($email, $params);
+    return $this->initEmail($email, ...$params);
   }
 
   /**
@@ -77,16 +77,29 @@ class EmailFactory implements EmailFactoryInterface {
    *
    * @param \Drupal\symfony_mailer\EmailInterface $email
    *   The email to initialize.
-   * @param array $params
+   * @param mixed $params
    *   Parameters for building this email.
    *
    * @return \Drupal\symfony_mailer\EmailInterface
    *   The email.
    */
-  protected function initEmail(EmailInterface $email, array $params) {
-    // Process.
-    $this->emailBuilderManager->applyBuilders($email, $params);
+  protected function initEmail(EmailInterface $email, ...$params) {
+    // Load builders with matching ID.
+    foreach ($email->getSuggestions('', '.') as $plugin_id) {
+      if ($this->emailBuilderManager->hasDefinition($plugin_id)) {
+        /** @var \Drupal\symfony_mailer\Processor\EmailBuilderInterface $builder */
+        $builder = $this->emailBuilderManager->createInstance($plugin_id);
+        if (empty($created)) {
+          $builder->createParams($email, ...$params);
+          $created = TRUE;
+        }
+        $builder->init($email);
+      }
+    }
+
+    // Apply policy.
     $this->emailAdjusterManager->applyPolicy($email);
+
     $email->initDone();
     return $email;
   }

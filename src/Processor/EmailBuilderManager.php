@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\symfony_mailer\EmailInterface;
 
 /**
  * Provides the email builder plugin manager.
@@ -111,24 +110,6 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
     if (isset($default_label) && !$definition['label']) {
       // Default the label.
       $definition['label'] = $default_label;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function applyBuilders(EmailInterface $email, array $params) {
-    // Load builders with matching ID.
-    foreach ($email->getSuggestions('', '.') as $plugin_id) {
-      if ($this->hasDefinition($plugin_id)) {
-        /** @var \Drupal\symfony_mailer\Processor\EmailBuilderInterface $builder */
-        $builder = $this->createInstance($plugin_id);
-        if (empty($created)) {
-          $builder->createParams($email, ...$params);
-          $created = TRUE;
-        }
-        $builder->init($email);
-      }
     }
   }
 

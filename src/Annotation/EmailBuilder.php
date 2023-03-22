@@ -77,15 +77,6 @@ class EmailBuilder extends Plugin {
   public $proxy = [];
 
   /**
-   * Whether the plugin is internal.
-   *
-   * Internal plugins are not available to add in GUI.
-   *
-   * @var bool
-   */
-  public $internal = FALSE;
-
-  /**
    * Array of common adjuster IDs.
    *
    * @var string[]
