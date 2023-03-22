@@ -84,16 +84,14 @@ class EmailFactory implements EmailFactoryInterface {
    *   The email.
    */
   protected function initEmail(EmailInterface $email, ...$params) {
-    // Load builders with matching ID.
+    // Load the best-matching builder.
     foreach ($email->getSuggestions('', '.') as $plugin_id) {
       if ($this->emailBuilderManager->hasDefinition($plugin_id)) {
         /** @var \Drupal\symfony_mailer\Processor\EmailBuilderInterface $builder */
         $builder = $this->emailBuilderManager->createInstance($plugin_id);
-        if (empty($created)) {
-          $builder->createParams($email, ...$params);
-          $created = TRUE;
-        }
+        $builder->createParams($email, ...$params);
         $builder->init($email);
+        break;
       }
     }
 
