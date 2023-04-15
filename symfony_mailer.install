@@ -40,6 +40,32 @@ function symfony_mailer_requirements($phase) {
 }
 
 /**
+ * Implements hook_install().
+ */
+function symfony_mailer_install($is_syncing) {
+  if (!$is_syncing && \Drupal::moduleHandler()->moduleExists('swiftmailer')) {
+    // Import transport settings.
+    $settings = \Drupal::config('swiftmailer.transport')->get();
+
+    if ($settings['transport'] == SWIFTMAILER_TRANSPORT_SMTP) {
+      $config = [
+        'user' => $settings['smtp_credentials']['swiftmailer']['username'],
+        'pass' => $settings['smtp_credentials']['swiftmailer']['password'],
+        'host' => $settings['smtp_host'],
+        'port' => $settings['smtp_port'],
+      ];
+
+      $transport = MailerTransport::load('swiftmailer') ?? MailerTransport::create(['id' => 'swiftmailer']);
+      $transport->setPluginId('smtp')
+      ->set('label', 'Imported from swiftmailer')
+      ->set('configuration', $config)
+      ->setAsDefault()
+      ->save();
+    }
+  }
+}
+
+/**
  * Update policy for multiple addresses.
  */
 function symfony_mailer_update_10001() {
