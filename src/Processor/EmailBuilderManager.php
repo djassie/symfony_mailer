@@ -212,5 +212,4 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
     return $this->proxyMapping;
   }
 
-
 }
