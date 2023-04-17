@@ -3,11 +3,11 @@
 namespace Drupal\Tests\symfony_mailer\Functional;
 
 /**
- * Test the Symfony Mailer Back-compatibility module.
+ * Tests Symfony Mailer compatibility mode.
  *
  * @group symfony_mailer
  */
-class TestLegacyEmail extends SymfonyMailerTestBase {
+class LegacyEmailTest extends SymfonyMailerTestBase {
 
   /**
    * Modules to enable.
@@ -15,8 +15,6 @@ class TestLegacyEmail extends SymfonyMailerTestBase {
    * @var array
    */
   protected static $modules = [
-    'symfony_mailer',
-    'symfony_mailer_test',
     'symfony_mailer_legacy_test',
   ];
 
