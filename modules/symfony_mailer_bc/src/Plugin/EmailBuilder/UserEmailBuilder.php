@@ -26,10 +26,41 @@ use Drupal\user\UserInterface;
  *     "status_blocked" = @Translation("Account blocked"),
  *     "status_canceled" = @Translation("Account cancelled"),
  *   },
- *   proxy = TRUE,
+ *   override = TRUE,
  *   common_adjusters = {"email_subject", "email_body", "email_skip_sending"},
  *   import = @Translation("User email settings"),
- *   import_warning = @Translation("This overrides the default HTML messages with imported plain text versions."),
+ *   import_warning = @Translation("This overrides the default HTML messages with imported plain text versions"),
+ *   config_overrides = {
+ *     "user.settings" = {
+ *       "notify" = {
+ *         "cancel_confirm" = TRUE,
+ *         "password_reset" = TRUE,
+ *         "status_activated" = TRUE,
+ *         "status_blocked" = TRUE,
+ *         "status_canceled" = TRUE,
+ *         "register_admin_created" = TRUE,
+ *         "register_no_approval_required" = TRUE,
+ *         "register_pending_approval" = TRUE,
+ *       },
+ *     },
+ *   },
+ *   form_alter = {
+ *     "user_admin_settings" = {
+ *       "remove" = {
+ *         "mail_notification_address",
+ *         "email_admin_created",
+ *         "email_pending_approval",
+ *         "email_pending_approval_admin",
+ *         "email_no_approval_required",
+ *         "email_password_reset",
+ *         "email_activated",
+ *         "email_blocked",
+ *         "email_cancel_confirm",
+ *         "email_canceled",
+ *       },
+ *       "type" = "user",
+ *     },
+ *   },
  * )
  *
  * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can

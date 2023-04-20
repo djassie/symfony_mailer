@@ -178,3 +178,22 @@ function symfony_mailer_update_10007() {
     }
   }
 }
+
+/**
+ * Set initial values for override configuration.
+ */
+function symfony_mailer_update_10008() {
+  $key_value = \Drupal::keyValue('mailer');
+  foreach ($key_value->get('import', []) as $id => $state) {
+    // Map IMPORT_COMPLETE (1) to STATE_IMPORTED (1) and everything else to
+    // STATE_ENABLED (2).
+    $settings[$id] = ($state == 1) ? 1 : 2;
+  }
+
+  if (isset($settings)) {
+    \Drupal::configFactory()->getEditable('symfony_mailer.settings')
+      ->set('override', $settings)
+      ->save();
+    $key_value->deleteAll();
+  }
+}

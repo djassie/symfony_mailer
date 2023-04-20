@@ -17,7 +17,7 @@ use Drupal\symfony_mailer\EmailInterface;
  *     "mail" = @Translation("Message"),
  *     "copy" = @Translation("Sender copy"),
  *   },
- *   proxy = {"contact.user_mail", "contact.user_copy"}
+ *   override = {"contact.user_mail", "contact.user_copy"}
  * )
  *
  * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can

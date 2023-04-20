@@ -18,10 +18,26 @@ use Drupal\update\UpdateManagerInterface;
  * @EmailBuilder(
  *   id = "update",
  *   sub_types = { "status_notify" = @Translation("Available updates") },
- *   proxy = TRUE,
+ *   override = TRUE,
  *   common_adjusters = {"email_subject", "email_body", "email_to"},
  *   import = @Translation("Update notification addresses"),
+ *   config_overrides = {
+ *     "update.settings" = {
+ *       "notification" = { "emails" = "dummy" },
+ *     },
+ *   },
+ *   form_alter = {
+ *     "update_settings" = {
+ *       "remove" = { "update_notify_emails" },
+ *       "type" = "update",
+ *     },
+ *   },
  * )
+ *
+ * The notification address is configured using Mailer Policy for
+ * UpdateEmailBuilder. Set a dummy value in update.settings to force the update
+ * module to send an email. NB UpdateEmailBuilder ignores the passed 'To'
+ * address so the dummy value will never be used.
  */
 class UpdateEmailBuilder extends EmailBuilderBase {
 

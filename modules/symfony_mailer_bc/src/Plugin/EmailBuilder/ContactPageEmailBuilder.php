@@ -22,13 +22,20 @@ use Drupal\symfony_mailer\Entity\MailerPolicy;
  *     "autoreply" = @Translation("Auto-reply"),
  *   },
  *   has_entity = TRUE,
- *   proxy = {
+ *   override = {
  *     "contact.page_mail",
  *     "contact.page_copy",
  *     "contact.page_autoreply",
  *   },
  *   common_adjusters = {"email_subject", "email_body", "email_to"},
  *   import = @Translation("Contact form recipients"),
+ *   form_alter = {
+ *     "contact_form_edit_form|contact_form_add_form" = {
+ *       "remove" = { "recipients" },
+ *       "default" = { "recipients" = "[site:mail]" },
+ *       "entity" = "mail",
+ *     },
+ *   }
  * )
  *
  * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can

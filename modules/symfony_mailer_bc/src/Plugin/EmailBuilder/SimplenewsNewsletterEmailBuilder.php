@@ -19,9 +19,20 @@ use Drupal\symfony_mailer\Entity\MailerPolicy;
  *     "node" = @Translation("Issue"),
  *   },
  *   has_entity = TRUE,
- *   proxy = {"simplenews.node", "simplenews.test"},
+ *   override = {"simplenews.node", "simplenews.test"},
+ *   override_warning = @Translation("Not tested for large numbers of recipients"),
  *   common_adjusters = {"email_subject", "email_from"},
  *   import = @Translation("Simplenews newsletter settings"),
+ *   form_alter = {
+ *     "simplenews_newsletter_edit_form|simplenews_newsletter_add_form" = {
+ *       "remove" = {
+ *         "email",
+ *         "simplenews_sender_information",
+ *         "simplenews_subject"
+ *       },
+ *       "entity" = "node",
+ *     },
+ *   },
  * )
  *
  * @todo Notes for adopting Symfony Mailer into simplenews. Can remove the

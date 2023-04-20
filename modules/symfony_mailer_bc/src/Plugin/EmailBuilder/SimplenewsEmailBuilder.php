@@ -16,10 +16,19 @@ use Drupal\symfony_mailer\Entity\MailerPolicy;
  *     "subscribe" = @Translation("Subscription confirmation"),
  *     "validate" = @Translation("Validate"),
  *   },
- *   proxy = {"simplenews.subscribe_combined", "simplenews.validate"},
+ *   override = {"simplenews.subscribe_combined", "simplenews.validate"},
  *   common_adjusters = {"email_subject", "email_body"},
  *   import = @Translation("Simplenews subscriber settings"),
- *   import_warning = @Translation("This overrides the default HTML messages with imported plain text versions."),
+ *   import_warning = @Translation("This overrides the default HTML messages with imported plain text versions"),
+ *   form_alter = {
+ *     "simplenews_admin_settings_newsletter" = {
+ *       "remove" = { "simplenews_default_options", "simplenews_sender_info" },
+ *     },
+ *     "simplenews_admin_settings_subscription" = {
+ *       "remove" = { "subscription_mail" },
+ *       "type" = "simplenews",
+ *     },
+ *   },
  * )
  */
 class SimplenewsEmailBuilder extends SimplenewsEmailBuilderBase {
