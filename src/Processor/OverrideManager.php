@@ -58,11 +58,27 @@ class OverrideManager implements OverrideManagerInterface {
   protected $overrideStorage;
 
   /**
-   * Mapping from override state code to human-readable string.
+   * Mapping from override state code to human-readable state string.
    *
    * @var string[]
    */
   protected $stateName;
+
+  /**
+   * Array of action names.
+   *
+   * This a 2-dimensional array indexed by override state code and action code.
+   *
+   * @var string[][]
+   */
+  protected $actionName;
+
+  /**
+   * Mapping from action code to human-readable warning string.
+   *
+   * @var string[]
+   */
+  protected $actionWarning;
 
   /**
    * The config prefix for the MailerPolicy entity type.

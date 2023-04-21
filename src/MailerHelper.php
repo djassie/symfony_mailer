@@ -210,7 +210,7 @@ class MailerHelper implements MailerHelperInterface {
       foreach ($this->builderManager->getDefinitions() as $builder_id => $definition) {
         foreach ($definition['form_alter'] as $match => $alter) {
           $alter += ['remove' => [], 'default' => [], 'entity_sub_type' => NULL, 'type' => NULL];
-          $ids = ($match == '*') ? ["${builder_id}_edit_form", "${builder_id}_add_form"] : [$match];
+          $ids = ($match == '*') ? ["{$builder_id}_edit_form", "{$builder_id}_add_form"] : [$match];
           foreach ($ids as $id) {
             // Merge existing values.
             $this->formAlter[$id] = NestedArray::mergeDeep($alter, $this->formAlter[$id] ?? []);
