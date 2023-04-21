@@ -15,7 +15,7 @@ use Drupal\symfony_mailer\Processor\EmailBuilderBase;
  * Defines the Email Builder plug-in for commerce order module.
  *
  * @EmailBuilder(
- *   id = "commerce_order_typezz",
+ *   id = "commerce_order_type",
  *   label = "Commerce order",
  *   sub_types = {
  *    "receipt" = @Translation("Receipt"),
