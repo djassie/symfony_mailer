@@ -165,9 +165,9 @@ class MailerHelper implements MailerHelperInterface {
   /**
    * {@inheritdoc}
    */
-  public function renderEntityPolicy(ConfigEntityInterface $entity, string $subtype) {
+  public function renderEntityPolicy(ConfigEntityInterface $entity, string $sub_type) {
     $type = $entity->getEntityTypeId();
-    $policy_id = "$type.$subtype";
+    $policy_id = "$type.$sub_type";
     $entities = [$policy_id];
     if (!$entity->isNew()) {
       $entities[] = $policy_id . '.' . $entity->id();
@@ -187,8 +187,8 @@ class MailerHelper implements MailerHelperInterface {
   public function renderTypePolicy(string $type) {
     $element = $this->renderCommon($type);
     $entities = [$type];
-    foreach (array_keys($this->builderManager->getDefinition($type)['sub_types']) as $subtype) {
-      $entities[] = "$type.$subtype";
+    foreach (array_keys($this->builderManager->getDefinition($type)['sub_types']) as $sub_type) {
+      $entities[] = "$type.$sub_type";
     }
 
     $element['listing'] = $this->entityTypeManager->getListBuilder('mailer_policy')
@@ -207,10 +207,11 @@ class MailerHelper implements MailerHelperInterface {
   public function formAlter(&$form, FormStateInterface $form_state, $form_id) {
     if (is_null($this->formAlter)) {
       $this->formAlter = [];
-      foreach ($this->builderManager->getDefinitions() as $id => $definition) {
-        foreach ($definition['form_alter'] as $ids => $alter) {
-          $alter += ['remove' => [], 'default' => []];
-          foreach (explode('|', $ids) as $id) {
+      foreach ($this->builderManager->getDefinitions() as $builder_id => $definition) {
+        foreach ($definition['form_alter'] as $match => $alter) {
+          $alter += ['remove' => [], 'default' => [], 'entity_sub_type' => NULL, 'type' => NULL];
+          $ids = ($match == '*') ? ["${builder_id}_edit_form", "${builder_id}_add_form"] : [$match];
+          foreach ($ids as $id) {
             // Merge existing values.
             $this->formAlter[$id] = NestedArray::mergeDeep($alter, $this->formAlter[$id] ?? []);
           }
@@ -232,13 +233,13 @@ class MailerHelper implements MailerHelperInterface {
       }
 
       // Add policy elements on entity forms.
-      if (!empty($alter['entity'])) {
-        $form['mailer_policy'] = $this->renderEntityPolicy($form_state->getFormObject()->getEntity(), $alter['entity']);
+      if ($sub_type = $alter['entity_sub_type']) {
+        $form['mailer_policy'] = $this->renderEntityPolicy($form_state->getFormObject()->getEntity(), $sub_type);
       }
 
       // Add policy elements on settings forms.
-      if (!empty($alter['type'])) {
-        $form['mailer_policy'] = $this->renderTypePolicy($alter['type']);
+      if ($type = $alter['type']) {
+        $form['mailer_policy'] = $this->renderTypePolicy($type);
       }
     }
   }

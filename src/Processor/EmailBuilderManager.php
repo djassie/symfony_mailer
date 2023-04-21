@@ -171,15 +171,8 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
-    if (!array_diff($names, ["core.extension", "symfony_mailer.settings"])) {
-      // Avoid an infinite loop.
-      return [];
-    }
-
     $this->buildCache();
-    $return = array_intersect_key($this->configOverrides, array_flip($names));
-    return $return;
-
+    return array_intersect_key($this->configOverrides, array_flip($names));
   }
 
   /**
@@ -218,6 +211,10 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
    */
   protected function buildCache() {
     if (!$this->builtCache) {
+      // Getting the definitions can cause reading of config which triggers
+      // `loadOverrides()` to call this function. Protect against an infinite
+      // loop by marking the cache as built before starting.
+      $this->builtCache = TRUE;
       foreach ($this->getDefinitions() as $id => $definition) {
         $this->configOverrides = array_merge($this->configOverrides, $definition['config_overrides']);
 
@@ -225,7 +222,6 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
           $this->overrideMapping[$override_id] = $id;
         }
       }
-      $this->builtCache = TRUE;
     }
   }
 

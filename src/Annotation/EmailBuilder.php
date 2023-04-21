@@ -116,12 +116,13 @@ class EmailBuilder extends Plugin {
   /**
    * Array of form alter information.
    *
-   * The array key is the form ID, or a list of IDs separated by '|'. The value
-   * is an array with the following allowed keys.
+   * The array key is the form ID, or '*' for the add/edit form of the
+   * corresponding config entity. The value is an array with the following
+   * allowed keys.
    * - remove: Array of fields to remove from the form.
    * - default: Array with key as the field name, and value as the field
    *   default value.
-   * - entity: Show entity policy for the specified sub-type.
+   * - entity_sub_type: Show entity policy for the specified sub-type.
    * - type: Show policy for the specified type.
    *
    * @var array

@@ -24,13 +24,13 @@ use Drupal\symfony_mailer\Entity\MailerPolicy;
  *   common_adjusters = {"email_subject", "email_from"},
  *   import = @Translation("Simplenews newsletter settings"),
  *   form_alter = {
- *     "simplenews_newsletter_edit_form|simplenews_newsletter_add_form" = {
+ *     "*" = {
  *       "remove" = {
  *         "email",
  *         "simplenews_sender_information",
  *         "simplenews_subject"
  *       },
- *       "entity" = "node",
+ *       "entity_sub_type" = "node",
  *     },
  *   },
  * )

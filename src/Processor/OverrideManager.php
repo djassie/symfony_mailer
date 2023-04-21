@@ -165,7 +165,7 @@ class OverrideManager implements OverrideManagerInterface {
     // Get all definitions, ignoring the current enabled status.
     $this->forceEnabled = TRUE;
     $definitions = $this->builderManager->findDefinitions();
-    asort($definitions);
+    ksort($definitions);
     $this->forceEnabled = FALSE;
 
     foreach ($definitions as $id => $definition) {
