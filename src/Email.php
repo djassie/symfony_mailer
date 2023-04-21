@@ -509,6 +509,7 @@ class Email implements InternalEmailInterface {
     $this->langcode = $langcode;
     $this->account = $account;
     $this->phase = self::PHASE_PRE_RENDER;
+    return $this;
   }
 
   /**
