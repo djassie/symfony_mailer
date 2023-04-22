@@ -29,7 +29,7 @@ class OverrideTest extends SymfonyMailerTestBase {
    *
    * @var array
    */
-  protected static $modules = ['contact', 'user', 'symfony_mailer_bc'];
+  protected static $modules = ['contact', 'user'];
 
   /**
    * Test sending a test email.

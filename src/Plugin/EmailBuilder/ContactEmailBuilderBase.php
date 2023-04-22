@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
+namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
 
 use Drupal\Core\Url;
 use Drupal\symfony_mailer\EmailInterface;
@@ -23,7 +23,7 @@ class ContactEmailBuilderBase extends EmailBuilderBase {
     $contact_message = $email->getParam('contact_message');
 
     $email->setBodyEntity($contact_message, 'mail')
-      ->addLibrary('symfony_mailer_bc/contact')
+      ->addLibrary('symfony_mailer/contact')
       ->setVariable('subject', $contact_message->getSubject())
       ->setVariable('site_name', $this->helper()->config()->get('system.site')->get('name'))
       ->setVariable('sender_name', $sender->getDisplayName())

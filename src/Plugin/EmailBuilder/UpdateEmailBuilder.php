@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
+namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
 
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;

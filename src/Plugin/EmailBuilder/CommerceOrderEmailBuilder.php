@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\symfony_mailer_bc\Plugin\EmailBuilder;
+namespace Drupal\symfony_mailer\Plugin\EmailBuilder;
 
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderType;
@@ -85,7 +85,7 @@ class CommerceOrderEmailBuilder extends EmailBuilderBase {
     $email->setTo($to)
       ->setBodyEntity($order, 'email')
       ->setFrom($store->getEmail())
-      ->addLibrary('symfony_mailer_bc/commerce_order')
+      ->addLibrary('symfony_mailer/commerce_order')
       ->setVariable('order_number', $order->getOrderNumber())
       ->setVariable('store', $store->getName());
   }
