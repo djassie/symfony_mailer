@@ -52,11 +52,12 @@ interface OverrideManagerInterface {
    * @return array
    *   Array keyed by plugin ID with values as an array with these keys:
    *   - name: Human-readable name for this override.
-   *   - import_warning: Human-readable warning for this override.
+   *   - warning: Human-readable warning for this override.
    *   - state: State, one of the STATE_ constants.
    *   - state_name: Human-readable name for the state.
    *   - import: Human-readable description of the import operation.
    *   - import_warning: Human-readable warning for the import operation.
+   *   - action_names: Array of human-readable action names.
    */
   public function getInfo(string $filterId = NULL);
 

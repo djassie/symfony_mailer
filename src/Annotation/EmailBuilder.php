@@ -66,6 +66,13 @@ class EmailBuilder extends Plugin {
   public $has_entity = FALSE;
 
   /**
+   * Array of common adjuster IDs.
+   *
+   * @var string[]
+   */
+  public $common_adjusters = [];
+
+  /**
    * Information about overriding emails for another module.
    *
    * The value is an array of email IDs to override. The annotation may set the
@@ -84,11 +91,14 @@ class EmailBuilder extends Plugin {
   public $override_warning = '';
 
   /**
-   * Array of common adjuster IDs.
+   * Array of config IDs to load when the override is enabled.
    *
-   * @var string[]
+   * Matching mailer policy is included automatically so should not be listed
+   * here.
+   *
+   * @var array
    */
-  public $common_adjusters = [];
+  public $override_config = [];
 
   /**
    * Human-readable name of config to import.

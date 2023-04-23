@@ -24,6 +24,10 @@ use Drupal\symfony_mailer\Processor\EmailBuilderBase;
  *   has_entity = TRUE,
  *   override = {"commerce.order_receipt"},
  *   override_warning = @Translation("Experimental, may change"),
+ *   override_config = {
+ *     "core.entity_view_mode.commerce_order.email",
+ *     "core.entity_view_display.commerce_order.default.email",
+ *   },
  *   common_adjusters = {"email_subject", "email_body", "email_bcc"},
  *   import = @Translation("Order type settings"),
  *   form_alter = {
