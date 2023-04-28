@@ -40,6 +40,13 @@ function symfony_mailer_theme_suggestions_email(array $variables) {
 }
 
 /**
+ * Implements hook_theme_suggestions_HOOK() for email_wrap.
+ */
+function symfony_mailer_theme_suggestions_email_wrap(array $variables) {
+  return array_slice($variables['email']->getSuggestions('email_wrap', '__'), 1);
+}
+
+/**
  * Implements hook_mailer_builder_info_alter().
  */
 function symfony_mailer_mailer_builder_info_alter(array &$email_builders) {
