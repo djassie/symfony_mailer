@@ -499,6 +499,7 @@ class Email implements InternalEmailInterface {
   public function initDone() {
     $this->valid(self::PHASE_INIT, self::PHASE_INIT);
     $this->phase = self::PHASE_BUILD;
+    return $this;
   }
 
   /**

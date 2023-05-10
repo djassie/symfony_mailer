@@ -103,7 +103,7 @@ class MailerHelper implements MailerHelperInterface {
       // Code copied from \Symfony\Component\Mime\Address::create().
       if (strpos($part, '<')) {
         if (!preg_match(self::FROM_STRING_PATTERN, $part, $matches)) {
-          throw new InvalidArgumentException("Could not parse $part as an address.");
+          throw new \InvalidArgumentException("Could not parse $part as an address.");
         }
         $addresses[] = new Address($matches['addrSpec'], trim($matches['displayName'], ' \'"'), $langcode);
       }
