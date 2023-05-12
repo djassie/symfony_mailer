@@ -2,10 +2,7 @@
 
 namespace Drupal\symfony_mailer\Processor;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Config\ConfigFactoryOverrideInterface;
-use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -14,7 +11,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 /**
  * Provides the email builder plugin manager.
  */
-class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderManagerInterface, ConfigFactoryOverrideInterface {
+class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderManagerInterface {
 
   use StringTranslationTrait;
 
@@ -40,15 +37,6 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
    * @var string[]
    */
   protected $overrideMapping = [];
-
-  /**
-   * Array of config overrides.
-   *
-   * As required by ConfigFactoryOverrideInterface::loadOverrides().
-   *
-   * @var array
-   */
-  protected $configOverrides = [];
 
   /**
    * Constructs the EmailBuilderManager object.
@@ -169,35 +157,6 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
 
   /**
    * {@inheritdoc}
-   */
-  public function loadOverrides($names) {
-    $this->buildCache();
-    return array_intersect_key($this->configOverrides, array_flip($names));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheSuffix() {
-    return 'MailerBcConfigOverride';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheableMetadata($name) {
-    return new CacheableMetadata();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
    *
    * Expose findDefinitions() as public, for internal use only.
    */
@@ -211,17 +170,12 @@ class EmailBuilderManager extends DefaultPluginManager implements EmailBuilderMa
    */
   protected function buildCache() {
     if (!$this->builtCache) {
-      // Getting the definitions can cause reading of config which triggers
-      // `loadOverrides()` to call this function. Protect against an infinite
-      // loop by marking the cache as built before starting.
-      $this->builtCache = TRUE;
       foreach ($this->getDefinitions() as $id => $definition) {
-        $this->configOverrides = array_merge($this->configOverrides, $definition['config_overrides']);
-
         foreach ($definition['override'] as $override_id) {
           $this->overrideMapping[$override_id] = $id;
         }
       }
+      $this->builtCache = TRUE;
     }
   }
 

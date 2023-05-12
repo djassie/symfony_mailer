@@ -9,8 +9,6 @@ services:
     class: Drupal\symfony_mailer\Processor\EmailBuilderManager
     arguments: ['@entity_type.manager']
     parent: default_plugin_manager
-    tags:
-      - {name: config.factory.override}
   plugin.manager.email_adjuster:
     class: Drupal\symfony_mailer\Processor\EmailAdjusterManager
     parent: default_plugin_manager
@@ -30,3 +28,7 @@ services:
     class: Drupal\symfony_mailer\TransportFactoryManager
     tags:
       - { name: service_collector, tag: mailer.transport_factory, call: addFactory }
+  symfony_mailer.config_override:
+    class: Drupal\symfony_mailer\Processor\MailerConfigOverride
+    tags:
+      - {name: config.factory.override}
