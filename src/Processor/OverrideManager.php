@@ -151,8 +151,6 @@ class OverrideManager implements OverrideManagerInterface {
       'enable' => $this->t('Related Mailer Policy will be reset to default values.'),
       'import' => $this->t('Importing overwrites existing policy.'),
     ];
-
-    $this->policyConfigPrefix = $this->entityTypeManager->getDefinition('mailer_policy')->getConfigPrefix();
   }
 
   /**
@@ -278,7 +276,7 @@ class OverrideManager implements OverrideManagerInterface {
     $this->builderManager->clearCachedDefinitions();
 
     // Find the config names to set or delete.
-    $config_names = $this->overrideStorage->listAll($this->policyConfigPrefix . ".$id");
+    $config_names = $this->overrideStorage->listAll($this->getPolicyConfigPrefix() . ".$id");
     $definition = $this->getBuilderDefinitions($id);
     $config_names = array_merge($config_names, $definition['override_config']);
 
@@ -297,6 +295,21 @@ class OverrideManager implements OverrideManagerInterface {
         $this->builderManager->createInstance($id)->import();
       }
     }
+  }
+
+  /**
+   * Gets the config prefix for the mailer_policy entity type.
+   *
+   * @return string
+   *   The config prefix.
+   */
+  protected function getPolicyConfigPrefix() {
+    if (!$this->policyConfigPrefix) {
+      // Don't calculate this in the constructor as the entity types may not
+      // have loaded yet.
+      $this->policyConfigPrefix = $this->entityTypeManager->getDefinition('mailer_policy')->getConfigPrefix();
+    }
+    return $this->policyConfigPrefix;
   }
 
   /**
