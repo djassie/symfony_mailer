@@ -172,11 +172,7 @@ class OverrideManager implements OverrideManagerInterface {
         'state_name' => '',
         'import' => '',
         'import_warning' => '',
-        'action_names' => [
-          'import' => $this->actionName[self::ALL_OVERRIDES]['import'],
-          'enable' => $this->actionName[self::ALL_OVERRIDES]['enable'],
-          'disable' => $this->actionName[self::ALL_OVERRIDES]['disable'],
-        ],
+        'action_names' => $this->actionName[self::ALL_OVERRIDES],
       ];
     }
 
@@ -196,6 +192,20 @@ class OverrideManager implements OverrideManagerInterface {
           $save = TRUE;
         }
         $state = $settings[$id];
+        $action_names = $this->actionName[$state];
+        if ($proxy) {
+          unset($action_names['enable']);
+          unset($action_names['disable']);
+        }
+        if (!$definition['import']) {
+          unset($action_names['import']);
+        }
+        if ($definition['import_warning']) {
+          // Move import to the end.
+          $import = $action_names['import'];
+          unset($action_names['import']);
+          $action_names['import'] = $import;
+        }
 
         $info[$id] = [
           'name' => $definition['label'],
@@ -204,11 +214,7 @@ class OverrideManager implements OverrideManagerInterface {
           'state_name' => $this->stateName[$state],
           'import' => $definition['import'],
           'import_warning' => $definition['import_warning'],
-          'action_names' => [
-            'import' => empty($definition['import']) ? FALSE : $this->actionName[$state]['import'],
-            'enable' => $proxy ? FALSE : $this->actionName[$state]['enable'],
-            'disable' => $proxy ? FALSE : $this->actionName[$state]['disable'],
-          ],
+          'action_names' => $action_names,
         ];
       }
     }
