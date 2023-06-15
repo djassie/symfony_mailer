@@ -30,5 +30,6 @@ services:
       - { name: service_collector, tag: mailer.transport_factory, call: addFactory }
   symfony_mailer.config_override:
     class: Drupal\symfony_mailer\Processor\MailerConfigOverride
+    arguments: ['@module_handler', '@plugin.manager.email_builder']
     tags:
       - {name: config.factory.override}

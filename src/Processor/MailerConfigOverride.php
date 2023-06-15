@@ -5,6 +5,7 @@ namespace Drupal\symfony_mailer\Processor;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Symfony Mailer configuration override.
@@ -28,14 +29,36 @@ class MailerConfigOverride implements ConfigFactoryOverrideInterface {
   protected $configOverrides = [];
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * The email builder manager.
+   *
+   * @var \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface
+   */
+  protected $builderManager;
+
+  /**
+   * Constructs the MailerConfigOverride object.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
+   * @param \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface $email_builder_manager
+   *   The email builder manager.
+   */
+  public function __construct(ModuleHandlerInterface $module_handler, EmailBuilderManagerInterface $email_builder_manager) {
+    $this->moduleHandler = $module_handler;
+    $this->builderManager = $email_builder_manager;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
-    if (!array_diff($names, ["core.extension", "symfony_mailer.settings"])) {
-      // Avoid an infinite loop.
-      return [];
-    }
-
     $this->buildCache();
     return array_intersect_key($this->configOverrides, array_flip($names));
   }
@@ -65,17 +88,13 @@ class MailerConfigOverride implements ConfigFactoryOverrideInterface {
    * Build cache of config overrides.
    */
   protected function buildCache() {
-    if (!$this->builtCache) {
+    if (!$this->builtCache && $this->moduleHandler->isLoaded()) {
       // Getting the definitions can cause reading of config which triggers
       // `loadOverrides()` to call this function. Protect against an infinite
       // loop by marking the cache as built before starting.
       $this->builtCache = TRUE;
 
-      // We cannot use dependency injection because that creates a circular
-      // dependency.
-      $builder_manager = \Drupal::service('plugin.manager.email_builder');
-
-      foreach ($builder_manager->getDefinitions() as $definition) {
+      foreach ($this->builderManager->getDefinitions() as $definition) {
         $this->configOverrides = array_merge($this->configOverrides, $definition['config_overrides']);
       }
     }
