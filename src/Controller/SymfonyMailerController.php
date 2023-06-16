@@ -69,6 +69,20 @@ class SymfonyMailerController extends ControllerBase {
       $info[OverrideManagerInterface::ALL_OVERRIDES] = $this->overrideManager->getInfo(OverrideManagerInterface::ALL_OVERRIDES);
     }
 
+    // Show a warning for unsupported combinations, fixed in v2.
+    // @see https://www.drupal.org/project/symfony_mailer/issues/3366091
+    $unsupported = [
+      'simplenews' => 'simplenews_newsletter',
+      'contact' => 'contact_form',
+    ];
+    foreach ($unsupported as $a => $b) {
+      if (isset($info[$a]['state']) && isset($info[$b]['state'])) {
+        if (($info[$a]['state'] != OverrideManagerInterface::STATE_DISABLED) && ($info[$b]['state'] == OverrideManagerInterface::STATE_DISABLED)) {
+          $this->messenger()->addError($this->t('Enabling %a but not %b is not supported', ['%a' => $info[$a]['name'], '%b' => $info[$b]['name']]));
+        }
+      }
+    }
+
     $build = [
       '#type' => 'table',
       '#header' => [
