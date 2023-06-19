@@ -123,6 +123,7 @@ function symfony_mailer_preprocess_commerce_order(&$variables) {
 function template_preprocess_email(array &$variables) {
   $email = $variables['email'];
   $variables['body'] = $email->getBody();
+  $variables['subject'] = $email->getSubject();
   $variables = array_merge($variables, $email->getVariables());
 }
 
@@ -139,6 +140,7 @@ function template_preprocess_email(array &$variables) {
  */
 function template_preprocess_email_wrap(array &$variables) {
   $email = $variables['email'];
+  $variables['subject'] = $email->getSubject();
   $variables['type'] = $email->getType();
   $variables['sub_type'] = $email->getSubType();
   $variables['attributes'] = new Attribute();
