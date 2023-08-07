@@ -90,7 +90,10 @@ class MailerConfigOverride implements ConfigFactoryOverrideInterface {
       $builderManager = \Drupal::service('plugin.manager.email_builder');
 
       foreach ($builderManager->getDefinitions() as $definition) {
-        $this->configOverrides = array_merge($this->configOverrides, $definition['config_overrides']);
+        // During upgrade to 1.3.x, this function can get called before the
+        // updated annotation that sets 'config_overrides' to [] has been read.
+        // Add in defaulting here.
+        $this->configOverrides = array_merge($this->configOverrides, $definition['config_overrides'] ?? []);
       }
     }
   }
