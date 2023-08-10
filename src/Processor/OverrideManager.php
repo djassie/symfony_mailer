@@ -157,7 +157,7 @@ class OverrideManager implements OverrideManagerInterface {
    * {@inheritdoc}
    */
   public function isEnabled(string $id) {
-    $state = $this->configFactory->get('symfony_mailer.settings')->get("override.$id", self::STATE_DISABLED);
+    $state = $this->configFactory->get('symfony_mailer.settings')->get("override.$id") ?: self::STATE_DISABLED;
     return $this->forceEnabled || ($state != self::STATE_DISABLED);
   }
 
