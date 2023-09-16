@@ -96,6 +96,7 @@ function symfony_mailer_update_10002() {
   $values = [
     'format' => 'email_html',
     'name' => 'Email HTML',
+    'weight' => 10,
   ];
 
   FilterFormat::create($values)->save();
