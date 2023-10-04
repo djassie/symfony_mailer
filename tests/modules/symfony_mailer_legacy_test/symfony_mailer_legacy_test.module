@@ -14,6 +14,7 @@ function symfony_mailer_legacy_test_mail($key, &$message, $params) {
     $message['body'][] = 'This email is sent via hook_mail().';
     $message['body'][] = symfony_mailer_legacy_test_add_template_to_body();
     $message['headers']['Cc'] = 'cc@example.com';
+    $message['headers']['bcc'] = 'bcc@example.com';
   }
 }
 
