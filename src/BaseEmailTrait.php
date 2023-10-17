@@ -60,8 +60,20 @@ trait BaseEmailTrait {
     if ($name == 'to') {
       $this->valid(self::PHASE_BUILD);
     }
-    $this->addresses[$name] = Address::convert($addresses);
+
+    // Either erasing all addresses or updating them for the specified header.
+    $this->addresses[$name] = is_null($addresses) ? [] : Address::convert($addresses);
+
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAddress(string $name): array {
+    $name = strtolower($name);
+    assert(isset($this->addresses[$name]));
+    return $this->addresses[$name] ?? [];
   }
 
   /**
