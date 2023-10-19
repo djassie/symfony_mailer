@@ -95,7 +95,7 @@ class SymfonyMailerKernelTest extends KernelTestBase {
     ];
 
     // Generate a different sets of headers/values.
-    foreach (['cc', 'bcc', 'reply-to'] as $name)  {
+    foreach (['cc', 'bcc', 'reply-to'] as $name) {
 
       // Tests header erasing.
       $data[] = [

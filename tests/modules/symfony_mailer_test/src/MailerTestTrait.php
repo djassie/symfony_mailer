@@ -150,6 +150,7 @@ trait MailerTestTrait {
     $this->assertAddress('bcc', new Address($email, $display_name));
     return $this;
   }
+
   /**
    * Checks 'reply-to' address of the most recently sent email.
    *
