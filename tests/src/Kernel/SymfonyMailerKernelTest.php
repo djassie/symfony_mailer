@@ -78,7 +78,7 @@ class SymfonyMailerKernelTest extends KernelTestBase {
     $this->readMail();
     $this->assertNoError();
     // The inline CSS from inline.text-small.css should appear.
-    $this->assertBodyContains('<h4 class="text-small" style="padding-top: 3px; padding-bottom: 3px; text-align: center; background-color: #0678be; color: white; font-size: smaller; font-weight: bold;">');
+    $this->assertBodyContains('<h4 class="text-small" style="padding-top: 3px; padding-bottom: 3px; text-align: center; color: white; background-color: #0678be; font-size: smaller; font-weight: bold;">');
     // The imported CSS from inline.day.css should appear.
     $this->assertBodyContains('<span class="day" style="font-style: italic;">');
   }

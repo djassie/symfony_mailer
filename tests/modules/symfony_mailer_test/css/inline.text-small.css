@@ -1,4 +1,6 @@
-@import url('inline.day.css');
+/** @codingStandardsIgnoreStart **/
+@import 'inline.day.css';
+/** @codingStandardsIgnoreEnd **/
 
 h4.text-small {
   font-weight: bold;
