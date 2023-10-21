@@ -73,7 +73,7 @@ trait BaseEmailTrait {
   public function getAddress(string $name): array {
     $name = strtolower($name);
     assert(isset($this->addresses[$name]));
-    return $this->addresses[$name] ?? [];
+    return $this->addresses[$name];
   }
 
   /**
